@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Heart, Trash2 } from 'lucide-react'
 import useWishlistStore from '../../stores/wishlistStore'
 import AddToCartButton from '../../components/cart/AddToCartButton'
+import ModelKitImage from '../../components/shared/ModelKitImage'
 
 const WishlistPage = () => {
   const { products, loading, fetchWishlist, clearWishlist, removeFromWishlist } = useWishlistStore()
@@ -46,7 +47,13 @@ const WishlistPage = () => {
             {products.map((product) => (
               <div key={product._id} className="glass-card border-gundam-border/30 p-5 flex flex-col">
                 <div className="aspect-square rounded-xl bg-gundam-bg-tertiary border border-gundam-border/20 overflow-hidden flex items-center justify-center p-4">
-                  <img src={product.images?.[0]?.url} alt={product.name} className="w-full h-full object-contain" />
+                  <ModelKitImage
+                    src={product.images?.[0]?.url}
+                    alt={product.name}
+                    name={product.name}
+                    grade={product.grade}
+                    series={product.series}
+                  />
                 </div>
                 <div className="mt-5 flex-1">
                   <Link to={`/products/${product.slug}`} className="text-white font-orbitron text-lg uppercase tracking-tight hover:text-gundam-cyan">

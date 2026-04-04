@@ -4,7 +4,7 @@ const ApiResponse = require('../../shared/utils/ApiResponse');
 
 class TradeController {
   createListing = asyncHandler(async (req, res) => {
-    const listing = await tradeService.createListing(req.body, req.user._id);
+    const listing = await tradeService.createListing(req.body, req.user._id, req.files || []);
     res.status(201).json(ApiResponse.created(listing, 'Trade listing created successfully'));
   });
 
@@ -36,7 +36,7 @@ class TradeController {
   });
 
   createOffer = asyncHandler(async (req, res) => {
-    const offer = await tradeService.createOffer(req.params.id, req.body, req.user._id);
+    const offer = await tradeService.createOffer(req.params.id, req.body, req.user._id, req.files || []);
     res.status(201).json(ApiResponse.created(offer, 'Offer sent successfully'));
   });
 

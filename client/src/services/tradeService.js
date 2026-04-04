@@ -21,7 +21,10 @@ const tradeService = {
    * Create new trade listing
    */
   createListing: async (listingData) => {
-    const response = await api.post('/trades', listingData)
+    const config = listingData instanceof FormData
+      ? { headers: { 'Content-Type': 'multipart/form-data' } }
+      : undefined
+    const response = await api.post('/trades', listingData, config)
     return response.data.data
   },
 
@@ -29,7 +32,10 @@ const tradeService = {
    * Submit an offer for a listing
    */
   createOffer: async (listingId, offerData) => {
-    const response = await api.post(`/trades/${listingId}/offers`, offerData)
+    const config = offerData instanceof FormData
+      ? { headers: { 'Content-Type': 'multipart/form-data' } }
+      : undefined
+    const response = await api.post(`/trades/${listingId}/offers`, offerData, config)
     return response.data.data
   },
 

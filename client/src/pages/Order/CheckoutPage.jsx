@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { FiPackage, FiTruck, FiCreditCard, FiCheckCircle, FiChevronRight } from 'react-icons/fi';
 import useCartStore from '../../stores/cartStore';
 import useOrderStore from '../../stores/orderStore';
+import ModelKitImage from '../../components/shared/ModelKitImage';
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -174,7 +175,13 @@ const CheckoutPage = () => {
                 {items.map((item) => (
                   <div key={item.product?._id} className="flex gap-4 items-center border-b border-white/5 pb-4">
                     <div className="w-12 h-12 bg-black/40 rounded border border-white/5 overflow-hidden flex-shrink-0">
-                      <img src={item.product?.images?.[0]?.url} className="w-full h-full object-contain" />
+                      <ModelKitImage
+                        src={item.product?.images?.[0]?.url}
+                        alt={item.product?.name}
+                        name={item.product?.name}
+                        grade={item.product?.grade}
+                        series={item.product?.series}
+                      />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-[10px] font-bold text-cyan-400 uppercase truncate">{item.product?.name}</p>

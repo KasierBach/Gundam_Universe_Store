@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useSearchParams } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import chatService from '../../services/chatService';
 import { initiateSocketConnection, disconnectSocket, joinConversation, leaveConversation } from '../../utils/socket';
 import useAuthStore from '../../stores/authStore';
@@ -13,6 +14,7 @@ const ChatConsole = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
+  const [showConversationList, setShowConversationList] = useState(true);
   const scrollRef = useRef(null);
   const socketRef = useRef(null);
   const getCounterparty = (conversation) => conversation?.participants?.find((participant) => participant._id !== user?._id) || conversation?.participants?.[0];
@@ -56,6 +58,7 @@ const ChatConsole = () => {
 
     if (matchedConversation) {
       setActiveChat(matchedConversation);
+      setShowConversationList(false);
     } else if (!requestedConversationId && conversations.length > 0) {
       setActiveChat((current) => current || conversations[0]);
     }
@@ -108,10 +111,10 @@ const ChatConsole = () => {
   };
 
   return (
-    <div className="pt-24 pb-4 px-4 max-w-7xl mx-auto h-screen flex flex-col">
-       <div className="flex-1 flex overflow-hidden border border-gundam-cyan/20 rounded-lg bg-gundam-dark-surface/50 backdrop-blur-xl">
+    <div className="pt-24 pb-4 px-4 max-w-7xl mx-auto min-h-[calc(100vh-6rem)] flex flex-col">
+       <div className="flex-1 flex min-h-[70vh] overflow-hidden border border-gundam-cyan/20 rounded-lg bg-gundam-dark-surface/50 backdrop-blur-xl">
           {/* Sidebar: Conversations */}
-          <div className="w-full md:w-80 border-r border-gundam-cyan/10 flex flex-col bg-black/40">
+          <div className={`${showConversationList || !activeChat ? 'flex' : 'hidden'} md:flex w-full md:w-80 md:min-w-80 border-r border-gundam-cyan/10 flex-col bg-black/40`}>
              <div className="p-6 border-b border-gundam-cyan/10">
                 <h2 className="text-xl font-orbitron text-gundam-cyan glow-text tracking-widest uppercase">Communication</h2>
                 <div className="text-[10px] text-gundam-text-secondary mt-1 uppercase font-orbitron tracking-tighter">Secure Link Established</div>
@@ -128,6 +131,7 @@ const ChatConsole = () => {
                     onClick={() => {
                       setActiveChat(conv);
                       setSearchParams({ conversation: conv._id });
+                      setShowConversationList(false);
                     }}
                     className={`p-4 border-b border-gundam-cyan/5 cursor-pointer hover:bg-gundam-cyan/5 transition-all ${activeChat?._id === conv._id ? 'bg-gundam-cyan/10 border-l-2 border-l-gundam-cyan' : ''}`}
                   >
@@ -150,19 +154,26 @@ const ChatConsole = () => {
           </div>
 
           {/* Main Chat Area */}
-          <div className="hidden md:flex flex-1 flex-col relative overflow-hidden bg-black/20">
+          <div className={`${showConversationList && activeChat ? 'hidden md:flex' : 'flex'} flex-1 flex-col relative overflow-hidden bg-black/20`}>
              {activeChat ? (
                 <>
                    {/* Chat Header */}
-                   <div className="p-4 border-b border-gundam-cyan/10 flex justify-between items-center bg-black/60 z-10">
+                   <div className="p-4 border-b border-gundam-cyan/10 flex items-center justify-between gap-3 bg-black/60 z-10">
                       <div className="flex items-center gap-3">
+                         <button
+                           type="button"
+                           onClick={() => setShowConversationList(true)}
+                           className="md:hidden inline-flex items-center justify-center w-9 h-9 rounded border border-gundam-cyan/20 text-gundam-cyan hover:bg-gundam-cyan/10"
+                         >
+                           <ArrowLeft size={16} />
+                         </button>
                          <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]"></div>
-                         <span className="text-white font-orbitron uppercase tracking-widest">
+                         <span className="text-white font-orbitron uppercase tracking-widest text-sm sm:text-base">
                            {getCounterparty(activeChat)?.displayName || 'Unknown Pilot'}
                          </span>
                       </div>
                       <div className="flex gap-4">
-                         <button className="text-gundam-cyan text-[10px] font-orbitron uppercase tracking-widest hover:text-white transition-colors">Terminate Mission</button>
+                         <button className="text-gundam-cyan text-[10px] font-orbitron uppercase tracking-widest hover:text-white transition-colors hidden sm:inline-flex">Terminate Mission</button>
                       </div>
                    </div>
 
@@ -175,7 +186,7 @@ const ChatConsole = () => {
                           key={msg._id} 
                           className={`flex ${msg.sender?._id === user?._id ? 'justify-end' : 'justify-start'}`}
                         >
-                           <div className={`max-w-[70%] ${msg.sender?._id === user?._id ? 'order-1' : 'order-2'}`}>
+                           <div className={`max-w-[88%] sm:max-w-[70%] ${msg.sender?._id === user?._id ? 'order-1' : 'order-2'}`}>
                               <div className={`p-4 ${msg.sender?._id === user?._id ? 'bg-gundam-cyan border-none text-black rounded-l-xl rounded-tr-xl' : 'bg-gundam-dark-surface border border-gundam-cyan/30 text-white rounded-r-xl rounded-tl-xl'} shadow-lg`}>
                                  <p className="text-sm leading-relaxed">{msg.text}</p>
                               </div>
@@ -190,7 +201,7 @@ const ChatConsole = () => {
 
                    {/* Input Area */}
                    <form onSubmit={handleSend} className="p-4 border-t border-gundam-cyan/10 bg-black/40">
-                      <div className="flex gap-3 relative">
+                      <div className="flex flex-col sm:flex-row gap-3 relative">
                          <input 
                             className="flex-1 bg-gundam-dark-surface border border-gundam-cyan/30 p-4 text-sm text-white focus:border-gundam-cyan outline-none transition-all rounded-lg"
                             placeholder="Input your message here..."
@@ -199,7 +210,7 @@ const ChatConsole = () => {
                          />
                          <button 
                             type="submit"
-                            className="px-8 bg-gundam-cyan text-black font-orbitron font-bold uppercase tracking-widest hover:bg-white transition-all rounded-lg shadow-[0_0_15px_rgba(0,243,255,0.3)]"
+                            className="px-8 py-4 sm:py-0 bg-gundam-cyan text-black font-orbitron font-bold uppercase tracking-widest hover:bg-white transition-all rounded-lg shadow-[0_0_15px_rgba(0,243,255,0.3)]"
                          >
                             Send
                          </button>

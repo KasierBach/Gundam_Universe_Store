@@ -11,6 +11,7 @@ const CreateTradePage = () => {
     wantedItems: '',
     condition: 'New (MISB)',
   });
+  const [imageFiles, setImageFiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -33,14 +34,21 @@ const CreateTradePage = () => {
     try {
       setLoading(true);
       setError(null);
-      
-      // In a real app, we'd handle image uploads here
-      // For the demo, we'll use a placeholder image
-      const submissionData = {
-        ...formData,
-        images: [{ url: 'https://images.unsplash.com/photo-1589118949245-7d48d24bc04b?q=80&w=600', publicId: 'trade_placeholder' }]
-      };
-      
+
+      if (imageFiles.length === 0) {
+        setError('Please attach at least one image for the trade listing.');
+        return;
+      }
+
+      const submissionData = new FormData();
+      submissionData.append('title', formData.title);
+      submissionData.append('description', formData.description);
+      submissionData.append('wantedItems', formData.wantedItems);
+      submissionData.append('condition', formData.condition);
+      imageFiles.forEach((file) => {
+        submissionData.append('images', file);
+      });
+
       await tradeService.createListing(submissionData);
       navigate('/trade');
     } catch (err) {
@@ -127,10 +135,26 @@ const CreateTradePage = () => {
 
           <div>
              <label className="block text-[10px] text-gundam-cyan font-orbitron uppercase mb-2 tracking-[0.2em]">Visual Confirmation (Images)</label>
-             <div className="h-32 border-2 border-dashed border-gundam-cyan/30 flex flex-col items-center justify-center text-gundam-text-secondary rounded cursor-pointer hover:bg-gundam-cyan/5 transition-all">
+             <label className="h-32 border-2 border-dashed border-gundam-cyan/30 flex flex-col items-center justify-center text-gundam-text-secondary rounded cursor-pointer hover:bg-gundam-cyan/5 transition-all">
                 <span className="text-xs uppercase tracking-widest font-orbitron mb-2">Upload Data Streams</span>
-                <span className="text-[10px] opacity-60">(Max 5 images / Placeholder enabled)</span>
-             </div>
+                <span className="text-[10px] opacity-60">(Max 5 images / Cloudinary upload)</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={(event) => setImageFiles(Array.from(event.target.files || []))}
+                />
+             </label>
+             {imageFiles.length > 0 && (
+               <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                 {imageFiles.map((file) => (
+                   <div key={`${file.name}-${file.size}`} className="rounded border border-gundam-cyan/20 bg-black/30 px-3 py-2 text-[10px] text-gundam-text-secondary truncate">
+                     {file.name}
+                   </div>
+                 ))}
+               </div>
+             )}
           </div>
         </div>
 

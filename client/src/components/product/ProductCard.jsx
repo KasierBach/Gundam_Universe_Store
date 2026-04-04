@@ -4,10 +4,12 @@ import { Eye } from 'lucide-react'
 import AddToCartButton from '../cart/AddToCartButton'
 import WishlistButton from '../wishlist/WishlistButton'
 import { cn } from '../../utils/cn'
+import ModelKitImage from '../shared/ModelKitImage'
 
 const ProductCard = ({ product }) => {
   const { name, slug, price, images, category, grade, series, rarity, condition } = product
-  const mainImage = images.find(img => img.isMain)?.url || images[0]?.url
+  const imageList = Array.isArray(images) ? images : []
+  const mainImage = imageList.find((img) => img.isMain)?.url || imageList[0]?.url
 
   return (
     <motion.div
@@ -31,10 +33,13 @@ const ProductCard = ({ product }) => {
       {/* Product Image */}
       <div className="relative aspect-square overflow-hidden bg-gundam-bg-tertiary">
         <Link to={`/products/${slug}`} className="block w-full h-full">
-          <img 
-            src={mainImage} 
-            alt={name} 
-            className="w-full h-full object-contain p-4 group-hover/card:scale-110 transition-transform duration-500"
+          <ModelKitImage
+            src={mainImage}
+            alt={name}
+            name={name}
+            grade={grade}
+            series={series}
+            imageClassName="p-4 group-hover/card:scale-110 transition-transform duration-500"
           />
         </Link>
         <div className="absolute inset-0 bg-gundam-bg-primary/20 opacity-0 group-hover/card:opacity-100 transition-opacity flex items-center justify-center gap-4 z-10">

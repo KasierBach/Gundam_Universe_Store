@@ -70,12 +70,12 @@ const SellerDashboardPage = () => {
                 <EmptySellerBlock text="No seller order feed available yet." />
               ) : dashboard.recentOrders.map((order) => (
                 <div key={order._id} className="rounded-xl border border-gundam-border/20 bg-black/20 p-5">
-                  <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                     <div>
                       <p className="text-white font-orbitron uppercase tracking-tight">{order.customer?.displayName || 'Unknown Pilot'}</p>
                       <p className="mt-1 text-gundam-text-muted text-xs uppercase tracking-widest">{order.customer?.email || 'No comm channel'}</p>
                     </div>
-                    <div className="text-right">
+                    <div className="text-left sm:text-right">
                       <span className="px-3 py-1 rounded border border-gundam-cyan/30 text-gundam-cyan text-[10px] font-orbitron uppercase tracking-widest">{order.status}</span>
                       <p className="mt-2 text-gundam-cyan font-orbitron">${(order.sellerRevenue || 0).toLocaleString()}</p>
                     </div>
@@ -89,7 +89,7 @@ const SellerDashboardPage = () => {
 
         <section className="glass-card border-gundam-border/30 p-6 mt-8">
           <h2 className="text-lg font-orbitron text-white uppercase tracking-widest mb-6">Inventory grid</h2>
-          <div className="overflow-x-auto">
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left">
               <thead>
                 <tr className="text-[10px] uppercase tracking-widest text-gundam-text-muted font-orbitron border-b border-gundam-border/20">
@@ -114,6 +114,24 @@ const SellerDashboardPage = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+
+          <div className="space-y-4 md:hidden">
+            {(dashboard?.products || []).map((product) => (
+              <div key={product._id} className="rounded-xl border border-gundam-border/20 bg-black/20 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-white font-orbitron uppercase tracking-tight">{product.name}</p>
+                    <p className="mt-1 text-xs text-gundam-text-muted">{product.category?.name || 'Unknown category'}</p>
+                  </div>
+                  <span className="px-3 py-1 rounded border border-gundam-cyan/20 text-gundam-cyan text-[10px] font-orbitron uppercase tracking-widest">{product.status}</span>
+                </div>
+                <div className="mt-4 flex items-center justify-between text-sm">
+                  <span className="text-gundam-text-secondary">Stock: {product.stock}</span>
+                  <span className="text-gundam-cyan font-orbitron">${product.price.toLocaleString()}</span>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
       </div>

@@ -18,6 +18,7 @@ const TradeDetailPage = () => {
   
   // Offer Form State
   const [offerDescription, setOfferDescription] = useState('');
+  const [offerImageFiles, setOfferImageFiles] = useState([]);
   const [submittingOffer, setSubmittingOffer] = useState(false);
   const [processingOfferId, setProcessingOfferId] = useState(null);
   const [reportReason, setReportReason] = useState('');
@@ -52,12 +53,21 @@ const TradeDetailPage = () => {
     if (!offerDescription.trim()) return;
     try {
       setSubmittingOffer(true);
-      const offerData = {
-        offeredItemsDescription: offerDescription,
-        images: [{ url: 'https://images.unsplash.com/photo-1589118949245-7d48d24bc04b?q=80&w=250', publicId: 'offer_placeholder' }]
-      };
+      if (offerImageFiles.length === 0) {
+        alert('Please attach at least one image for your offer.');
+        return;
+      }
+
+      const offerData = new FormData();
+      offerData.append('offeredItemsDescription', offerDescription);
+      offerImageFiles.forEach((file) => {
+        offerData.append('images', file);
+      });
+
       const createdOffer = await tradeService.createOffer(id, offerData);
       setShowOfferModal(false);
+      setOfferDescription('');
+      setOfferImageFiles([]);
       navigate(createdOffer?.conversationId ? `/chat?conversation=${createdOffer.conversationId}` : '/chat');
     } catch (err) {
       alert('Offer transmission failed. Check connection.');
@@ -136,7 +146,7 @@ const TradeDetailPage = () => {
             {/* Tech Scan Effect overlay */}
             <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(0,243,255,0.05)_1px,transparent_1px)] bg-[size:100%_4px] opacity-20" />
           </div>
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {(listing.images || []).map((img, idx) => (
               <div key={idx} className="aspect-square border border-gundam-cyan/20 rounded cursor-pointer hover:border-gundam-cyan transition-all overflow-hidden bg-gundam-dark-surface p-1">
                 <img src={img.url} alt={`${listing.title}-${idx + 1}`} className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all" />
@@ -160,7 +170,7 @@ const TradeDetailPage = () => {
             <h1 className="text-3xl md:text-5xl font-orbitron text-white glow-text uppercase tracking-tighter leading-none mb-4">
               {listing.title}
             </h1>
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-4">
                <span className="bg-gundam-cyan/5 border border-gundam-cyan/40 text-gundam-cyan px-4 py-1 text-[10px] font-bold uppercase tracking-widest font-orbitron">
                   Cond: {listing.condition}
                </span>
@@ -183,7 +193,7 @@ const TradeDetailPage = () => {
           </div>
 
           {/* Action Area */}
-          <div className="flex flex-col sm:flex-row gap-4 pt-6">
+          <div className="flex flex-col xl:flex-row gap-4 pt-6">
              {isOwner ? (
                 <div className="w-full p-4 border border-gundam-cyan/30 bg-gundam-cyan/5 rounded font-orbitron text-xs text-gundam-cyan text-center uppercase tracking-widest italic animate-pulse">
                   System Awaiting Incoming Proposals...
@@ -197,12 +207,12 @@ const TradeDetailPage = () => {
                  >
                    {listing.status === 'open' ? 'Initiate Proposal' : 'Sector Closed'}
                  </button>
-                 <button className="px-8 py-4 bg-transparent border-2 border-gundam-cyan/40 text-gundam-cyan font-orbitron font-bold uppercase tracking-widest hover:bg-gundam-cyan/10 transition-all">
+                 <button className="w-full xl:w-auto px-8 py-4 bg-transparent border-2 border-gundam-cyan/40 text-gundam-cyan font-orbitron font-bold uppercase tracking-widest hover:bg-gundam-cyan/10 transition-all">
                    Save Map
                  </button>
                  <button
                   onClick={() => setShowReportModal(true)}
-                  className="px-8 py-4 bg-transparent border-2 border-gundam-red/40 text-gundam-red font-orbitron font-bold uppercase tracking-widest hover:bg-gundam-red/10 transition-all"
+                  className="w-full xl:w-auto px-8 py-4 bg-transparent border-2 border-gundam-red/40 text-gundam-red font-orbitron font-bold uppercase tracking-widest hover:bg-gundam-red/10 transition-all"
                  >
                    Report Listing
                  </button>
@@ -211,7 +221,7 @@ const TradeDetailPage = () => {
           </div>
 
           {/* Owner Identity */}
-          <div className="pt-8 mt-8 border-t border-gundam-cyan/10 flex items-center justify-between">
+          <div className="pt-8 mt-8 border-t border-gundam-cyan/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
              <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded bg-gundam-dark-surface border border-gundam-cyan/30 flex items-center justify-center font-orbitron text-gundam-cyan text-xl shadow-inner shadow-black">
                   {listing.owner?.displayName?.[0] || '?'}
@@ -225,7 +235,7 @@ const TradeDetailPage = () => {
                 </div>
              </div>
              {listing.owner.address?.city && (
-               <div className="text-right">
+               <div className="text-left sm:text-right">
                   <span className="block text-[9px] text-gundam-text-muted font-orbitron uppercase">Sector Lock</span>
                   <span className="text-white text-[10px] font-orbitron">{listing.owner.address.city}</span>
                </div>
@@ -241,7 +251,7 @@ const TradeDetailPage = () => {
           animate={{ opacity: 1, y: 0 }}
           className="mt-24 border-t border-gundam-cyan/20 pt-12"
         >
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div>
               <h2 className="text-2xl font-orbitron text-white uppercase tracking-widest">Received Signal Stream</h2>
               <p className="text-gundam-cyan text-[10px] font-orbitron uppercase mt-1 tracking-[0.2em] opacity-70">Monitor incoming trade proposals from other pilots</p>
@@ -264,11 +274,11 @@ const TradeDetailPage = () => {
                   className={`p-6 border ${offer.status === 'accepted' ? 'border-gundam-emerald bg-gundam-emerald/5' : 'border-gundam-cyan/20 bg-gundam-dark-surface/50'} rounded-lg relative transition-all group`}
                 >
                   <div className="flex justify-between items-start mb-4">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
                        <div className="w-8 h-8 rounded bg-black flex items-center justify-center font-orbitron text-gundam-cyan text-[10px] border border-gundam-cyan/20">
                           {offer.offerer?.displayName?.[0] || '?'}
                        </div>
-                       <span className="text-white font-orbitron text-[11px] uppercase tracking-wider">{offer.offerer?.displayName || 'Unknown Pilot'}</span>
+                       <span className="text-white font-orbitron text-[11px] uppercase tracking-wider truncate">{offer.offerer?.displayName || 'Unknown Pilot'}</span>
                     </div>
                     <span className={`text-[9px] font-orbitron px-2 py-0.5 rounded uppercase tracking-tighter ${
                       offer.status === 'accepted' ? 'text-gundam-emerald border border-gundam-emerald' : 
@@ -283,7 +293,7 @@ const TradeDetailPage = () => {
                     "{offer.offeredItemsDescription}"
                   </p>
 
-                  <div className="flex gap-2">
+                   <div className="flex flex-wrap gap-2">
                     {offer.status === 'pending' && (
                       <>
                         <button 
@@ -304,7 +314,7 @@ const TradeDetailPage = () => {
                     )}
                     <button 
                       onClick={() => navigate(offer.conversationId ? `/chat?conversation=${offer.conversationId}` : '/chat')}
-                      className="w-12 h-9 flex items-center justify-center bg-white/10 hover:bg-white/20 text-white rounded transition-all"
+                      className="w-full sm:w-12 h-9 flex items-center justify-center bg-white/10 hover:bg-white/20 text-white rounded transition-all"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clipRule="evenodd" />
@@ -331,14 +341,17 @@ const TradeDetailPage = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setShowOfferModal(false)}
+              onClick={() => {
+                setShowOfferModal(false)
+                setOfferImageFiles([])
+              }}
               className="absolute inset-0 bg-black/90 backdrop-blur-sm"
              />
              <motion.div
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="relative w-full max-w-xl bg-gundam-dark-surface border border-gundam-cyan p-8 rounded-lg shadow-[0_0_50px_rgba(0,243,255,0.2)]"
+              className="relative w-full max-w-xl bg-gundam-dark-surface border border-gundam-cyan p-5 sm:p-8 rounded-lg shadow-[0_0_50px_rgba(0,243,255,0.2)] max-h-[90vh] overflow-y-auto"
              >
                 <h2 className="text-2xl font-orbitron text-gundam-cyan mb-6 uppercase tracking-widest text-glow">Mission Proposal</h2>
                 <div className="space-y-6">
@@ -355,12 +368,28 @@ const TradeDetailPage = () => {
                    </div>
                    <div>
                       <label className="block text-[10px] text-gundam-cyan font-orbitron uppercase mb-2 tracking-widest opacity-80">Visual Evidence Payload</label>
-                      <div className="h-28 border-2 border-dashed border-gundam-cyan/30 flex flex-col items-center justify-center text-gundam-text-secondary rounded-lg cursor-pointer hover:bg-gundam-cyan/5 transition-all group">
+                      <label className="h-28 border-2 border-dashed border-gundam-cyan/30 flex flex-col items-center justify-center text-gundam-text-secondary rounded-lg cursor-pointer hover:bg-gundam-cyan/5 transition-all group">
                          <span className="text-[10px] font-orbitron uppercase opacity-60 group-hover:opacity-100 transition-opacity">Upload tactical photos</span>
-                         <span className="text-[9px] opacity-40 mt-1">(Demo Placeholder Enabled)</span>
-                      </div>
+                         <span className="text-[9px] opacity-40 mt-1">(Max 5 images / Cloudinary upload)</span>
+                         <input
+                           type="file"
+                           accept="image/*"
+                           multiple
+                           className="hidden"
+                           onChange={(event) => setOfferImageFiles(Array.from(event.target.files || []))}
+                         />
+                      </label>
+                      {offerImageFiles.length > 0 && (
+                        <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {offerImageFiles.map((file) => (
+                            <div key={`${file.name}-${file.size}`} className="rounded border border-gundam-cyan/20 bg-black/20 px-3 py-2 text-[10px] text-gundam-text-secondary truncate">
+                              {file.name}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                    </div>
-                   <div className="flex gap-4 pt-4">
+                   <div className="flex flex-col sm:flex-row gap-4 pt-4">
                       <button 
                         onClick={handleOfferSubmit}
                         disabled={submittingOffer || !offerDescription.trim()}
@@ -369,7 +398,10 @@ const TradeDetailPage = () => {
                         {submittingOffer ? 'TRANSMITTING...' : 'DISPATCH OFFER'}
                       </button>
                       <button 
-                        onClick={() => setShowOfferModal(false)}
+                        onClick={() => {
+                          setShowOfferModal(false)
+                          setOfferImageFiles([])
+                        }}
                         disabled={submittingOffer}
                         className="px-6 py-4 border border-gundam-red text-gundam-red font-orbitron font-bold uppercase tracking-widest hover:bg-gundam-red/10 transition-all disabled:opacity-50"
                       >
@@ -396,7 +428,7 @@ const TradeDetailPage = () => {
               initial={{ scale: 0.92, opacity: 0, y: 16 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.92, opacity: 0, y: 16 }}
-              className="relative w-full max-w-xl bg-gundam-dark-surface border border-gundam-red/50 p-8 rounded-lg shadow-[0_0_40px_rgba(239,68,68,0.18)]"
+              className="relative w-full max-w-xl bg-gundam-dark-surface border border-gundam-red/50 p-5 sm:p-8 rounded-lg shadow-[0_0_40px_rgba(239,68,68,0.18)] max-h-[90vh] overflow-y-auto"
             >
               <h2 className="text-2xl font-orbitron text-gundam-red mb-6 uppercase tracking-widest">Violation Report</h2>
               <div className="space-y-5">
@@ -419,7 +451,7 @@ const TradeDetailPage = () => {
                     placeholder="Describe the violation so moderation can investigate quickly."
                   />
                 </div>
-                <div className="flex gap-4 pt-2">
+                <div className="flex flex-col sm:flex-row gap-4 pt-2">
                   <button
                     onClick={handleSubmitReport}
                     disabled={submittingReport || !reportReason.trim() || !reportDetails.trim()}

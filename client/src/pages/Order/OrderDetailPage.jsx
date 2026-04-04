@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { CheckCircle2, ChevronRight, Clock3, Package, Truck } from 'lucide-react'
 import useOrderStore from '../../stores/orderStore'
+import ModelKitImage from '../../components/shared/ModelKitImage'
 
 const ORDER_STAGES = ['PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED']
 
@@ -85,7 +86,7 @@ const OrderDetailPage = () => {
                 {currentOrder.items.map((item, index) => (
                   <div key={`${item.product}-${index}`} className="flex flex-col sm:flex-row gap-4 border border-gundam-border/20 rounded-xl p-4 bg-black/20">
                     <div className="w-20 h-20 rounded-lg bg-gundam-bg-tertiary border border-gundam-border/20 overflow-hidden p-2 flex items-center justify-center">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-contain" />
+                      <ModelKitImage src={item.image} alt={item.name} name={item.name} grade={item.grade} series={item.series} />
                     </div>
                     <div className="flex-1">
                       <h3 className="text-white font-orbitron uppercase tracking-tight">{item.name}</h3>
@@ -93,7 +94,7 @@ const OrderDetailPage = () => {
                         {item.grade} | {item.series} | {item.condition}
                       </p>
                     </div>
-                    <div className="text-right">
+                    <div className="text-left sm:text-right">
                       <p className="text-gundam-text-muted text-[10px] uppercase tracking-widest">Qty {item.quantity}</p>
                       <p className="mt-2 text-gundam-cyan font-orbitron text-lg">${(item.price * item.quantity).toLocaleString()}</p>
                     </div>

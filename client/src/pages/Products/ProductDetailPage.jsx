@@ -8,6 +8,7 @@ import ProductCard from '../../components/product/ProductCard'
 import ReviewSection from '../../components/product/ReviewSection'
 import WishlistButton from '../../components/wishlist/WishlistButton'
 import { cn } from '../../utils/cn'
+import ModelKitImage from '../../components/shared/ModelKitImage'
 
 const ProductDetailPage = () => {
   const { slug } = useParams()
@@ -68,19 +69,27 @@ const ProductDetailPage = () => {
            <span className="text-gundam-cyan">{product.name}</span>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 xl:gap-20">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 xl:gap-20">
           {/* Left: Image Gallery */}
           <div className="space-y-6">
             <div className="relative aspect-square glass-card bg-gundam-bg-tertiary overflow-hidden border-gundam-border flex items-center justify-center group/main">
                <AnimatePresence mode="wait">
-                  <motion.img 
+                  <motion.div
                     key={selectedImage}
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 1.1 }}
-                    src={mainImages[selectedImage]?.url} 
-                    className="w-full h-full object-contain p-8"
-                  />
+                    className="w-full h-full"
+                  >
+                    <ModelKitImage
+                      src={mainImages[selectedImage]?.url}
+                      alt={product.name}
+                      name={product.name}
+                      grade={product.grade}
+                      series={product.series}
+                      imageClassName="p-8"
+                    />
+                  </motion.div>
                </AnimatePresence>
                <div className="absolute inset-0 hud-scanline opacity-10" />
                <div className="absolute bottom-4 left-4 font-orbitron text-[8px] tracking-[0.2em] text-gundam-cyan/40">
@@ -98,7 +107,7 @@ const ProductDetailPage = () => {
                     selectedImage === idx ? "border-gundam-cyan bg-gundam-cyan/10" : "border-gundam-border/30 hover:border-gundam-cyan/50"
                   )}
                 >
-                  <img src={img.url} className="w-full h-full object-contain" />
+                  <ModelKitImage src={img.url} alt={`${product.name}-${idx + 1}`} name={product.name} grade={product.grade} series={product.series} />
                 </button>
               ))}
             </div>
@@ -170,7 +179,7 @@ const ProductDetailPage = () => {
                <h3 className="font-orbitron font-bold text-sm tracking-widest mb-6 uppercase flex items-center gap-2">
                  <div className="w-2 h-2 bg-gundam-cyan animate-pulse" /> TECHNICAL SPECS
                </h3>
-               <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
                   <SpecItem label="Scale" value={product.specs.scale || 'N/A'} />
                   <SpecItem label="Material" value={product.specs.material || 'N/A'} />
                   <SpecItem label="Box Dimensions" value={product.specs.dimensions || 'N/A'} />
@@ -181,7 +190,7 @@ const ProductDetailPage = () => {
             </div>
 
             {/* Seller Info Placeholder */}
-            <div className="mt-12 pt-8 border-t border-gundam-border/30 flex items-center justify-between">
+            <div className="mt-12 pt-8 border-t border-gundam-border/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                    <div className="w-10 h-10 rounded-full bg-gundam-bg-tertiary flex items-center justify-center border border-gundam-border/50">
                       <User size={20} className="text-gundam-text-muted" />

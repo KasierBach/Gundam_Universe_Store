@@ -29,7 +29,10 @@ const productService = {
    * @param {Object} data 
    */
   createProduct: async (data) => {
-    const response = await api.post('/products', data);
+    const config = data instanceof FormData
+      ? { headers: { 'Content-Type': 'multipart/form-data' } }
+      : undefined
+    const response = await api.post('/products', data, config);
     return response.data.data;
   },
 
@@ -39,7 +42,10 @@ const productService = {
    * @param {Object} data 
    */
   updateProduct: async (id, data) => {
-    const response = await api.put(`/products/${id}`, data);
+    const config = data instanceof FormData
+      ? { headers: { 'Content-Type': 'multipart/form-data' } }
+      : undefined
+    const response = await api.put(`/products/${id}`, data, config);
     return response.data.data;
   },
 

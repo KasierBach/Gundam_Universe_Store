@@ -4,6 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Repeat, CheckCircle, ChevronRight, MessageSquare, AlertTriangle } from 'lucide-react';
 import tradeService from '../../services/tradeService';
 import useAuthStore from '../../stores/authStore';
+import ModelKitImage from '../../components/shared/ModelKitImage';
 
 const MyTradesPage = () => {
   const navigate = useNavigate();
@@ -119,10 +120,16 @@ const TradeItemCard = ({ item, subtitle }) => {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ scale: 1.005 }}
-      className="bg-gundam-dark-surface/40 border border-gundam-cyan/10 hover:border-gundam-cyan/40 p-4 rounded-lg flex items-center gap-6 group transition-all"
+      className="bg-gundam-dark-surface/40 border border-gundam-cyan/10 hover:border-gundam-cyan/40 p-4 rounded-lg flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 group transition-all"
     >
       <div className="w-20 h-20 bg-black rounded border border-gundam-cyan/20 overflow-hidden flex-shrink-0 p-1">
-        <img src={item.images?.[0]?.url || 'https://images.unsplash.com/photo-1589118949245-7d48d24bc04b?q=80&w=600'} alt={item.title} className="w-full h-full object-contain grayscale group-hover:grayscale-0 transition-all duration-500" />
+        <ModelKitImage
+          src={item.images?.[0]?.url}
+          alt={item.title}
+          name={item.title}
+          series={item.wantedItems}
+          imageClassName="grayscale group-hover:grayscale-0 transition-all duration-500"
+        />
       </div>
       
       <div className="flex-1">
@@ -138,14 +145,14 @@ const TradeItemCard = ({ item, subtitle }) => {
         <p className="text-xs text-gundam-text-muted font-rajdhani line-clamp-1 italic px-0.5">{subtitle || `Searching for: ${item.wantedItems}`}</p>
       </div>
 
-      <div className="flex flex-col items-end gap-2 pr-4">
+      <div className="flex flex-col items-start sm:items-end gap-2 sm:pr-4">
          <span className="text-[10px] font-orbitron text-gundam-text-muted uppercase tracking-widest opacity-60">Created At</span>
          <span className="text-xs font-orbitron text-white tracking-widest opacity-80">{new Date(item.createdAt).toLocaleDateString()}</span>
       </div>
 
       <button 
         onClick={() => navigate(`/trade/${item._id}`)}
-        className="h-12 w-12 flex items-center justify-center bg-gundam-cyan/10 hover:bg-gundam-cyan text-gundam-cyan hover:text-black transition-all rounded"
+        className="h-12 w-full sm:w-12 flex items-center justify-center bg-gundam-cyan/10 hover:bg-gundam-cyan text-gundam-cyan hover:text-black transition-all rounded"
       >
         <ChevronRight size={20} />
       </button>

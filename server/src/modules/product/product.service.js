@@ -2,6 +2,7 @@ const productRepository = require('./product.repository');
 const BaseService = require('../../shared/base/BaseService');
 const ApiError = require('../../shared/utils/ApiError');
 const slugify = require('slugify');
+const { uploadFilesToCloudinary, destroyManagedAssets } = require('../../shared/utils/cloudinaryAsset');
 
 class ProductService extends BaseService {
   constructor() {
@@ -13,9 +14,12 @@ class ProductService extends BaseService {
    * @param {Object} data 
    * @param {string} sellerId 
    */
-  async create(data, sellerId) {
+  async create(data, sellerId, files = []) {
+    const images = await this._resolveProductImages(data.images, files);
+
     data.seller = sellerId;
     data.slug = this._generateSlug(data.name);
+    data.images = images;
     return this.repository.create(data);
   }
 
@@ -26,7 +30,7 @@ class ProductService extends BaseService {
    * @param {string} userId 
    * @param {string} role 
    */
-  async update(id, data, userId, role) {
+  async update(id, data, userId, role, files = []) {
     const product = await this.getById(id);
     if (!product) {
       throw ApiError.notFound('Product not found');
@@ -39,6 +43,14 @@ class ProductService extends BaseService {
 
     if (data.name && data.name !== product.name) {
       data.slug = this._generateSlug(data.name);
+    }
+
+    if (files.length > 0 || Array.isArray(data.images)) {
+      data.images = await this._resolveProductImages(data.images, files);
+
+      const incomingPublicIds = new Set((data.images || []).map((image) => image.publicId));
+      const staleImages = (product.images || []).filter((image) => !incomingPublicIds.has(image.publicId));
+      await destroyManagedAssets(staleImages);
     }
 
     return this.repository.update(id, data);
@@ -61,6 +73,7 @@ class ProductService extends BaseService {
       throw ApiError.forbidden('You are not authorized to delete this product');
     }
 
+    await destroyManagedAssets(product.images || []);
     return this.repository.delete(id);
   }
 
@@ -132,6 +145,27 @@ class ProductService extends BaseService {
    */
   _generateSlug(name) {
     return slugify(name, { lower: true, strict: true }) + '-' + Date.now();
+  }
+
+  async _resolveProductImages(existingImages = [], files = []) {
+    const normalizedImages = Array.isArray(existingImages) ? existingImages : [];
+    const uploadedImages = files.length > 0
+      ? await uploadFilesToCloudinary(files, {
+        folder: 'gundam-universe/products',
+      })
+      : [];
+
+    const resolvedImages = uploadedImages.length > 0 ? uploadedImages : normalizedImages;
+
+    if (!resolvedImages.length) {
+      throw ApiError.badRequest('At least one product image is required');
+    }
+
+    return resolvedImages.map((image, index) => ({
+      url: image.url,
+      publicId: image.publicId,
+      isMain: index === 0,
+    }));
   }
 }
 

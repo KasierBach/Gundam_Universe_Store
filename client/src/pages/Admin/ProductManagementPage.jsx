@@ -18,6 +18,7 @@ import {
 import productService from '../../services/productService';
 import categoryService from '../../services/categoryService';
 import { PRODUCT_GRADES } from '../../shared/constants/productConstants';
+import ModelKitImage from '../../components/shared/ModelKitImage';
 
 const ProductManagementPage = () => {
   const [products, setProducts] = useState([]);
@@ -26,6 +27,7 @@ const ProductManagementPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [imageFiles, setImageFiles] = useState([]);
   
   // Form State
   const [formData, setFormData] = useState({
@@ -74,6 +76,7 @@ const ProductManagementPage = () => {
         description: product.description,
         images: product.images.length > 0 ? product.images : [{ url: '', publicId: 'manually_added', isMain: true }]
       });
+      setImageFiles([]);
     } else {
       setEditingProduct(null);
       setFormData({
@@ -84,8 +87,9 @@ const ProductManagementPage = () => {
         grade: PRODUCT_GRADES.NONE,
         series: 'Universal Century',
         description: '',
-        images: [{ url: 'https://images.unsplash.com/photo-1589118949245-7d48d24bc04b?q=80&w=600', publicId: 'manually_added', isMain: true }]
+        images: []
       });
+      setImageFiles([]);
     }
     setIsModalOpen(true);
   };
@@ -93,10 +97,32 @@ const ProductManagementPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const payload = new FormData();
+      payload.append('name', formData.name);
+      payload.append('price', formData.price);
+      payload.append('stock', formData.stock);
+      payload.append('category', formData.category);
+      payload.append('grade', formData.grade);
+      payload.append('series', formData.series);
+      payload.append('description', formData.description);
+
+      if (editingProduct && imageFiles.length === 0) {
+        payload.append('images', JSON.stringify(formData.images));
+      }
+
+      imageFiles.forEach((file) => {
+        payload.append('images', file);
+      });
+
+      if (!editingProduct && imageFiles.length === 0) {
+        alert('Please upload at least one product image.');
+        return;
+      }
+
       if (editingProduct) {
-        await productService.updateProduct(editingProduct._id, formData);
+        await productService.updateProduct(editingProduct._id, payload);
       } else {
-        await productService.createProduct(formData);
+        await productService.createProduct(payload);
       }
       setIsModalOpen(false);
       fetchData();
@@ -182,7 +208,14 @@ const ProductManagementPage = () => {
                   <td className="p-5">
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 bg-black rounded border border-gundam-cyan/20 p-1 flex-shrink-0">
-                        <img src={product.images[0]?.url} className="w-full h-full object-contain grayscale group-hover:grayscale-0 transition-all" alt={product.name} />
+                        <ModelKitImage
+                          src={product.images[0]?.url}
+                          alt={product.name}
+                          name={product.name}
+                          grade={product.grade}
+                          series={product.series}
+                          imageClassName="grayscale group-hover:grayscale-0 transition-all"
+                        />
                       </div>
                       <div>
                         <div className="text-white font-bold tracking-tight uppercase line-clamp-1">{product.name}</div>
@@ -312,18 +345,38 @@ const ProductManagementPage = () => {
                 </div>
 
                 <div className="space-y-2">
-                   <label className="text-[10px] text-gundam-cyan font-orbitron uppercase tracking-widest">Visual Databank (Image URL)</label>
-                   <div className="relative">
-                      <ImageIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gundam-cyan opacity-50" size={16} />
-                      <input 
-                        className="w-full bg-black/50 border border-white/10 p-3 pl-10 text-white focus:border-gundam-cyan outline-none rounded transition-all italic text-xs"
-                        placeholder="https://..."
-                        value={formData.images[0].url}
-                        onChange={(e) => setFormData({
-                          ...formData, 
-                          images: [{ ...formData.images[0], url: e.target.value }]
-                        })}
-                      />
+                   <label className="text-[10px] text-gundam-cyan font-orbitron uppercase tracking-widest">Visual Databank (Images)</label>
+                   <div className="space-y-3">
+                      <label className="flex min-h-28 cursor-pointer flex-col items-center justify-center rounded border border-dashed border-gundam-cyan/30 bg-black/30 px-4 text-center hover:bg-gundam-cyan/5 transition-all">
+                        <ImageIcon className="mb-2 text-gundam-cyan opacity-60" size={18} />
+                        <span className="text-[10px] font-orbitron uppercase tracking-widest text-gundam-cyan">Upload product images</span>
+                        <span className="mt-1 text-[10px] text-gundam-text-muted">PNG, JPG, WEBP up to 5MB each</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          className="hidden"
+                          onChange={(event) => setImageFiles(Array.from(event.target.files || []))}
+                        />
+                      </label>
+
+                      {imageFiles.length > 0 ? (
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                          {imageFiles.map((file) => (
+                            <div key={`${file.name}-${file.size}`} className="rounded border border-gundam-cyan/20 bg-black/30 p-2 text-[10px] text-gundam-text-secondary truncate">
+                              {file.name}
+                            </div>
+                          ))}
+                        </div>
+                      ) : editingProduct?.images?.length > 0 ? (
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                          {editingProduct.images.map((image) => (
+                            <div key={image.publicId || image.url} className="aspect-square rounded border border-gundam-cyan/20 bg-black/30 overflow-hidden">
+                              <img src={image.url} alt={editingProduct.name} className="w-full h-full object-contain p-2" />
+                            </div>
+                          ))}
+                        </div>
+                      ) : null}
                    </div>
                 </div>
 

@@ -13,7 +13,7 @@ const createListingSchema = {
         url: Joi.string().uri().required(),
         publicId: Joi.string().required(),
       })
-    ).min(1).max(5).required(),
+    ).min(1).max(5),
   }),
 };
 
@@ -37,7 +37,7 @@ const createOfferSchema = {
         url: Joi.string().uri().required(),
         publicId: Joi.string().required(),
       })
-    ).min(1).max(5).required(),
+    ).min(1).max(5),
   }),
 };
 

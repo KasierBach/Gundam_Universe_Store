@@ -39,7 +39,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="pt-24 pb-12 px-4 max-w-[1600px] mx-auto min-h-screen">
-      <div className="mb-10 flex items-center justify-between">
+      <div className="mb-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div>
           <h1 className="text-3xl md:text-5xl font-orbitron text-white uppercase tracking-tighter glow-text-red italic">
             TACTICAL COMMAND CENTER
@@ -48,7 +48,7 @@ const AdminDashboard = () => {
             <span className="w-2 h-2 bg-gundam-red rounded-full animate-ping" /> System Authorization: LEVEL 10 ADMIN
           </p>
         </div>
-        <div className="flex gap-4">
+        <div className="flex gap-4 self-start lg:self-auto">
            <button className="p-3 bg-white/5 border border-white/10 rounded hover:bg-white/10 transition-all text-white">
               <Settings size={20} />
            </button>
@@ -98,7 +98,7 @@ const AdminDashboard = () => {
                  <BarChart3 size={20} className="text-gundam-cyan" /> Recent Deployment Activity
               </h3>
               
-              <div className="overflow-x-auto">
+              <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-left font-rajdhani">
                    <thead>
                       <tr className="border-b border-white/10 text-[10px] font-orbitron text-gundam-text-muted uppercase tracking-widest">
@@ -146,6 +146,31 @@ const AdminDashboard = () => {
                    </tbody>
                 </table>
               </div>
+
+              <div className="space-y-4 md:hidden">
+                {stats?.recentActivity.map((order) => (
+                  <div key={order._id} className="rounded-xl border border-white/10 bg-black/20 p-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="min-w-0">
+                        <p className="text-white font-bold truncate">{order.user?.displayName}</p>
+                        <p className="text-[10px] text-gundam-text-muted uppercase truncate">{order.user?.email}</p>
+                      </div>
+                      <span className="text-[9px] text-gundam-text-muted">{new Date(order.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    <div className="mt-4 flex items-center justify-between gap-3">
+                      <span className="text-gundam-cyan font-mono uppercase">{order._id.slice(-8)}</span>
+                      <span className="text-white font-bold">${order.totalAmount.toLocaleString()}</span>
+                    </div>
+                    <span className={`mt-3 inline-flex text-[9px] font-orbitron px-2 py-1 rounded border ${
+                      order.status === 'DELIVERED' ? 'text-gundam-emerald border-gundam-emerald/40 bg-gundam-emerald/5' :
+                      order.status === 'CANCELLED' ? 'text-gundam-red border-gundam-red/40 bg-gundam-red/5' :
+                      'text-gundam-amber border-gundam-amber/40 bg-gundam-amber/5'
+                    } uppercase`}>
+                      {order.status}
+                    </span>
+                  </div>
+                ))}
+              </div>
            </div>
         </div>
 
@@ -155,7 +180,7 @@ const AdminDashboard = () => {
               <h3 className="text-lg font-orbitron text-white uppercase tracking-tight mb-6 flex items-center gap-2">
                  <ShieldAlert size={18} className="text-gundam-red" /> Operational Control
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                  <AdminQuickAction to="/admin/products" icon={<Package size={16} />} label="Manage Armory (Products)" color="bg-gundam-cyan/10 text-gundam-cyan hover:bg-gundam-cyan/20" />
                  <AdminQuickAction to="/admin/categories" icon={<LayoutGrid size={16} />} label="Protocol Categories" color="bg-gundam-cyan/10 text-gundam-cyan hover:bg-gundam-cyan/20" />
                  <AdminQuickAction to="/admin/users" icon={<UserCheck size={16} />} label="Pilot Authorization" color="bg-gundam-emerald/10 text-gundam-emerald hover:bg-gundam-emerald/20" />

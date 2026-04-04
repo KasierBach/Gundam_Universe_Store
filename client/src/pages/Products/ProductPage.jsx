@@ -95,7 +95,7 @@ const ProductPage = () => {
               </div>
            </div>
            
-           <div className="flex items-center gap-4">
+           <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full md:w-auto">
               <div className="relative group flex-grow md:w-80">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gundam-cyan/40 group-focus-within:text-gundam-cyan transition-colors" size={16} />
                 <input 
@@ -110,6 +110,7 @@ const ProductPage = () => {
                 onClick={() => setShowFilters(!showFilters)}
                 className={cn(
                   "px-6 py-3 rounded border font-orbitron text-[10px] tracking-widest uppercase transition-all flex items-center gap-3 relative overflow-hidden group",
+                  "justify-center sm:justify-start",
                   showFilters ? "bg-gundam-cyan text-black border-gundam-cyan shadow-cyan-glow" : "bg-black/40 text-gundam-cyan border-gundam-cyan/30 hover:border-gundam-cyan hover:bg-gundam-cyan/5"
                 )}
               >
@@ -128,9 +129,9 @@ const ProductPage = () => {
                 initial={{ width: 0, opacity: 0, x: -30 }}
                 animate={{ width: 300, opacity: 1, x: 0 }}
                 exit={{ width: 0, opacity: 0, x: -30 }}
-                className="lg:block flex-shrink-0"
+                className="w-full lg:max-w-[300px] flex-shrink-0"
               >
-                <div className="bg-gundam-dark-surface/50 border border-gundam-cyan/20 p-8 rounded shadow-2xl sticky top-24 backdrop-blur-xl">
+                <div className="bg-gundam-dark-surface/50 border border-gundam-cyan/20 p-6 sm:p-8 rounded shadow-2xl lg:sticky lg:top-24 backdrop-blur-xl">
                    <div className="absolute top-0 right-0 w-12 h-12 border-t-2 border-r-2 border-gundam-cyan/20 rounded-tr" />
                    
                    <h3 className="font-orbitron font-bold text-[11px] text-white tracking-[0.3em] mb-8 flex items-center gap-3 uppercase">

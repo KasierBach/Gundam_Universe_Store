@@ -24,7 +24,7 @@ const productSchema = {
         publicId: Joi.string().required(),
         isMain: Joi.boolean().default(false),
       })
-    ).min(1).required(),
+    ).min(1),
     status: Joi.string().valid('active', 'inactive', 'out_of_stock', 'archived').default('active'),
     tags: Joi.array().items(Joi.string().trim()),
   }),

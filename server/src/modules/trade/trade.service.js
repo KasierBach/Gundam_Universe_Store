@@ -4,14 +4,18 @@ const conversationRepository = require('../chat/conversation.repository');
 const notificationService = require('../notification/notification.service');
 const { TRADE_LISTING_STATUS, TRADE_OFFER_STATUS } = require('../../shared/constants/tradeStatus');
 const ApiError = require('../../shared/utils/ApiError');
+const { uploadFilesToCloudinary } = require('../../shared/utils/cloudinaryAsset');
 
 class TradeService {
   /**
    * Create a new trade listing
    */
-  async createListing(listingData, ownerId) {
+  async createListing(listingData, ownerId, files = []) {
+    const images = await this._resolveTradeImages(listingData.images, files, 'gundam-universe/trades/listings');
+
     return tradeListingRepository.create({
       ...listingData,
+      images,
       owner: ownerId,
       status: TRADE_LISTING_STATUS.OPEN,
     });
@@ -42,7 +46,7 @@ class TradeService {
   /**
    * Create a trade offer and an associated conversation
    */
-  async createOffer(listingId, offerData, offererId) {
+  async createOffer(listingId, offerData, offererId, files = []) {
     const listing = await tradeListingRepository.findById(listingId);
     if (!listing) {
       throw new ApiError(404, 'Trade listing not found');
@@ -61,6 +65,7 @@ class TradeService {
       listing: listingId,
       offerer: offererId,
       ...offerData,
+      images: await this._resolveTradeImages(offerData.images, files, 'gundam-universe/trades/offers'),
       status: TRADE_OFFER_STATUS.PENDING,
     });
 
@@ -187,6 +192,24 @@ class TradeService {
     }
 
     return tradeOfferRepository.findByListingId(listingId);
+  }
+
+  async _resolveTradeImages(existingImages = [], files = [], folder) {
+    const normalizedImages = Array.isArray(existingImages) ? existingImages : [];
+    const uploadedImages = files.length > 0
+      ? await uploadFilesToCloudinary(files, { folder })
+      : [];
+
+    const resolvedImages = uploadedImages.length > 0 ? uploadedImages : normalizedImages;
+
+    if (!resolvedImages.length) {
+      throw new ApiError(400, 'At least one trade image is required');
+    }
+
+    return resolvedImages.map((image) => ({
+      url: image.url,
+      publicId: image.publicId,
+    }));
   }
 }
 

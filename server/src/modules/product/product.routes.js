@@ -2,6 +2,8 @@ const { Router } = require('express');
 const productController = require('./product.controller');
 const { authenticate, authorize } = require('../../shared/middlewares/auth.middleware');
 const { validate } = require('../../shared/middlewares/validate.middleware');
+const { uploadMultiple } = require('../../shared/middlewares/upload.middleware');
+const { normalizeMultipartFields } = require('../../shared/middlewares/multipart.middleware');
 const { ROLES } = require('../../shared/constants/roles');
 const {
   productSchema,
@@ -21,7 +23,9 @@ router.get('/:slug', (req, res, next) => productController.getBySlug(req, res, n
 router.post(
   '/', 
   authenticate, 
-  authorize(ROLES.ADMIN, ROLES.SELLER), 
+  authorize(ROLES.ADMIN, ROLES.SELLER),
+  uploadMultiple,
+  normalizeMultipartFields(['specs', 'images', 'tags']),
   validate(productSchema), 
   (req, res, next) => productController.create(req, res, next)
 );
@@ -29,7 +33,9 @@ router.post(
 router.put(
   '/:id', 
   authenticate, 
-  authorize(ROLES.ADMIN, ROLES.SELLER), 
+  authorize(ROLES.ADMIN, ROLES.SELLER),
+  uploadMultiple,
+  normalizeMultipartFields(['specs', 'images', 'tags']),
   validate(updateProductSchema), 
   (req, res, next) => productController.update(req, res, next)
 );

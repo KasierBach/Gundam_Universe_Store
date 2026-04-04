@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ArrowRight, Minus, Plus, ShieldAlert, ShoppingCart, Trash2 } from 'lucide-react'
 import useCartStore from '../../stores/cartStore'
+import ModelKitImage from '../../components/shared/ModelKitImage'
 
 const CartPage = () => {
   const {
@@ -57,7 +58,13 @@ const CartPage = () => {
                 >
                   <div className="flex flex-col sm:flex-row gap-5">
                     <div className="w-28 h-28 bg-gundam-bg-tertiary border border-gundam-border/30 rounded-lg overflow-hidden flex items-center justify-center p-2">
-                      <img src={item.product?.images?.[0]?.url} alt={item.product?.name} className="w-full h-full object-contain" />
+                      <ModelKitImage
+                        src={item.product?.images?.[0]?.url}
+                        alt={item.product?.name}
+                        name={item.product?.name}
+                        grade={item.product?.grade}
+                        series={item.product?.series}
+                      />
                     </div>
 
                     <div className="flex-1 min-w-0">

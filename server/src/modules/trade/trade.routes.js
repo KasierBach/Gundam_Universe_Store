@@ -5,6 +5,8 @@ const reportController = require('../report/report.controller');
 const reportValidator = require('../report/report.validator');
 const { validate } = require('../../shared/middlewares/validate.middleware');
 const { authenticate } = require('../../shared/middlewares/auth.middleware');
+const { uploadMultiple } = require('../../shared/middlewares/upload.middleware');
+const { normalizeMultipartFields } = require('../../shared/middlewares/multipart.middleware');
 
 const router = express.Router();
 
@@ -14,7 +16,13 @@ const router = express.Router();
 router.get('/offers/me', authenticate, tradeController.getMyOffers);
 
 router.route('/')
-  .post(authenticate, validate(tradeValidator.createListingSchema), tradeController.createListing)
+  .post(
+    authenticate,
+    uploadMultiple,
+    normalizeMultipartFields(['images']),
+    validate(tradeValidator.createListingSchema),
+    tradeController.createListing
+  )
   .get(validate(tradeValidator.queryListingSchema), tradeController.queryListings);
 
 router.route('/:id')
@@ -31,7 +39,13 @@ router.post(
  * Trade Offer Routes
  */
 router.route('/:id/offers')
-  .post(authenticate, validate(tradeValidator.createOfferSchema), tradeController.createOffer)
+  .post(
+    authenticate,
+    uploadMultiple,
+    normalizeMultipartFields(['images']),
+    validate(tradeValidator.createOfferSchema),
+    tradeController.createOffer
+  )
   .get(authenticate, tradeController.getListingOffers);
 
 router.route('/:id/offers/:offerId/status')

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { FiPackage, FiCalendar, FiDollarSign, FiClock, FiChevronRight, FiCheckCircle } from 'react-icons/fi';
 import useOrderStore from '../../stores/orderStore';
 import { Link } from 'react-router-dom';
+import ModelKitImage from '../../components/shared/ModelKitImage';
 
 const OrdersPage = () => {
   const { orders, fetchOrders, loading } = useOrderStore();
@@ -86,7 +87,7 @@ const OrdersPage = () => {
                      <div className="flex flex-wrap gap-3">
                         {order.items.slice(0, 3).map((item, i) => (
                            <div key={i} className="w-12 h-12 rounded bg-black/40 border border-white/5 p-1 relative group/img overflow-hidden">
-                              <img src={item.image} className="w-full h-full object-contain" />
+                              <ModelKitImage src={item.image} alt={item.name} name={item.name} grade={item.grade} series={item.series} />
                               <div className="absolute inset-0 bg-cyan-500/10 opacity-0 group-hover/img:opacity-100 transition-opacity" />
                            </div>
                         ))}

@@ -20,7 +20,7 @@ class ProductController extends BaseController {
    */
   async create(req, res) {
     const data = req.body;
-    const product = await this.service.create(data, req.user._id);
+    const product = await this.service.create(data, req.user._id, req.files || []);
     res.status(201).json(ApiResponse.success(product, 'Product created successfully'));
   }
 
@@ -30,7 +30,7 @@ class ProductController extends BaseController {
   async update(req, res) {
     const { id } = req.params;
     const data = req.body;
-    const product = await this.service.update(id, data, req.user._id, req.user.role);
+    const product = await this.service.update(id, data, req.user._id, req.user.role, req.files || []);
     res.status(200).json(ApiResponse.success(product, 'Product updated successfully'));
   }
 

@@ -46,15 +46,15 @@ const TradeMarketPage = () => {
       )}
 
       {/* Filter / Actions Bar */}
-      <div className="flex justify-between items-center mb-8 border-b border-gundam-cyan/30 pb-4">
-        <div className="flex gap-4">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8 border-b border-gundam-cyan/30 pb-4">
+        <div className="flex gap-4 flex-wrap">
           <button className="px-4 py-2 bg-gundam-cyan/10 border border-gundam-cyan text-gundam-cyan uppercase text-xs font-bold tracking-widest hover:bg-gundam-cyan hover:text-black transition-all duration-300">
             Filter: All
           </button>
         </div>
         <Link 
           to="/trade/new"
-          className="px-6 py-2 bg-gundam-red text-white uppercase text-xs font-bold tracking-widest clip-path-mech hover:bg-gundam-red-hover transition-all duration-300 shadow-[0_0_15px_rgba(255,50,50,0.5)]"
+          className="w-full sm:w-auto text-center px-6 py-3 bg-gundam-red text-white uppercase text-xs font-bold tracking-widest clip-path-mech hover:bg-gundam-red-hover transition-all duration-300 shadow-[0_0_15px_rgba(255,50,50,0.5)]"
         >
           Post Trade
         </Link>

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { FiX, FiShoppingCart, FiPlus, FiMinus, FiTrash2 } from 'react-icons/fi';
 import useCartStore from '../../stores/cartStore';
+import ModelKitImage from '../shared/ModelKitImage';
 
 const CartDrawer = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
@@ -63,10 +64,13 @@ const CartDrawer = ({ isOpen, onClose }) => {
                       <div className="flex gap-4">
                         {/* Unit Image */}
                         <div className="w-20 h-20 bg-black/50 rounded overflow-hidden flex-shrink-0 border border-cyan-500/5 group-hover:border-cyan-500/20 transition-colors">
-                          <img 
-                            src={item.product?.images?.[0]?.url || 'https://via.placeholder.com/80'} 
+                          <ModelKitImage
+                            src={item.product?.images?.[0]?.url}
                             alt={item.product?.name}
-                            className="w-full h-full object-contain"
+                            name={item.product?.name}
+                            grade={item.product?.grade}
+                            series={item.product?.series}
+                            imageClassName="p-2"
                           />
                         </div>
 
