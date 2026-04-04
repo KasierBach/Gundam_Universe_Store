@@ -592,8 +592,3 @@ Dự án hiện ở mức:
 | `P2` | Analytics nâng cao cho seller/admin |
 | `P3` | Notification center realtime nâng cao |
 | `P3` | Email service thật cho reset password |
-
-- nộp đồ án
-- đọc trên GitHub
-- onboarding người tiếp quản repo
-- làm tài liệu tổng quan cho phase deploy và báo cáo
