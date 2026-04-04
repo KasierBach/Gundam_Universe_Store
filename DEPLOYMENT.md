@@ -58,7 +58,7 @@ Neu health check tra ve JSON thanh cong thi backend san sang.
 
 1. Import repo vao Vercel.
 2. Chon Root Directory la `client`.
-3. Framework Preset: `Vite`.
+3. Framework Preset: `Vite`.  
 4. Build Command: `npm run build`
 5. Output Directory: `dist`
 
