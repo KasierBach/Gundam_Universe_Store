@@ -83,7 +83,15 @@ const useCartStore = create(
         } catch (error) {
           set({ error: error.message });
         }
-      }
+      },
+
+      resetCartState: () => set({
+        items: [],
+        totalItems: 0,
+        totalPrice: 0,
+        loading: false,
+        error: null,
+      }),
     }),
     {
       name: 'gundam-cart-storage',

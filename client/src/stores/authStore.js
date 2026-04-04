@@ -73,6 +73,10 @@ const useAuthStore = create(
             isAuthenticated: false,
           })
           localStorage.removeItem('auth-storage')
+          localStorage.removeItem('gundam-cart-storage')
+          localStorage.removeItem('gundam-order-storage')
+          localStorage.removeItem('gundam-notification-storage')
+          localStorage.removeItem('gundam-wishlist-storage')
         }
       },
 
@@ -85,17 +89,30 @@ const useAuthStore = create(
           set({
             user: response.data.data,
             isAuthenticated: true,
+            isLoading: false,
           })
         } catch (error) {
           if (error.response?.status === 401) {
             // Interceptor handles refresh, if it fails then logout is called there
+            set({
+              user: null,
+              accessToken: null,
+              refreshToken: null,
+              isAuthenticated: false,
+              isLoading: false,
+            })
           }
         }
       },
     }),
     {
       name: 'auth-storage',
-      partialize: (state) => ({ accessToken: state.accessToken, refreshToken: state.refreshToken }),
+      partialize: (state) => ({
+        user: state.user,
+        accessToken: state.accessToken,
+        refreshToken: state.refreshToken,
+        isAuthenticated: state.isAuthenticated,
+      }),
     }
   )
 )

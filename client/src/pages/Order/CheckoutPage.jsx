@@ -5,19 +5,21 @@ import { FiPackage, FiTruck, FiCreditCard, FiCheckCircle, FiChevronRight } from 
 import useCartStore from '../../stores/cartStore';
 import useOrderStore from '../../stores/orderStore';
 import ModelKitImage from '../../components/shared/ModelKitImage';
+import useUiStore from '../../stores/uiStore';
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
   const { items, totalPrice, clearCart, fetchCart } = useCartStore();
   const { checkout, loading } = useOrderStore();
+  const { checkoutDraft, setCheckoutDraft, clearCheckoutDraft } = useUiStore();
 
   const [formData, setFormData] = useState({
-    fullName: '',
-    phone: '',
-    address: '',
-    city: '',
-    notes: '',
-    paymentMethod: 'COD'
+    fullName: checkoutDraft.fullName,
+    phone: checkoutDraft.phone,
+    address: checkoutDraft.address,
+    city: checkoutDraft.city,
+    notes: checkoutDraft.notes,
+    paymentMethod: checkoutDraft.paymentMethod
   });
 
   useEffect(() => {
@@ -31,7 +33,9 @@ const CheckoutPage = () => {
   }, [items, navigate, loading]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const nextState = { ...formData, [e.target.name]: e.target.value };
+    setFormData(nextState);
+    setCheckoutDraft(nextState);
   };
 
   const handleSubmit = async (e) => {
@@ -47,6 +51,7 @@ const CheckoutPage = () => {
         paymentMethod: formData.paymentMethod,
         notes: formData.notes
       });
+      clearCheckoutDraft();
       // Success: Cart is cleared by store/service
       navigate('/orders');
     } catch (error) {

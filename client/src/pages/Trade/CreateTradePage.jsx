@@ -2,14 +2,16 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import tradeService from '../../services/tradeService';
+import useUiStore from '../../stores/uiStore';
 
 const CreateTradePage = () => {
   const navigate = useNavigate();
+  const { tradeDraft, setTradeDraft, clearTradeDraft } = useUiStore();
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    wantedItems: '',
-    condition: 'New (MISB)',
+    title: tradeDraft.title,
+    description: tradeDraft.description,
+    wantedItems: tradeDraft.wantedItems,
+    condition: tradeDraft.condition,
   });
   const [imageFiles, setImageFiles] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -23,10 +25,12 @@ const CreateTradePage = () => {
   ];
 
   const handleChange = (e) => {
-    setFormData({
+    const nextState = {
       ...formData,
       [e.target.name]: e.target.value,
-    });
+    };
+    setFormData(nextState);
+    setTradeDraft(nextState);
   };
 
   const handleSubmit = async (e) => {
@@ -50,6 +54,7 @@ const CreateTradePage = () => {
       });
 
       await tradeService.createListing(submissionData);
+      clearTradeDraft();
       navigate('/trade');
     } catch (err) {
       setError(err.response?.data?.message || 'Transmission failed. Engine malfunction.');

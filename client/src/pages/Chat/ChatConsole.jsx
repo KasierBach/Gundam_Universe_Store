@@ -5,9 +5,11 @@ import { ArrowLeft } from 'lucide-react';
 import chatService from '../../services/chatService';
 import { initiateSocketConnection, disconnectSocket, joinConversation, leaveConversation } from '../../utils/socket';
 import useAuthStore from '../../stores/authStore';
+import useUiStore from '../../stores/uiStore';
 
 const ChatConsole = () => {
   const { user } = useAuthStore();
+  const { chatDrafts, setChatDraft, clearChatDraft, lastConversationId, setLastConversationId } = useUiStore();
   const [searchParams, setSearchParams] = useSearchParams();
   const [conversations, setConversations] = useState([]);
   const [activeChat, setActiveChat] = useState(null);
@@ -56,16 +58,28 @@ const ChatConsole = () => {
       ? conversations.find((conversation) => conversation._id === requestedConversationId)
       : null;
 
+    const rememberedConversation = !requestedConversationId && lastConversationId
+      ? conversations.find((conversation) => conversation._id === lastConversationId)
+      : null;
+
     if (matchedConversation) {
       setActiveChat(matchedConversation);
+      setShowConversationList(false);
+      setLastConversationId(matchedConversation._id);
+    } else if (rememberedConversation) {
+      setActiveChat(rememberedConversation);
+      setSearchParams({ conversation: rememberedConversation._id });
       setShowConversationList(false);
     } else if (!requestedConversationId && conversations.length > 0) {
       setActiveChat((current) => current || conversations[0]);
     }
-  }, [conversations, searchParams]);
+  }, [conversations, lastConversationId, searchParams, setLastConversationId, setSearchParams]);
 
   useEffect(() => {
     if (activeChat) {
+      setLastConversationId(activeChat._id);
+      setNewMessage(chatDrafts[activeChat._id] || '');
+
       // 1. Fetch Messages
       const fetchMessages = async () => {
         try {
@@ -91,7 +105,7 @@ const ChatConsole = () => {
         socketRef.current?.off('receive_message');
       };
     }
-  }, [activeChat]);
+  }, [activeChat, chatDrafts, setLastConversationId]);
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -105,6 +119,7 @@ const ChatConsole = () => {
       // We send via REST, socket in backend handles emitting 'receive_message'
       await chatService.sendMessage(activeChat._id, newMessage);
       setNewMessage('');
+      clearChatDraft(activeChat._id);
     } catch (err) {
       console.error('Signal transmission failed:', err);
     }
@@ -131,6 +146,7 @@ const ChatConsole = () => {
                     onClick={() => {
                       setActiveChat(conv);
                       setSearchParams({ conversation: conv._id });
+                      setLastConversationId(conv._id);
                       setShowConversationList(false);
                     }}
                     className={`p-4 border-b border-gundam-cyan/5 cursor-pointer hover:bg-gundam-cyan/5 transition-all ${activeChat?._id === conv._id ? 'bg-gundam-cyan/10 border-l-2 border-l-gundam-cyan' : ''}`}
@@ -205,8 +221,13 @@ const ChatConsole = () => {
                          <input 
                             className="flex-1 bg-gundam-dark-surface border border-gundam-cyan/30 p-4 text-sm text-white focus:border-gundam-cyan outline-none transition-all rounded-lg"
                             placeholder="Input your message here..."
-                            value={newMessage}
-                            onChange={(e) => setNewMessage(e.target.value)}
+                             value={newMessage}
+                            onChange={(e) => {
+                              setNewMessage(e.target.value)
+                              if (activeChat?._id) {
+                                setChatDraft(activeChat._id, e.target.value)
+                              }
+                            }}
                          />
                          <button 
                             type="submit"
