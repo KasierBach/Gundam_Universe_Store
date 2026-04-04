@@ -4,9 +4,11 @@ import { useNavigate } from 'react-router-dom'
 import useAuthStore from '../../stores/authStore'
 import useWishlistStore from '../../stores/wishlistStore'
 import { cn } from '../../utils/cn'
+import { useI18n } from '../../i18n/I18nProvider'
 
 const WishlistButton = ({ productId, className, iconClassName }) => {
   const navigate = useNavigate()
+  const { t } = useI18n()
   const { isAuthenticated } = useAuthStore()
   const {
     addToWishlist,
@@ -54,7 +56,7 @@ const WishlistButton = ({ productId, className, iconClassName }) => {
           : 'bg-gundam-bg-secondary text-gundam-text-primary border border-gundam-border hover:border-gundam-red/40 hover:text-gundam-red',
         className
       )}
-      aria-label={active ? 'Remove from wishlist' : 'Add to wishlist'}
+      aria-label={active ? t('product.actions.removeFromWishlist') : t('product.actions.addToWishlist')}
     >
       <Heart size={18} className={cn(active ? 'fill-current' : '', iconClassName)} />
     </button>

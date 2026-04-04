@@ -1,13 +1,16 @@
 import { Outlet } from 'react-router-dom'
+import { AnimatePresence, motion } from 'framer-motion'
 import Navbar from './Navbar'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useI18n } from '../../i18n/I18nProvider'
 
 const MainLayout = () => {
+  const { t } = useI18n()
+
   return (
-    <div className="relative min-h-screen flex flex-col">
+    <div className="relative flex min-h-screen flex-col">
       <Navbar />
-      
-      <main className="flex-grow z-10">
+
+      <main className="z-10 flex-grow">
         <AnimatePresence mode="wait">
           <motion.div
             key={window.location.pathname}
@@ -21,20 +24,25 @@ const MainLayout = () => {
         </AnimatePresence>
       </main>
 
-      <footer className="z-10 py-8 border-t border-gundam-border/30 bg-gundam-bg-secondary/50 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
+      <footer className="z-10 border-t border-gundam-border/30 bg-gundam-bg-secondary/50 py-8 backdrop-blur-sm">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 md:flex-row">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gundam-cyan rounded rotate-45 flex items-center justify-center">
-              <span className="text-gundam-bg-primary font-bold -rotate-45">G</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded bg-gundam-cyan rotate-45">
+              <span className="-rotate-45 font-bold text-gundam-bg-primary">G</span>
             </div>
-            <span className="font-orbitron font-bold tracking-tighter text-gundam-cyan">GUNDAM UNIVERSE</span>
+            <div>
+              <span className="block font-orbitron font-bold tracking-tighter text-gundam-cyan">{t('navbar.brand')}</span>
+              <span className="block text-[10px] uppercase tracking-[0.18em] text-gundam-text-muted">
+                {t('layout.footerTagline')}
+              </span>
+            </div>
           </div>
-          <p className="text-gundam-text-secondary text-sm font-rajdhani">
-            © {new Date().getFullYear()} UC ERA - PILOT AUTHENTICATION SYSTEM
+          <p className="text-sm text-gundam-text-secondary font-rajdhani">
+            © {new Date().getFullYear()} UC ERA
           </p>
           <div className="flex gap-4">
-            {['Facebook', 'Twitter', 'Github'].map((link) => (
-              <a key={link} href="#" className="text-gundam-text-muted hover:text-gundam-cyan transition-colors text-sm">
+            {[t('layout.socials.facebook'), t('layout.socials.twitter'), t('layout.socials.github')].map((link) => (
+              <a key={link} href="#" className="text-sm text-gundam-text-muted transition-colors hover:text-gundam-cyan">
                 {link}
               </a>
             ))}

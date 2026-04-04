@@ -1,320 +1,321 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useParams, useNavigate } from 'react-router-dom';
-import tradeService from '../../services/tradeService';
-import useAuthStore from '../../stores/authStore';
+import React, { useEffect, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { useNavigate, useParams } from 'react-router-dom'
+import tradeService from '../../services/tradeService'
+import useAuthStore from '../../stores/authStore'
+import { useI18n } from '../../i18n/I18nProvider'
 
 const TradeDetailPage = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const { user } = useAuthStore();
-  
-  const [listing, setListing] = useState(null);
-  const [offers, setOffers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [showOfferModal, setShowOfferModal] = useState(false);
-  const [showReportModal, setShowReportModal] = useState(false);
-  
-  // Offer Form State
-  const [offerDescription, setOfferDescription] = useState('');
-  const [offerImageFiles, setOfferImageFiles] = useState([]);
-  const [submittingOffer, setSubmittingOffer] = useState(false);
-  const [processingOfferId, setProcessingOfferId] = useState(null);
-  const [reportReason, setReportReason] = useState('');
-  const [reportDetails, setReportDetails] = useState('');
-  const [submittingReport, setSubmittingReport] = useState(false);
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const { t, tv } = useI18n()
+  const { user } = useAuthStore()
 
-  const isOwner = user && listing && user._id === listing.owner._id;
+  const [listing, setListing] = useState(null)
+  const [offers, setOffers] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [showOfferModal, setShowOfferModal] = useState(false)
+  const [showReportModal, setShowReportModal] = useState(false)
+
+  const [offerDescription, setOfferDescription] = useState('')
+  const [offerImageFiles, setOfferImageFiles] = useState([])
+  const [submittingOffer, setSubmittingOffer] = useState(false)
+  const [processingOfferId, setProcessingOfferId] = useState(null)
+  const [reportReason, setReportReason] = useState('')
+  const [reportDetails, setReportDetails] = useState('')
+  const [submittingReport, setSubmittingReport] = useState(false)
+
+  const isOwner = user && listing && user._id === listing.owner._id
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true);
-        const listingData = await tradeService.getListing(id);
-        setListing(listingData);
+        setLoading(true)
+        const listingData = await tradeService.getListing(id)
+        setListing(listingData)
 
-        // If user is owner, fetch offers
         if (user && user._id === listingData.owner._id) {
-          const offersData = await tradeService.getOffers(id);
-          setOffers(offersData);
+          const offersData = await tradeService.getOffers(id)
+          setOffers(offersData)
         }
       } catch (err) {
-        setError('Failed to retrieve tactical data from the sector.');
-        console.error(err);
+        setError(t('trade.detail.error'))
+        console.error(err)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
-    fetchData();
-  }, [id, user]);
+    }
+    fetchData()
+  }, [id, user, t])
 
   const handleOfferSubmit = async () => {
-    if (!offerDescription.trim()) return;
+    if (!offerDescription.trim()) return
     try {
-      setSubmittingOffer(true);
+      setSubmittingOffer(true)
       if (offerImageFiles.length === 0) {
-        alert('Please attach at least one image for your offer.');
-        return;
+        alert(t('trade.detail.attachRequired'))
+        return
       }
 
-      const offerData = new FormData();
-      offerData.append('offeredItemsDescription', offerDescription);
+      const offerData = new FormData()
+      offerData.append('offeredItemsDescription', offerDescription)
       offerImageFiles.forEach((file) => {
-        offerData.append('images', file);
-      });
+        offerData.append('images', file)
+      })
 
-      const createdOffer = await tradeService.createOffer(id, offerData);
-      setShowOfferModal(false);
-      setOfferDescription('');
-      setOfferImageFiles([]);
-      navigate(createdOffer?.conversationId ? `/chat?conversation=${createdOffer.conversationId}` : '/chat');
+      const createdOffer = await tradeService.createOffer(id, offerData)
+      setShowOfferModal(false)
+      setOfferDescription('')
+      setOfferImageFiles([])
+      navigate(createdOffer?.conversationId ? `/chat?conversation=${createdOffer.conversationId}` : '/chat')
     } catch (err) {
-      alert('Offer transmission failed. Check connection.');
+      alert(t('trade.detail.offerFailed'))
     } finally {
-      setSubmittingOffer(false);
+      setSubmittingOffer(false)
     }
-  };
+  }
 
   const handleUpdateOfferStatus = async (offerId, status) => {
     try {
-      setProcessingOfferId(offerId);
-      await tradeService.updateOfferStatus(id, offerId, status);
-      
-      // Refresh listing and offers
-      const listingData = await tradeService.getListing(id);
-      const offersData = await tradeService.getOffers(id);
-      setListing(listingData);
-      setOffers(offersData);
+      setProcessingOfferId(offerId)
+      await tradeService.updateOfferStatus(id, offerId, status)
+
+      const listingData = await tradeService.getListing(id)
+      const offersData = await tradeService.getOffers(id)
+      setListing(listingData)
+      setOffers(offersData)
 
       if (status === 'accepted') {
-        alert('Mission Success: Trade agreement finalized.');
+        alert(t('trade.detail.missionSuccess'))
       }
     } catch (err) {
-      alert('Strategic error during status update.');
+      alert(t('trade.detail.updateError'))
     } finally {
-      setProcessingOfferId(null);
+      setProcessingOfferId(null)
     }
-  };
+  }
 
   const handleSubmitReport = async () => {
-    if (!reportReason.trim() || !reportDetails.trim()) return;
+    if (!reportReason.trim() || !reportDetails.trim()) {
+      alert(t('trade.detail.reasonRequired'))
+      return
+    }
 
     try {
-      setSubmittingReport(true);
+      setSubmittingReport(true)
       await tradeService.reportListing(id, {
         reason: reportReason,
         details: reportDetails,
-      });
-      setShowReportModal(false);
-      setReportReason('');
-      setReportDetails('');
-      alert('Violation report transmitted to command moderation.');
+      })
+      setShowReportModal(false)
+      setReportReason('')
+      setReportDetails('')
+      alert(t('trade.detail.reportSuccess'))
     } catch (err) {
-      alert(err.response?.data?.message || 'Unable to submit violation report.');
+      alert(err.response?.data?.message || t('trade.detail.reportFailed'))
     } finally {
-      setSubmittingReport(false);
+      setSubmittingReport(false)
     }
-  };
+  }
 
-  if (loading) return <div className="pt-32 text-center text-gundam-cyan font-orbitron animate-pulse">Initializing Data Stream...</div>;
+  if (loading) {
+    return <div className="pt-32 text-center font-orbitron animate-pulse text-gundam-cyan">Initializing Data Stream...</div>
+  }
 
-  if (error || !listing) return (
-    <div className="pt-32 text-center">
-      <div className="text-gundam-red font-orbitron uppercase mb-4">[CRITICAL ERROR]</div>
-      <p className="text-gundam-text-secondary">{error || 'Data packet lost.'}</p>
-      <button onClick={() => navigate('/trade')} className="mt-8 text-gundam-cyan underline uppercase text-xs font-orbitron text-glow">Return to Market</button>
-    </div>
-  );
+  if (error || !listing) {
+    return (
+      <div className="pt-32 text-center">
+        <div className="mb-4 font-orbitron uppercase text-gundam-red">{t('trade.detail.critical')}</div>
+        <p className="text-gundam-text-secondary">{error || t('trade.detail.packetLost')}</p>
+        <button onClick={() => navigate('/trade')} className="text-glow mt-8 text-xs font-orbitron uppercase text-gundam-cyan underline">
+          {t('trade.detail.returnMarket')}
+        </button>
+      </div>
+    )
+  }
 
   return (
-    <div className="pt-24 pb-12 px-4 max-w-7xl mx-auto">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        {/* Gallery Section */}
+    <div className="mx-auto max-w-7xl px-4 pb-12 pt-24">
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
         <motion.div
           initial={{ opacity: 0, x: -30 }}
           animate={{ opacity: 1, x: 0 }}
           className="space-y-4"
         >
-          <div className="relative aspect-square border border-gundam-cyan/30 rounded-lg overflow-hidden bg-black shadow-2xl group">
-            <img src={listing.images?.[0]?.url || 'https://images.unsplash.com/photo-1589118949245-7d48d24bc04b?q=80&w=900'} alt={listing.title} className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105" />
+          <div className="group relative aspect-square overflow-hidden rounded-lg border border-gundam-cyan/30 bg-black shadow-2xl">
+            <img src={listing.images?.[0]?.url || 'https://images.unsplash.com/photo-1589118949245-7d48d24bc04b?q=80&w=900'} alt={listing.title} className="h-full w-full object-contain transition-transform duration-700 group-hover:scale-105" />
             <div className="absolute bottom-4 left-4 flex gap-2">
-              <span className={`${listing.status === 'open' ? 'bg-gundam-red shadow-[0_0_15px_rgba(239,68,68,0.5)]' : 'bg-gundam-emerald shadow-[0_0_15px_rgba(16,185,129,0.5)]'} px-4 py-1 text-[10px] font-orbitron text-white skew-x-[-12deg] tracking-widest`}>
-                {listing.status === 'open' ? 'MISSION OPEN' : 'MISSION COMPLETE'}
+              <span className={`${listing.status === 'open' ? 'bg-gundam-red shadow-[0_0_15px_rgba(239,68,68,0.5)]' : 'bg-gundam-emerald shadow-[0_0_15px_rgba(16,185,129,0.5)]'} skew-x-[-12deg] px-4 py-1 text-[10px] font-orbitron tracking-widest text-white`}>
+                {listing.status === 'open' ? t('trade.detail.missionOpen') : t('trade.detail.missionComplete')}
               </span>
             </div>
-            {/* Tech Scan Effect overlay */}
-            <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(0,243,255,0.05)_1px,transparent_1px)] bg-[size:100%_4px] opacity-20" />
+            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(0,243,255,0.05)_1px,transparent_1px)] bg-[size:100%_4px] opacity-20" />
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {(listing.images || []).map((img, idx) => (
-              <div key={idx} className="aspect-square border border-gundam-cyan/20 rounded cursor-pointer hover:border-gundam-cyan transition-all overflow-hidden bg-gundam-dark-surface p-1">
-                <img src={img.url} alt={`${listing.title}-${idx + 1}`} className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all" />
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {(listing.images || []).map((image, index) => (
+              <div key={index} className="aspect-square cursor-pointer overflow-hidden rounded border border-gundam-cyan/20 bg-gundam-dark-surface p-1 transition-all hover:border-gundam-cyan">
+                <img src={image.url} alt={`${listing.title}-${index + 1}`} className="h-full w-full object-cover grayscale transition-all hover:grayscale-0" />
               </div>
             ))}
           </div>
         </motion.div>
 
-        {/* Info Section */}
         <motion.div
-           initial={{ opacity: 0, x: 30 }}
-           animate={{ opacity: 1, x: 0 }}
-           className="space-y-8"
+          initial={{ opacity: 0, x: 30 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="space-y-8"
         >
           <div className="relative">
-            <div className="flex items-center gap-4 mb-2 text-gundam-cyan text-[10px] font-orbitron tracking-widest">
-              <span className="bg-white/5 px-2 py-0.5 rounded">SCAN_ID: {listing._id.substring(listing._id.length - 8)}</span>
+            <div className="mb-2 flex items-center gap-4 text-[10px] font-orbitron tracking-widest text-gundam-cyan">
+              <span className="rounded bg-white/5 px-2 py-0.5">SCAN_ID: {listing._id.substring(listing._id.length - 8)}</span>
               <span>|</span>
-              <span className="opacity-60 uppercase">{new Date(listing.createdAt).toLocaleDateString()}</span>
+              <span className="opacity-60">{new Date(listing.createdAt).toLocaleDateString()}</span>
             </div>
-            <h1 className="text-3xl md:text-5xl font-orbitron text-white glow-text uppercase tracking-tighter leading-none mb-4">
+            <h1 className="glow-text mb-4 text-3xl font-orbitron uppercase leading-none tracking-tighter text-white md:text-5xl">
               {listing.title}
             </h1>
             <div className="flex flex-wrap gap-4">
-               <span className="bg-gundam-cyan/5 border border-gundam-cyan/40 text-gundam-cyan px-4 py-1 text-[10px] font-bold uppercase tracking-widest font-orbitron">
-                  Cond: {listing.condition}
-               </span>
+              <span className="border border-gundam-cyan/40 bg-gundam-cyan/5 px-4 py-1 text-[10px] font-orbitron font-bold uppercase tracking-widest text-gundam-cyan">
+                {tv('condition', listing.condition)}
+              </span>
             </div>
           </div>
 
-          <div className="bg-gundam-dark-surface/80 border border-gundam-cyan/20 p-6 rounded-lg relative overflow-hidden backdrop-blur-md shadow-xl">
-             <h3 className="text-gundam-cyan font-orbitron text-[10px] uppercase mb-4 flex items-center gap-2 tracking-[0.2em]">
-                <span className="w-1.5 h-1.5 bg-gundam-cyan rounded-full animate-pulse shadow-[0_0_8px_#00f3ff]"></span>
-                Tactical Objective: Wanted
-             </h3>
-             <p className="text-2xl text-white font-rajdhani font-bold italic tracking-wide">{listing.wantedItems}</p>
-             {/* Tech grid overlay */}
-             <div className="absolute top-0 right-0 w-32 h-32 bg-[radial-gradient(#00f3ff1a_1px,transparent_1px)] bg-[size:16px_16px] opacity-30"></div>
+          <div className="relative overflow-hidden rounded-lg border border-gundam-cyan/20 bg-gundam-dark-surface/80 p-6 shadow-xl backdrop-blur-md">
+            <h3 className="mb-4 flex items-center gap-2 text-[10px] font-orbitron uppercase tracking-[0.2em] text-gundam-cyan">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-gundam-cyan shadow-[0_0_8px_#00f3ff]" />
+              {t('trade.detail.tacticalObjective')}
+            </h3>
+            <p className="text-2xl font-bold italic tracking-wide text-white font-rajdhani">{listing.wantedItems}</p>
+            <div className="absolute right-0 top-0 h-32 w-32 bg-[radial-gradient(#00f3ff1a_1px,transparent_1px)] bg-[size:16px_16px] opacity-30" />
           </div>
 
-          <div className="space-y-4 text-gundam-text-secondary leading-relaxed border-t border-gundam-cyan/10 pt-6">
-             <h4 className="text-white font-orbitron text-[10px] uppercase tracking-[0.3em] opacity-80 mb-3">Signal Decryption (Description)</h4>
-             <p className="font-rajdhani text-lg">{listing.description}</p>
+          <div className="space-y-4 border-t border-gundam-cyan/10 pt-6 leading-relaxed text-gundam-text-secondary">
+            <h4 className="mb-3 text-[10px] font-orbitron uppercase tracking-[0.3em] text-white opacity-80">{t('trade.detail.decrypt')}</h4>
+            <p className="text-lg font-rajdhani">{listing.description}</p>
           </div>
 
-          {/* Action Area */}
-          <div className="flex flex-col xl:flex-row gap-4 pt-6">
-             {isOwner ? (
-                <div className="w-full p-4 border border-gundam-cyan/30 bg-gundam-cyan/5 rounded font-orbitron text-xs text-gundam-cyan text-center uppercase tracking-widest italic animate-pulse">
-                  System Awaiting Incoming Proposals...
-                </div>
-             ) : (
-               <>
-                 <button 
+          <div className="flex flex-col gap-4 pt-6 xl:flex-row">
+            {isOwner ? (
+              <div className="w-full rounded border border-gundam-cyan/30 bg-gundam-cyan/5 p-4 text-center text-xs font-orbitron uppercase tracking-widest italic text-gundam-cyan animate-pulse">
+                {t('trade.detail.waiting')}
+              </div>
+            ) : (
+              <>
+                <button
                   disabled={listing.status !== 'open'}
                   onClick={() => setShowOfferModal(true)}
-                  className="flex-1 py-4 bg-gundam-cyan text-black font-orbitron font-bold uppercase tracking-[0.3em] hover:bg-white transition-all shadow-[0_0_25px_rgba(0,243,255,0.4)] disabled:opacity-30 disabled:grayscale"
-                 >
-                   {listing.status === 'open' ? 'Initiate Proposal' : 'Sector Closed'}
-                 </button>
-                 <button className="w-full xl:w-auto px-8 py-4 bg-transparent border-2 border-gundam-cyan/40 text-gundam-cyan font-orbitron font-bold uppercase tracking-widest hover:bg-gundam-cyan/10 transition-all">
-                   Save Map
-                 </button>
-                 <button
+                  className="flex-1 bg-gundam-cyan py-4 font-orbitron font-bold uppercase tracking-[0.3em] text-black shadow-[0_0_25px_rgba(0,243,255,0.4)] transition-all hover:bg-white disabled:grayscale disabled:opacity-30"
+                >
+                  {listing.status === 'open' ? t('trade.detail.initiateProposal') : t('trade.detail.sectorClosed')}
+                </button>
+                <button className="w-full border-2 border-gundam-cyan/40 bg-transparent px-8 py-4 font-orbitron font-bold uppercase tracking-widest text-gundam-cyan transition-all hover:bg-gundam-cyan/10 xl:w-auto">
+                  {t('trade.detail.saveMap')}
+                </button>
+                <button
                   onClick={() => setShowReportModal(true)}
-                  className="w-full xl:w-auto px-8 py-4 bg-transparent border-2 border-gundam-red/40 text-gundam-red font-orbitron font-bold uppercase tracking-widest hover:bg-gundam-red/10 transition-all"
-                 >
-                   Report Listing
-                 </button>
-               </>
-             )}
+                  className="w-full border-2 border-gundam-red/40 bg-transparent px-8 py-4 font-orbitron font-bold uppercase tracking-widest text-gundam-red transition-all hover:bg-gundam-red/10 xl:w-auto"
+                >
+                  {t('trade.detail.reportListing')}
+                </button>
+              </>
+            )}
           </div>
 
-          {/* Owner Identity */}
-          <div className="pt-8 mt-8 border-t border-gundam-cyan/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-             <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded bg-gundam-dark-surface border border-gundam-cyan/30 flex items-center justify-center font-orbitron text-gundam-cyan text-xl shadow-inner shadow-black">
-                  {listing.owner?.displayName?.[0] || '?'}
+          <div className="mt-8 flex flex-col gap-4 border-t border-gundam-cyan/10 pt-8 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded border border-gundam-cyan/30 bg-gundam-dark-surface font-orbitron text-xl text-gundam-cyan shadow-inner shadow-black">
+                {listing.owner?.displayName?.[0] || '?'}
+              </div>
+              <div>
+                <p className="text-xs font-orbitron uppercase tracking-widest text-white">{listing.owner?.displayName || t('trade.market.unknownPilot')}</p>
+                <div className="mt-1 flex items-center gap-2">
+                  <span className="text-[9px] uppercase tracking-tighter text-gundam-text-muted">{t('trade.detail.compatibility')}:</span>
+                  <span className="text-xs font-orbitron font-bold text-gundam-cyan">{listing.owner?.reputation?.score || 0}%</span>
                 </div>
-                <div>
-                   <p className="text-white font-orbitron uppercase text-xs tracking-widest">{listing.owner?.displayName || 'Unknown Pilot'}</p>
-                   <div className="flex items-center gap-2 mt-1">
-                     <span className="text-gundam-text-muted text-[9px] uppercase tracking-tighter">Pilot Compatibility:</span>
-                     <span className="text-gundam-cyan text-xs font-bold font-orbitron">{listing.owner.reputation?.score || 0}%</span>
-                   </div>
-                </div>
-             </div>
-             {listing.owner.address?.city && (
-               <div className="text-left sm:text-right">
-                  <span className="block text-[9px] text-gundam-text-muted font-orbitron uppercase">Sector Lock</span>
-                  <span className="text-white text-[10px] font-orbitron">{listing.owner.address.city}</span>
-               </div>
-             )}
+              </div>
+            </div>
+            {listing.owner?.address?.city && (
+              <div className="text-left sm:text-right">
+                <span className="block text-[9px] font-orbitron uppercase text-gundam-text-muted">{t('trade.detail.sectorLock')}</span>
+                <span className="text-[10px] font-orbitron text-white">{listing.owner.address.city}</span>
+              </div>
+            )}
           </div>
         </motion.div>
       </div>
 
-      {/* OFFERS MANAGEMENT SECTION (FOR OWNER) */}
       {isOwner && (
-        <motion.section 
+        <motion.section
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           className="mt-24 border-t border-gundam-cyan/20 pt-12"
         >
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+          <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-2xl font-orbitron text-white uppercase tracking-widest">Received Signal Stream</h2>
-              <p className="text-gundam-cyan text-[10px] font-orbitron uppercase mt-1 tracking-[0.2em] opacity-70">Monitor incoming trade proposals from other pilots</p>
+              <h2 className="text-2xl font-orbitron uppercase tracking-widest text-white">{t('trade.detail.signalStream')}</h2>
+              <p className="mt-1 text-[10px] font-orbitron uppercase tracking-[0.2em] text-gundam-cyan opacity-70">{t('trade.detail.signalSubtitle')}</p>
             </div>
-            <span className="bg-gundam-dark-surface border border-gundam-cyan/30 px-3 py-1 rounded font-orbitron text-[10px] text-gundam-cyan uppercase">
-              {offers.length} ACTIVE SIGNALS
+            <span className="rounded border border-gundam-cyan/30 bg-gundam-dark-surface px-3 py-1 text-[10px] font-orbitron uppercase text-gundam-cyan">
+              {t('trade.detail.activeSignals', { count: offers.length })}
             </span>
           </div>
 
           {offers.length === 0 ? (
-            <div className="py-20 text-center border border-dashed border-gundam-cyan/10 rounded-xl bg-white/5">
-              <p className="text-gundam-text-secondary font-orbitron text-xs uppercase tracking-widest opacity-50">No incoming signals detected in this sector.</p>
+            <div className="rounded-xl border border-dashed border-gundam-cyan/10 bg-white/5 py-20 text-center">
+              <p className="text-xs font-orbitron uppercase tracking-widest text-gundam-text-secondary opacity-50">{t('trade.detail.noSignals')}</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {offers.map((offer) => (
-                <motion.div 
+                <motion.div
                   key={offer._id}
                   whileHover={{ y: -5 }}
-                  className={`p-6 border ${offer.status === 'accepted' ? 'border-gundam-emerald bg-gundam-emerald/5' : 'border-gundam-cyan/20 bg-gundam-dark-surface/50'} rounded-lg relative transition-all group`}
+                  className={`group relative rounded-lg border p-6 transition-all ${offer.status === 'accepted' ? 'border-gundam-emerald bg-gundam-emerald/5' : 'border-gundam-cyan/20 bg-gundam-dark-surface/50'}`}
                 >
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex items-center gap-2 min-w-0">
-                       <div className="w-8 h-8 rounded bg-black flex items-center justify-center font-orbitron text-gundam-cyan text-[10px] border border-gundam-cyan/20">
-                          {offer.offerer?.displayName?.[0] || '?'}
-                       </div>
-                       <span className="text-white font-orbitron text-[11px] uppercase tracking-wider truncate">{offer.offerer?.displayName || 'Unknown Pilot'}</span>
+                  <div className="mb-4 flex items-start justify-between">
+                    <div className="min-w-0 flex items-center gap-2">
+                      <div className="flex h-8 w-8 items-center justify-center rounded border border-gundam-cyan/20 bg-black font-orbitron text-[10px] text-gundam-cyan">
+                        {offer.offerer?.displayName?.[0] || '?'}
+                      </div>
+                      <span className="truncate text-[11px] font-orbitron uppercase tracking-wider text-white">{offer.offerer?.displayName || t('trade.market.unknownPilot')}</span>
                     </div>
-                    <span className={`text-[9px] font-orbitron px-2 py-0.5 rounded uppercase tracking-tighter ${
-                      offer.status === 'accepted' ? 'text-gundam-emerald border border-gundam-emerald' : 
-                      offer.status === 'rejected' ? 'text-gundam-red border border-gundam-red' : 
-                      'text-gundam-cyan border border-gundam-cyan opacity-80'
+                    <span className={`rounded px-2 py-0.5 text-[9px] font-orbitron uppercase tracking-tighter ${
+                      offer.status === 'accepted' ? 'border border-gundam-emerald text-gundam-emerald' :
+                      offer.status === 'rejected' ? 'border border-gundam-red text-gundam-red' :
+                      'border border-gundam-cyan text-gundam-cyan opacity-80'
                     }`}>
                       {offer.status}
                     </span>
                   </div>
-                  
-                  <p className="text-gundam-text-secondary font-rajdhani text-sm italic mb-6 line-clamp-3 leading-relaxed">
+
+                  <p className="mb-6 line-clamp-3 text-sm italic leading-relaxed text-gundam-text-secondary font-rajdhani">
                     "{offer.offeredItemsDescription}"
                   </p>
 
-                   <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2">
                     {offer.status === 'pending' && (
                       <>
-                        <button 
+                        <button
                           disabled={processingOfferId === offer._id}
                           onClick={() => handleUpdateOfferStatus(offer._id, 'accepted')}
-                          className="flex-1 py-2 bg-gundam-cyan text-black font-orbitron text-[10px] font-bold uppercase tracking-widest hover:bg-white transition-all shadow-[0_0_10px_rgba(0,243,255,0.2)] disabled:opacity-50"
+                          className="flex-1 bg-gundam-cyan py-2 text-[10px] font-orbitron font-bold uppercase tracking-widest text-black shadow-[0_0_10px_rgba(0,243,255,0.2)] transition-all hover:bg-white disabled:opacity-50"
                         >
-                          Accept
+                          {t('trade.detail.accept')}
                         </button>
-                        <button 
+                        <button
                           disabled={processingOfferId === offer._id}
                           onClick={() => handleUpdateOfferStatus(offer._id, 'rejected')}
-                          className="flex-1 py-2 border border-gundam-red/50 text-gundam-red font-orbitron text-[10px] font-bold uppercase tracking-widest hover:bg-gundam-red/10 transition-all disabled:opacity-50"
+                          className="flex-1 border border-gundam-red/50 py-2 text-[10px] font-orbitron font-bold uppercase tracking-widest text-gundam-red transition-all hover:bg-gundam-red/10 disabled:opacity-50"
                         >
-                          Reject
+                          {t('trade.detail.reject')}
                         </button>
                       </>
                     )}
-                    <button 
+                    <button
                       onClick={() => navigate(offer.conversationId ? `/chat?conversation=${offer.conversationId}` : '/chat')}
-                      className="w-full sm:w-12 h-9 flex items-center justify-center bg-white/10 hover:bg-white/20 text-white rounded transition-all"
+                      className="flex h-9 w-full items-center justify-center rounded bg-white/10 text-white transition-all hover:bg-white/20 sm:w-12"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clipRule="evenodd" />
@@ -322,9 +323,8 @@ const TradeDetailPage = () => {
                     </button>
                   </div>
 
-                  {/* Date badge */}
-                  <div className="absolute top-0 right-0 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span className="text-[7px] text-gundam-text-muted font-orbitron translate-y-1 block">{new Date(offer.createdAt).toLocaleTimeString()}</span>
+                  <div className="absolute right-0 top-0 p-1 opacity-0 transition-opacity group-hover:opacity-100">
+                    <span className="block translate-y-1 text-[7px] font-orbitron text-gundam-text-muted">{new Date(offer.createdAt).toLocaleTimeString()}</span>
                   </div>
                 </motion.div>
               ))}
@@ -333,11 +333,10 @@ const TradeDetailPage = () => {
         </motion.section>
       )}
 
-      {/* Offer Modal */}
       <AnimatePresence>
         {showOfferModal && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-             <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -346,70 +345,70 @@ const TradeDetailPage = () => {
                 setOfferImageFiles([])
               }}
               className="absolute inset-0 bg-black/90 backdrop-blur-sm"
-             />
-             <motion.div
+            />
+            <motion.div
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="relative w-full max-w-xl bg-gundam-dark-surface border border-gundam-cyan p-5 sm:p-8 rounded-lg shadow-[0_0_50px_rgba(0,243,255,0.2)] max-h-[90vh] overflow-y-auto"
-             >
-                <h2 className="text-2xl font-orbitron text-gundam-cyan mb-6 uppercase tracking-widest text-glow">Mission Proposal</h2>
-                <div className="space-y-6">
-                   <div>
-                      <label className="block text-[10px] text-gundam-cyan font-orbitron uppercase mb-2 tracking-widest opacity-80">Proposal Logistics</label>
-                      <textarea 
-                        className="w-full bg-black/50 border border-gundam-cyan/30 p-4 text-white focus:border-gundam-cyan outline-none transition-all rounded-lg font-rajdhani text-lg resize-none"
-                        rows="5"
-                        placeholder="Detail your exchange items and tactical advantages..."
-                        value={offerDescription}
-                        onChange={(e) => setOfferDescription(e.target.value)}
-                        disabled={submittingOffer}
-                      ></textarea>
-                   </div>
-                   <div>
-                      <label className="block text-[10px] text-gundam-cyan font-orbitron uppercase mb-2 tracking-widest opacity-80">Visual Evidence Payload</label>
-                      <label className="h-28 border-2 border-dashed border-gundam-cyan/30 flex flex-col items-center justify-center text-gundam-text-secondary rounded-lg cursor-pointer hover:bg-gundam-cyan/5 transition-all group">
-                         <span className="text-[10px] font-orbitron uppercase opacity-60 group-hover:opacity-100 transition-opacity">Upload tactical photos</span>
-                         <span className="text-[9px] opacity-40 mt-1">(Max 5 images / Cloudinary upload)</span>
-                         <input
-                           type="file"
-                           accept="image/*"
-                           multiple
-                           className="hidden"
-                           onChange={(event) => setOfferImageFiles(Array.from(event.target.files || []))}
-                         />
-                      </label>
-                      {offerImageFiles.length > 0 && (
-                        <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {offerImageFiles.map((file) => (
-                            <div key={`${file.name}-${file.size}`} className="rounded border border-gundam-cyan/20 bg-black/20 px-3 py-2 text-[10px] text-gundam-text-secondary truncate">
-                              {file.name}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                   </div>
-                   <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                      <button 
-                        onClick={handleOfferSubmit}
-                        disabled={submittingOffer || !offerDescription.trim()}
-                        className="flex-1 py-4 bg-gundam-cyan text-black font-orbitron font-bold uppercase tracking-[0.2em] hover:bg-white transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-cyan-glow"
-                      >
-                        {submittingOffer ? 'TRANSMITTING...' : 'DISPATCH OFFER'}
-                      </button>
-                      <button 
-                        onClick={() => {
-                          setShowOfferModal(false)
-                          setOfferImageFiles([])
-                        }}
-                        disabled={submittingOffer}
-                        className="px-6 py-4 border border-gundam-red text-gundam-red font-orbitron font-bold uppercase tracking-widest hover:bg-gundam-red/10 transition-all disabled:opacity-50"
-                      >
-                        ABORT
-                      </button>
-                   </div>
+              className="relative max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-lg border border-gundam-cyan bg-gundam-dark-surface p-5 shadow-[0_0_50px_rgba(0,243,255,0.2)] sm:p-8"
+            >
+              <h2 className="text-glow mb-6 text-2xl font-orbitron uppercase tracking-widest text-gundam-cyan">{t('trade.detail.offerTitle')}</h2>
+              <div className="space-y-6">
+                <div>
+                  <label className="mb-2 block text-[10px] font-orbitron uppercase tracking-widest text-gundam-cyan opacity-80">{t('trade.detail.tacticalObjective')}</label>
+                  <textarea
+                    className="w-full resize-none rounded-lg border border-gundam-cyan/30 bg-black/50 p-4 font-rajdhani text-lg text-white outline-none transition-all focus:border-gundam-cyan"
+                    rows="5"
+                    placeholder={t('trade.detail.offerPlaceholder')}
+                    value={offerDescription}
+                    onChange={(event) => setOfferDescription(event.target.value)}
+                    disabled={submittingOffer}
+                  />
                 </div>
-             </motion.div>
+                <div>
+                  <label className="mb-2 block text-[10px] font-orbitron uppercase tracking-widest text-gundam-cyan opacity-80">{t('trade.detail.offerVisuals')}</label>
+                  <label className="group flex h-28 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gundam-cyan/30 transition-all hover:bg-gundam-cyan/5">
+                    <span className="text-[10px] font-orbitron uppercase text-gundam-text-secondary opacity-60 transition-opacity group-hover:opacity-100">{t('trade.detail.uploadPhotos')}</span>
+                    <span className="mt-1 text-[9px] opacity-40">{t('trade.detail.uploadHint')}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      onChange={(event) => setOfferImageFiles(Array.from(event.target.files || []))}
+                    />
+                  </label>
+                  {offerImageFiles.length > 0 && (
+                    <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                      {offerImageFiles.map((file) => (
+                        <div key={`${file.name}-${file.size}`} className="truncate rounded border border-gundam-cyan/20 bg-black/20 px-3 py-2 text-[10px] text-gundam-text-secondary">
+                          {file.name}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div className="flex flex-col gap-4 pt-4 sm:flex-row">
+                  <button
+                    onClick={handleOfferSubmit}
+                    disabled={submittingOffer || !offerDescription.trim()}
+                    className="flex-1 bg-gundam-cyan py-4 font-orbitron font-bold uppercase tracking-[0.2em] text-black shadow-cyan-glow transition-all hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {submittingOffer ? t('trade.detail.transmitting') : t('trade.detail.dispatch')}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowOfferModal(false)
+                      setOfferImageFiles([])
+                    }}
+                    disabled={submittingOffer}
+                    className="border border-gundam-red px-6 py-4 font-orbitron font-bold uppercase tracking-widest text-gundam-red transition-all hover:bg-gundam-red/10 disabled:opacity-50"
+                  >
+                    {t('trade.detail.abort')}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
           </div>
         )}
       </AnimatePresence>
@@ -428,43 +427,43 @@ const TradeDetailPage = () => {
               initial={{ scale: 0.92, opacity: 0, y: 16 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.92, opacity: 0, y: 16 }}
-              className="relative w-full max-w-xl bg-gundam-dark-surface border border-gundam-red/50 p-5 sm:p-8 rounded-lg shadow-[0_0_40px_rgba(239,68,68,0.18)] max-h-[90vh] overflow-y-auto"
+              className="relative max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-lg border border-gundam-red/50 bg-gundam-dark-surface p-5 shadow-[0_0_40px_rgba(239,68,68,0.18)] sm:p-8"
             >
-              <h2 className="text-2xl font-orbitron text-gundam-red mb-6 uppercase tracking-widest">Violation Report</h2>
+              <h2 className="mb-6 text-2xl font-orbitron uppercase tracking-widest text-gundam-red">{t('trade.detail.reportTitle')}</h2>
               <div className="space-y-5">
                 <div>
-                  <label className="block text-[10px] text-gundam-red font-orbitron uppercase mb-2 tracking-widest opacity-80">Reason</label>
+                  <label className="mb-2 block text-[10px] font-orbitron uppercase tracking-widest text-gundam-red opacity-80">{t('trade.detail.reportReason')}</label>
                   <input
                     value={reportReason}
                     onChange={(event) => setReportReason(event.target.value)}
-                    className="w-full bg-black/50 border border-gundam-red/30 p-4 text-white focus:border-gundam-red outline-none transition-all rounded-lg font-rajdhani"
-                    placeholder="Counterfeit listing, abusive content, scam signal..."
+                    className="w-full rounded-lg border border-gundam-red/30 bg-black/50 p-4 font-rajdhani text-white outline-none transition-all focus:border-gundam-red"
+                    placeholder={t('trade.detail.reportPlaceholder')}
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] text-gundam-red font-orbitron uppercase mb-2 tracking-widest opacity-80">Details</label>
+                  <label className="mb-2 block text-[10px] font-orbitron uppercase tracking-widest text-gundam-red opacity-80">{t('trade.detail.reportDetails')}</label>
                   <textarea
                     rows="5"
                     value={reportDetails}
                     onChange={(event) => setReportDetails(event.target.value)}
-                    className="w-full bg-black/50 border border-gundam-red/30 p-4 text-white focus:border-gundam-red outline-none transition-all rounded-lg font-rajdhani resize-none"
-                    placeholder="Describe the violation so moderation can investigate quickly."
+                    className="w-full resize-none rounded-lg border border-gundam-red/30 bg-black/50 p-4 font-rajdhani text-white outline-none transition-all focus:border-gundam-red"
+                    placeholder={t('trade.detail.reportDetailsPlaceholder')}
                   />
                 </div>
-                <div className="flex flex-col sm:flex-row gap-4 pt-2">
+                <div className="flex flex-col gap-4 pt-2 sm:flex-row">
                   <button
                     onClick={handleSubmitReport}
                     disabled={submittingReport || !reportReason.trim() || !reportDetails.trim()}
-                    className="flex-1 py-4 bg-gundam-red text-white font-orbitron font-bold uppercase tracking-[0.2em] hover:bg-red-500 transition-all disabled:opacity-50"
+                    className="flex-1 bg-gundam-red py-4 font-orbitron font-bold uppercase tracking-[0.2em] text-white transition-all hover:bg-red-500 disabled:opacity-50"
                   >
-                    {submittingReport ? 'TRANSMITTING...' : 'SUBMIT REPORT'}
+                    {submittingReport ? t('trade.detail.transmitting') : t('trade.detail.submitReport')}
                   </button>
                   <button
                     onClick={() => setShowReportModal(false)}
                     disabled={submittingReport}
-                    className="px-6 py-4 border border-white/10 text-white font-orbitron font-bold uppercase tracking-widest hover:bg-white/5 transition-all disabled:opacity-50"
+                    className="border border-white/10 px-6 py-4 font-orbitron font-bold uppercase tracking-widest text-white transition-all hover:bg-white/5 disabled:opacity-50"
                   >
-                    CANCEL
+                    {t('trade.detail.cancel')}
                   </button>
                 </div>
               </div>
@@ -473,7 +472,7 @@ const TradeDetailPage = () => {
         )}
       </AnimatePresence>
     </div>
-  );
-};
+  )
+}
 
-export default TradeDetailPage;
+export default TradeDetailPage

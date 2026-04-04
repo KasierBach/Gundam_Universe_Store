@@ -18,28 +18,36 @@ import categoryService from '../../services/categoryService'
 import ProductCard from '../../components/product/ProductCard'
 import { cn } from '../../utils/cn'
 import { PRODUCT_GRADES } from '../../shared/constants/productConstants'
-
-const SORT_OPTIONS = [
-  { label: 'Latest Launch', value: 'createdAt:desc' },
-  { label: 'Most Viewed', value: 'views:desc' },
-  { label: 'Price Ascending', value: 'price:asc' },
-  { label: 'Price Descending', value: 'price:desc' },
-  { label: 'Top Rated', value: 'ratings.average:desc' },
-]
-
-const QUICK_SIGNAL_COPY = [
-  { label: 'Active Catalog', value: 'Live Drops' },
-  { label: 'Intel Grade', value: 'Curated' },
-  { label: 'Hangar Mode', value: 'Responsive' },
-]
+import { useI18n } from '../../i18n/I18nProvider'
 
 const ProductPage = () => {
+  const { t, tv } = useI18n()
   const [searchParams, setSearchParams] = useSearchParams()
   const [products, setProducts] = useState([])
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
   const [showFilters, setShowFilters] = useState(false)
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1, totalResults: 0 })
+
+  const sortOptions = useMemo(
+    () => [
+      { label: t('product.listing.sort.latest'), value: 'createdAt:desc' },
+      { label: t('product.listing.sort.viewed'), value: 'views:desc' },
+      { label: t('product.listing.sort.priceAsc'), value: 'price:asc' },
+      { label: t('product.listing.sort.priceDesc'), value: 'price:desc' },
+      { label: t('product.listing.sort.rated'), value: 'ratings.average:desc' },
+    ],
+    [t]
+  )
+
+  const quickSignalCopy = useMemo(
+    () => [
+      { label: t('product.listing.activeCatalog'), value: t('product.listing.liveDrops') },
+      { label: t('product.listing.intelGrade'), value: t('product.listing.curated') },
+      { label: t('product.listing.hangarMode'), value: t('product.listing.responsive') },
+    ],
+    [t]
+  )
 
   const selectedSort = `${searchParams.get('sortBy') || 'createdAt'}:${searchParams.get('order') || 'desc'}`
 
@@ -130,15 +138,14 @@ const ProductPage = () => {
           <div className="grid gap-8 xl:grid-cols-[1.35fr_0.95fr]">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full border border-gundam-cyan/20 bg-gundam-cyan/10 px-4 py-2 text-[10px] font-orbitron uppercase tracking-[0.32em] text-gundam-cyan">
-                <Radar size={14} /> Tactical Catalog Uplink
+                <Radar size={14} /> {t('product.listing.heroBadge')}
               </div>
               <h1 className="mt-6 max-w-3xl text-4xl font-black uppercase tracking-tight text-white sm:text-5xl lg:text-6xl">
-                Build Your Next
-                <span className="block text-gundam-cyan glow-text-cyan">Command-Grade Hangar</span>
+                {t('product.listing.titleLine1')}
+                <span className="block text-gundam-cyan glow-text-cyan">{t('product.listing.titleLine2')}</span>
               </h1>
               <p className="mt-5 max-w-2xl text-base leading-7 text-gundam-text-secondary sm:text-lg">
-                Curated Gundam kits with cleaner tactical filtering, better command visibility, and a gallery-first layout
-                that still holds up on split-screen, tablet, and mobile cockpit views.
+                {t('product.listing.description')}
               </p>
 
               <div className="mt-8 flex flex-col gap-4 lg:flex-row lg:items-center">
@@ -146,7 +153,7 @@ const ProductPage = () => {
                   <Search className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gundam-cyan/40" size={18} />
                   <input
                     type="text"
-                    placeholder="Search by unit name, pilot, or keyword..."
+                    placeholder={t('product.listing.searchPlaceholder')}
                     value={searchParams.get('name') || ''}
                     onChange={(event) => handleFilterChange('name', event.target.value)}
                     className="w-full rounded-2xl border border-gundam-border/40 bg-black/35 py-4 pl-12 pr-4 text-sm text-gundam-text-primary outline-none transition-all placeholder:text-gundam-text-muted/60 focus:border-gundam-cyan focus:shadow-cyan-glow/20"
@@ -161,7 +168,7 @@ const ProductPage = () => {
                       onChange={(event) => handleSortChange(event.target.value)}
                       className="w-full appearance-none rounded-2xl border border-gundam-border/40 bg-black/35 py-4 pl-12 pr-10 text-sm text-gundam-text-primary outline-none transition-all focus:border-gundam-cyan"
                     >
-                      {SORT_OPTIONS.map((option) => (
+                      {sortOptions.map((option) => (
                         <option key={option.value} value={option.value}>
                           {option.label}
                         </option>
@@ -178,14 +185,14 @@ const ProductPage = () => {
                         : 'border-gundam-cyan/30 bg-black/35 text-gundam-cyan hover:border-gundam-cyan hover:bg-gundam-cyan/10'
                     )}
                   >
-                    <SlidersHorizontal size={16} /> Logistics Panel {activeFilters.length > 0 ? `(${activeFilters.length})` : ''}
+                    <SlidersHorizontal size={16} /> {t('product.listing.logistics')} {activeFilters.length > 0 ? `(${activeFilters.length})` : ''}
                   </button>
                 </div>
               </div>
 
               <div className="mt-8 flex flex-wrap gap-3">
                 <GradeChip
-                  label="All Frames"
+                  label={t('common.allFrames')}
                   active={!searchParams.get('grade')}
                   onClick={() => handleFilterChange('grade', 'all')}
                 />
@@ -194,7 +201,7 @@ const ProductPage = () => {
                   .map((grade) => (
                     <GradeChip
                       key={grade}
-                      label={grade}
+                      label={tv('grade', grade)}
                       active={searchParams.get('grade') === grade}
                       onClick={() => handleFilterChange('grade', grade)}
                     />
@@ -204,31 +211,31 @@ const ProductPage = () => {
 
             <div className="grid gap-4 sm:grid-cols-3 xl:grid-cols-1 xl:grid-rows-[auto_auto_1fr]">
               <div className="rounded-[1.75rem] border border-gundam-border/30 bg-black/25 p-5">
-                <p className="text-[10px] font-orbitron uppercase tracking-[0.28em] text-gundam-text-muted">Sector Scan</p>
+                <p className="text-[10px] font-orbitron uppercase tracking-[0.28em] text-gundam-text-muted">{t('product.listing.scan')}</p>
                 <p className="mt-4 text-4xl font-black text-white">{pagination.totalResults}</p>
-                <p className="mt-2 text-sm text-gundam-text-secondary">kits currently synchronized in the catalog</p>
+                <p className="mt-2 text-sm text-gundam-text-secondary">{t('product.listing.kitsCount')}</p>
               </div>
 
               <div className="rounded-[1.75rem] border border-gundam-border/30 bg-black/25 p-5">
-                <p className="text-[10px] font-orbitron uppercase tracking-[0.28em] text-gundam-text-muted">Page Vector</p>
+                <p className="text-[10px] font-orbitron uppercase tracking-[0.28em] text-gundam-text-muted">{t('product.listing.pageVector')}</p>
                 <p className="mt-4 text-4xl font-black text-gundam-cyan">
                   {pagination.page.toString().padStart(2, '0')}
                   <span className="mx-2 text-gundam-text-muted">/</span>
                   {pagination.totalPages.toString().padStart(2, '0')}
                 </p>
-                <p className="mt-2 text-sm text-gundam-text-secondary">adaptive layout tuned for narrow cockpit windows</p>
+                <p className="mt-2 text-sm text-gundam-text-secondary">{t('product.listing.gridDescription')}</p>
               </div>
 
               <div className="rounded-[1.75rem] border border-gundam-border/30 bg-[linear-gradient(180deg,rgba(0,243,255,0.08),rgba(0,0,0,0.12))] p-5">
                 <div className="flex items-center justify-between gap-4">
                   <div>
-                    <p className="text-[10px] font-orbitron uppercase tracking-[0.28em] text-gundam-cyan">Command Signals</p>
-                    <p className="mt-2 text-lg font-orbitron font-black text-white">Pilot-Ready UI</p>
+                    <p className="text-[10px] font-orbitron uppercase tracking-[0.28em] text-gundam-cyan">{t('product.listing.featuredBadge')}</p>
+                    <p className="mt-2 text-lg font-orbitron font-black text-white">{t('product.listing.responsive')}</p>
                   </div>
                   <Sparkles className="text-gundam-cyan" size={20} />
                 </div>
                 <div className="mt-5 grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
-                  {QUICK_SIGNAL_COPY.map((item) => (
+                  {quickSignalCopy.map((item) => (
                     <div key={item.label} className="rounded-2xl border border-white/10 bg-black/20 p-3">
                       <p className="text-[10px] font-orbitron uppercase tracking-[0.24em] text-gundam-text-muted">{item.label}</p>
                       <p className="mt-2 text-sm font-orbitron font-bold uppercase text-white">{item.value}</p>
@@ -256,12 +263,12 @@ const ProductPage = () => {
                 onClick={clearAllFilters}
                 className="rounded-full border border-gundam-red/30 bg-gundam-red/10 px-4 py-2 text-[10px] font-orbitron uppercase tracking-[0.22em] text-gundam-red transition-colors hover:bg-gundam-red/20"
               >
-                Clear Tactical Filters
+                {t('product.listing.clear')}
               </button>
             </>
           ) : (
             <p className="text-xs uppercase tracking-[0.28em] text-gundam-text-muted">
-              No active overrides. Displaying the full command catalog.
+              {t('product.listing.noFilters')}
             </p>
           )}
         </div>
@@ -278,35 +285,35 @@ const ProductPage = () => {
                 <div className="sticky top-24 rounded-[1.75rem] border border-gundam-border/30 bg-[linear-gradient(180deg,rgba(9,15,28,0.98),rgba(3,8,18,0.98))] p-6 shadow-2xl">
                   <div className="mb-8 flex items-center gap-3">
                     <Filter className="text-gundam-cyan" size={16} />
-                    <h2 className="text-[11px] font-orbitron font-bold uppercase tracking-[0.3em] text-white">Strategic Filters</h2>
+                    <h2 className="text-[11px] font-orbitron font-bold uppercase tracking-[0.3em] text-white">{t('product.listing.filters.title')}</h2>
                   </div>
 
                   <div className="space-y-8">
                     <FilterGroup
-                      label="Protocol Grade"
-                      options={[{ _id: 'all', name: 'All Grades' }, ...Object.values(PRODUCT_GRADES).map((grade) => ({ _id: grade, name: grade }))]}
+                      label={t('product.listing.filters.protocolGrade')}
+                      options={[{ _id: 'all', name: t('product.listing.filters.allGrades') }, ...Object.values(PRODUCT_GRADES).map((grade) => ({ _id: grade, name: tv('grade', grade) }))]}
                       value={searchParams.get('grade') || 'all'}
                       onChange={(value) => handleFilterChange('grade', value)}
                     />
 
                     <FilterGroup
-                      label="Sector HQ"
-                      options={[{ _id: 'all', name: 'All Categories' }, ...categories]}
+                      label={t('product.listing.filters.sector')}
+                      options={[{ _id: 'all', name: t('product.listing.filters.allCategories') }, ...categories]}
                       value={searchParams.get('category') || 'all'}
                       onChange={(value) => handleFilterChange('category', value)}
                     />
 
                     <div className="space-y-4">
-                      <label className="block text-[10px] font-orbitron uppercase tracking-[0.28em] text-gundam-cyan/70">Resource Threshold</label>
+                      <label className="block text-[10px] font-orbitron uppercase tracking-[0.28em] text-gundam-cyan/70">{t('product.listing.filters.threshold')}</label>
                       <div className="grid grid-cols-2 gap-3">
                         <PriceInput
-                          label="Min"
+                          label={t('product.listing.filters.min')}
                           placeholder="0"
                           value={searchParams.get('minPrice') || ''}
                           onChange={(value) => handleFilterChange('minPrice', value)}
                         />
                         <PriceInput
-                          label="Max"
+                          label={t('product.listing.filters.max')}
                           placeholder="999"
                           value={searchParams.get('maxPrice') || ''}
                           onChange={(value) => handleFilterChange('maxPrice', value)}
@@ -318,7 +325,7 @@ const ProductPage = () => {
                       onClick={clearAllFilters}
                       className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-gundam-red px-4 py-4 text-[10px] font-orbitron uppercase tracking-[0.24em] text-gundam-red transition-colors hover:bg-gundam-red/10"
                     >
-                      <AlertCircle size={14} /> Reset Scan Parameters
+                      <AlertCircle size={14} /> {t('product.listing.filters.reset')}
                     </button>
                   </div>
                 </div>
@@ -331,13 +338,13 @@ const ProductPage = () => {
               <section className="mb-10">
                 <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                   <div>
-                    <p className="text-[10px] font-orbitron uppercase tracking-[0.3em] text-gundam-cyan">Command Picks</p>
+                    <p className="text-[10px] font-orbitron uppercase tracking-[0.3em] text-gundam-cyan">{t('product.listing.featuredBadge')}</p>
                     <h2 className="mt-2 text-2xl font-orbitron font-black uppercase tracking-tight text-white">
-                      Featured Mobile Suit Drops
+                      {t('product.listing.featuredTitle')}
                     </h2>
                   </div>
                   <p className="max-w-xl text-sm text-gundam-text-secondary">
-                    High-signal picks surfaced from the current result set so the hero zone still feels alive even when the window gets narrow.
+                    {t('product.listing.featuredDescription')}
                   </p>
                 </div>
 
@@ -356,21 +363,21 @@ const ProductPage = () => {
                   <div className="absolute inset-0 rounded-full bg-gundam-cyan/20 blur-xl" />
                 </div>
                 <div className="text-center">
-                  <span className="mb-2 block text-sm font-orbitron uppercase tracking-[0.45em] text-gundam-cyan">Synchronizing Fleet Data</span>
-                  <span className="text-[10px] uppercase tracking-[0.3em] text-gundam-text-muted">Building the mobile suit showcase grid...</span>
+                  <span className="mb-2 block text-sm font-orbitron uppercase tracking-[0.45em] text-gundam-cyan">{t('product.listing.loading.title')}</span>
+                  <span className="text-[10px] uppercase tracking-[0.3em] text-gundam-text-muted">{t('product.listing.loading.subtitle')}</span>
                 </div>
               </div>
             ) : products.length > 0 ? (
               <>
                 <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <p className="text-[10px] font-orbitron uppercase tracking-[0.28em] text-gundam-text-muted">Grid Status</p>
+                    <p className="text-[10px] font-orbitron uppercase tracking-[0.28em] text-gundam-text-muted">{t('product.listing.gridStatus')}</p>
                     <h3 className="mt-2 text-xl font-orbitron font-black uppercase tracking-tight text-white">
-                      {pagination.totalResults} tactical units available
+                      {t('product.listing.unitsAvailable', { count: pagination.totalResults })}
                     </h3>
                   </div>
                   <p className="text-sm text-gundam-text-secondary">
-                    Adaptive product cards tuned for desktop, tablet, and half-width multitasking layouts.
+                    {t('product.listing.gridDescription')}
                   </p>
                 </div>
 
@@ -390,11 +397,11 @@ const ProductPage = () => {
                     onClick={() => handleFilterChange('page', String(pagination.page - 1))}
                     className="min-w-[180px] rounded-full border border-gundam-border/30 px-6 py-3 text-[10px] font-orbitron uppercase tracking-[0.24em] text-gundam-text-secondary transition-colors hover:border-gundam-cyan hover:text-gundam-cyan disabled:cursor-not-allowed disabled:opacity-30"
                   >
-                    Previous Sector
+                    {t('product.listing.previous')}
                   </button>
 
                   <div className="text-center">
-                    <p className="text-[10px] font-orbitron uppercase tracking-[0.3em] text-gundam-text-muted">Page Vector</p>
+                    <p className="text-[10px] font-orbitron uppercase tracking-[0.3em] text-gundam-text-muted">{t('product.listing.pageVector')}</p>
                     <p className="mt-2 text-3xl font-orbitron font-black text-white">
                       {pagination.page.toString().padStart(2, '0')}
                       <span className="mx-2 text-gundam-text-muted">/</span>
@@ -407,7 +414,7 @@ const ProductPage = () => {
                     onClick={() => handleFilterChange('page', String(pagination.page + 1))}
                     className="min-w-[180px] rounded-full border border-gundam-border/30 px-6 py-3 text-[10px] font-orbitron uppercase tracking-[0.24em] text-gundam-text-secondary transition-colors hover:border-gundam-cyan hover:text-gundam-cyan disabled:cursor-not-allowed disabled:opacity-30"
                   >
-                    Next Sector
+                    {t('product.listing.next')}
                   </button>
                 </div>
               </>
@@ -423,17 +430,17 @@ const ProductPage = () => {
                 </div>
                 <div>
                   <h3 className="text-2xl font-orbitron font-black uppercase tracking-tight text-white/70">
-                    No units detected in this sector
+                    {t('product.listing.noResultTitle')}
                   </h3>
                   <p className="mt-3 text-[11px] uppercase tracking-[0.3em] text-gundam-text-muted">
-                    Tactical advice: widen your scan or clear the current filters
+                    {t('product.listing.noResultHint')}
                   </p>
                 </div>
                 <button
                   onClick={clearAllFilters}
                   className="rounded-full border border-gundam-cyan px-6 py-3 text-[10px] font-orbitron uppercase tracking-[0.24em] text-gundam-cyan transition-colors hover:bg-gundam-cyan/10"
                 >
-                  Revert to Default Sector
+                  {t('product.listing.revert')}
                 </button>
               </motion.div>
             )}

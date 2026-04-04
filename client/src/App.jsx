@@ -6,6 +6,7 @@ import useCartStore from './stores/cartStore'
 import useWishlistStore from './stores/wishlistStore'
 import useNotificationStore from './stores/notificationStore'
 import useOrderStore from './stores/orderStore'
+import { I18nProvider } from './i18n/I18nProvider'
 
 function App() {
   const { checkAuth, accessToken } = useAuthStore()
@@ -43,10 +44,10 @@ function App() {
   ])
 
   return (
-    <>
+    <I18nProvider>
       <HUDOverlay />
       <Router />
-    </>
+    </I18nProvider>
   )
 }
 

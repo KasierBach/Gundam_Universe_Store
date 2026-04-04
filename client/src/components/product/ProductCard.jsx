@@ -5,6 +5,7 @@ import AddToCartButton from '../cart/AddToCartButton'
 import WishlistButton from '../wishlist/WishlistButton'
 import { cn } from '../../utils/cn'
 import ModelKitImage from '../shared/ModelKitImage'
+import { useI18n } from '../../i18n/I18nProvider'
 
 const rarityStyles = {
   Legendary: 'border-gundam-red/60 bg-gundam-red text-white shadow-[0_0_24px_rgba(239,68,68,0.35)]',
@@ -13,6 +14,7 @@ const rarityStyles = {
 }
 
 const ProductCard = ({ product, priority = false }) => {
+  const { t, tv } = useI18n()
   const { _id, name, slug, price, images, category, grade, series, rarity, condition, ratings, stock } = product
   const imageList = Array.isArray(images) ? images : []
   const mainImage = imageList.find((img) => img.isMain)?.url || imageList[0]?.url
@@ -36,19 +38,19 @@ const ProductCard = ({ product, priority = false }) => {
             'rounded-full border px-3 py-1 text-[10px] font-orbitron uppercase tracking-[0.24em]',
             rarityStyles[rarity] || 'border-gundam-cyan/30 bg-black/45 text-gundam-cyan'
           )}>
-            {rarity}
+            {tv('rarity', rarity)}
           </span>
           <span className="rounded-full border border-white/10 bg-black/45 px-3 py-1 text-[10px] font-orbitron uppercase tracking-[0.22em] text-gundam-text-secondary">
-            {condition}
+            {tv('condition', condition)}
           </span>
         </div>
 
         <div className="absolute bottom-4 left-4 z-20 flex items-center gap-2">
           <span className="rounded-full border border-gundam-cyan/20 bg-black/45 px-3 py-1 text-[10px] font-orbitron uppercase tracking-[0.22em] text-gundam-cyan">
-            {grade}
+            {tv('grade', grade)}
           </span>
           <span className="rounded-full border border-white/10 bg-black/45 px-3 py-1 text-[10px] font-rajdhani uppercase tracking-[0.18em] text-gundam-text-muted">
-            {category?.name || 'Gundam Unit'}
+            {category?.name || t('product.card.categoryFallback')}
           </span>
         </div>
 
@@ -86,19 +88,19 @@ const ProductCard = ({ product, priority = false }) => {
 
         <div className="mb-5 grid grid-cols-2 gap-3 rounded-2xl border border-gundam-border/20 bg-black/20 p-3">
           <InfoPill
-            label="Rating"
-            value={ratings?.count ? `${ratings.average?.toFixed(1)} / 5` : 'No data'}
+            label={t('product.card.rating')}
+            value={ratings?.count ? `${ratings.average?.toFixed(1)} / 5` : t('product.card.noData')}
           />
           <InfoPill
-            label="Stock"
-            value={stock > 0 ? `${stock} units` : 'Out'}
+            label={t('product.card.stock')}
+            value={stock > 0 ? `${stock} ${t('product.card.units')}` : t('product.card.out')}
             accent={isLowStock ? 'warning' : stock > 0 ? 'normal' : 'danger'}
           />
         </div>
 
         <div className="mb-5 flex items-end justify-between gap-4">
           <div>
-            <p className="text-[10px] uppercase tracking-[0.26em] text-gundam-text-muted">Power Required</p>
+            <p className="text-[10px] uppercase tracking-[0.26em] text-gundam-text-muted">{t('product.card.powerRequired')}</p>
             <p className="mt-2 text-2xl font-orbitron font-black text-white">
               ${price.toLocaleString()}
             </p>
@@ -120,14 +122,14 @@ const ProductCard = ({ product, priority = false }) => {
             to={`/products/${slug}`}
             className="inline-flex items-center justify-center gap-2 rounded-xl border border-gundam-border/40 bg-white/5 px-4 py-3 text-[10px] font-orbitron uppercase tracking-[0.24em] text-gundam-text-secondary transition-colors hover:border-gundam-cyan/30 hover:text-gundam-cyan"
           >
-            <ShieldCheck size={14} /> Full Intel
+            <ShieldCheck size={14} /> {t('product.card.fullIntel')}
           </Link>
         </div>
       </div>
 
       {priority && (
         <div className="absolute right-4 top-4 z-30 rounded-full border border-gundam-amber/30 bg-gundam-amber/15 px-3 py-1 text-[10px] font-orbitron uppercase tracking-[0.28em] text-gundam-amber">
-          Command Pick
+          {t('product.card.commandPick')}
         </div>
       )}
     </motion.article>
