@@ -2,7 +2,7 @@
 
 # Gundam Universe Store
 
-### Website ban hang va san trao doi giao dich Gundam theo phong cach mecha / HUD / futuristic
+### Website bán hàng và sàn trao đổi giao dịch Gundam theo phong cách mecha / HUD / futuristic
 
 [![Frontend](https://img.shields.io/badge/Frontend-React%20%2B%20Vite-00d8ff?style=for-the-badge&logo=react&logoColor=06131a)](./client)
 [![Backend](https://img.shields.io/badge/Backend-Node.js%20%2B%20Express-1f2937?style=for-the-badge&logo=node.js&logoColor=8cc84b)](./server)
@@ -11,7 +11,7 @@
 [![Deploy](https://img.shields.io/badge/Deploy-Vercel%20%2B%20Render-0b1220?style=for-the-badge&logo=vercel&logoColor=ffffff)](./DEPLOYMENT.md)
 
 [![Cloudinary](https://img.shields.io/badge/Media-Cloudinary-1d4ed8?style=flat-square&logo=cloudinary&logoColor=white)](https://cloudinary.com/)
-[![JWT](https://img.shields.io/badge/Auth-JWT%20%2B%20Refresh%20Token-7c3aed?style=flat-square)](#bao-mat-va-hieu-suat)
+[![JWT](https://img.shields.io/badge/Auth-JWT%20%2B%20Refresh%20Token-7c3aed?style=flat-square)](#bảo-mật-và-hiệu-suất)
 [![TailwindCSS](https://img.shields.io/badge/UI-TailwindCSS%20%2B%20Framer%20Motion-0891b2?style=flat-square&logo=tailwindcss&logoColor=white)](./client)
 [![License](https://img.shields.io/badge/License-ISC-334155?style=flat-square)](./server/package.json)
 
@@ -19,124 +19,124 @@
 
 ---
 
-## Muc luc
+## Mục lục
 
-- [Tong quan](#tong-quan)
-- [Gia tri cua du an](#gia-tri-cua-du-an)
-- [Tinh nang noi bat](#tinh-nang-noi-bat)
-- [Tech stack va phien ban](#tech-stack-va-phien-ban)
-- [Kien truc he thong](#kien-truc-he-thong)
-- [Cau truc thu muc](#cau-truc-thu-muc)
-- [Domain model va collection](#domain-model-va-collection)
-- [API chinh](#api-chinh)
-- [Bao mat va hieu suat](#bao-mat-va-hieu-suat)
-- [UI UX design direction](#ui-ux-design-direction)
-- [Cai dat local](#cai-dat-local)
-- [Bien moi truong](#bien-moi-truong)
-- [Seed du lieu](#seed-du-lieu)
+- [Tổng quan](#tổng-quan)
+- [Giá trị của dự án](#giá-trị-của-dự-án)
+- [Tính năng nổi bật](#tính-năng-nổi-bật)
+- [Tech stack và phiên bản](#tech-stack-và-phiên-bản)
+- [Kiến trúc hệ thống](#kiến-trúc-hệ-thống)
+- [Cấu trúc thư mục](#cấu-trúc-thư-mục)
+- [Domain model và collection](#domain-model-và-collection)
+- [API chính](#api-chính)
+- [Bảo mật và hiệu suất](#bảo-mật-và-hiệu-suất)
+- [UI/UX design direction](#uiux-design-direction)
+- [Cài đặt local](#cài-đặt-local)
+- [Biến môi trường](#biến-môi-trường)
+- [Seed dữ liệu](#seed-dữ-liệu)
 - [Deploy](#deploy)
-- [Trang thai hien tai](#trang-thai-hien-tai)
-- [Roadmap tiep theo](#roadmap-tiep-theo)
+- [Trạng thái hiện tại](#trạng-thái-hiện-tại)
+- [Roadmap tiếp theo](#roadmap-tiếp-theo)
 
-## Tong quan
+## Tổng quan
 
-`Gundam Universe Store` la mot he thong full-stack ket hop hai domain trong cung mot nen tang:
+`Gundam Universe Store` là một hệ thống full-stack kết hợp hai domain trong cùng một nền tảng:
 
-| Domain | Mo ta |
+| Domain | Mô tả |
 | --- | --- |
-| `Gundam Store` | Ban san pham Gundam/Gunpla voi catalog, tim kiem, loc, gio hang, checkout, lich su don hang |
-| `Trade Exchange` | San trao doi giao dich Gundam voi trade listing, trade offer, chat realtime, report moderation |
+| `Gundam Store` | Bán sản phẩm Gundam/Gunpla với catalog, tìm kiếm, lọc, giỏ hàng, checkout, lịch sử đơn hàng |
+| `Trade Exchange` | Sàn trao đổi Gundam với trade listing, trade offer, chat realtime, report moderation |
 
-Du an duoc xay dung theo huong:
+Dự án được xây dựng theo hướng:
 
-- kien truc module hoa, ro domain
-- clean code, de doc, de mo rong
-- UI dam chat mecha / sci-fi / tactical HUD
-- co the dung cho do an va co kha nang phat trien tiep thanh san pham that
+- kiến trúc module hóa, rõ domain
+- clean code, dễ đọc, dễ mở rộng
+- UI đậm chất mecha / sci-fi / tactical HUD
+- có thể dùng cho đồ án và tiếp tục phát triển thành sản phẩm thật
 
-## Gia tri cua du an
+## Giá trị của dự án
 
-README nay huong den 3 muc tieu:
+README này hướng đến 3 mục tiêu:
 
-| Muc tieu | Gia tri |
+| Mục tiêu | Giá trị |
 | --- | --- |
-| `Do an` | Trinh bay ro kien truc, tinh nang, data flow, va huong trien khai |
-| `Demo` | Co day du flow MVP de thuyet trinh va demo truc tiep |
-| `Thuc chien` | Da co nen tang deploy, upload media, auth, realtime, moderation, seller/admin console |
+| `Đồ án` | Trình bày rõ kiến trúc, tính năng, data flow và hướng triển khai |
+| `Demo` | Có đầy đủ flow MVP để thuyết trình và demo trực tiếp |
+| `Thực chiến` | Đã có nền tảng deploy, upload media, auth, realtime, moderation, seller/admin console |
 
-## Tinh nang noi bat
+## Tính năng nổi bật
 
-### 1. Auth va account
+### 1. Auth và account
 
-| Tinh nang | Trang thai |
+| Tính năng | Trạng thái |
 | --- | --- |
-| Dang ky / dang nhap / dang xuat | Hoan thanh |
-| Refresh token | Hoan thanh |
-| Quen mat khau / dat lai mat khau | Hoan thanh |
-| Doi mat khau | Hoan thanh |
-| Cap nhat profile | Hoan thanh |
-| Upload avatar Cloudinary | Hoan thanh |
-| Ghi nho email dang nhap | Hoan thanh |
-| Phuc hoi session tu refresh token | Hoan thanh |
+| Đăng ký / đăng nhập / đăng xuất | Hoàn thành |
+| Refresh token | Hoàn thành |
+| Quên mật khẩu / đặt lại mật khẩu | Hoàn thành |
+| Đổi mật khẩu | Hoàn thành |
+| Cập nhật profile | Hoàn thành |
+| Upload avatar Cloudinary | Hoàn thành |
+| Ghi nhớ email đăng nhập | Hoàn thành |
+| Phục hồi session từ refresh token | Hoàn thành |
 
 ### 2. Store module
 
-| Tinh nang | Trang thai |
+| Tính năng | Trạng thái |
 | --- | --- |
-| Home page | Hoan thanh |
-| Product listing | Hoan thanh |
-| Search / filter / sort | Hoan thanh |
-| Product detail | Hoan thanh |
-| Related products | Hoan thanh |
-| Rare item valuation mock | Hoan thanh |
-| Cart page | Hoan thanh |
-| Checkout | Hoan thanh |
-| Order history | Hoan thanh |
-| Order detail / tracking basic | Hoan thanh |
-| Wishlist | Hoan thanh |
-| Review | Hoan thanh |
+| Home page | Hoàn thành |
+| Product listing | Hoàn thành |
+| Search / filter / sort | Hoàn thành |
+| Product detail | Hoàn thành |
+| Related products | Hoàn thành |
+| Rare item valuation mô phỏng | Hoàn thành |
+| Cart page | Hoàn thành |
+| Checkout | Hoàn thành |
+| Order history | Hoàn thành |
+| Order detail / tracking cơ bản | Hoàn thành |
+| Wishlist | Hoàn thành |
+| Review | Hoàn thành |
 
 ### 3. Trade module
 
-| Tinh nang | Trang thai |
+| Tính năng | Trạng thái |
 | --- | --- |
-| Tao trade listing | Hoan thanh |
-| Upload anh listing | Hoan thanh |
-| Gui trade offer | Hoan thanh |
-| Upload anh offer | Hoan thanh |
-| Accept / reject offer | Hoan thanh |
-| Chat realtime | Hoan thanh |
-| Report vi pham | Hoan thanh |
+| Tạo trade listing | Hoàn thành |
+| Upload ảnh listing | Hoàn thành |
+| Gửi trade offer | Hoàn thành |
+| Upload ảnh offer | Hoàn thành |
+| Accept / reject offer | Hoàn thành |
+| Chat realtime | Hoàn thành |
+| Report vi phạm | Hoàn thành |
 | Trade suggestion theo wishlist | MVP |
 
-### 4. Seller va admin
+### 4. Seller và admin
 
-| Tinh nang | Trang thai |
+| Tính năng | Trạng thái |
 | --- | --- |
-| Seller dashboard | Hoan thanh |
-| Seller product operations | Hoan thanh |
-| Seller order operations | Hoan thanh |
-| Admin dashboard | Hoan thanh |
-| Admin product/category/user/order management | Hoan thanh |
-| Admin trade moderation | Hoan thanh |
-| Admin report resolution note | Hoan thanh |
+| Seller dashboard | Hoàn thành |
+| Seller product operations | Hoàn thành |
+| Seller order operations | Hoàn thành |
+| Admin dashboard | Hoàn thành |
+| Admin product/category/user/order management | Hoàn thành |
+| Admin trade moderation | Hoàn thành |
+| Admin report resolution note | Hoàn thành |
 
-### 5. UX va state persistence
+### 5. UX và state persistence
 
-| Tinh nang | Trang thai |
+| Tính năng | Trạng thái |
 | --- | --- |
-| Responsive mobile / tablet / desktop | Hoan thanh |
-| Split-screen friendly | Hoan thanh |
-| Persist cart / wishlist / notifications | Hoan thanh |
-| Persist checkout draft | Hoan thanh |
-| Persist trade draft | Hoan thanh |
-| Persist chat draft theo conversation | Hoan thanh |
+| Responsive mobile / tablet / desktop | Hoàn thành |
+| Split-screen friendly | Hoàn thành |
+| Persist cart / wishlist / notifications | Hoàn thành |
+| Persist checkout draft | Hoàn thành |
+| Persist trade draft | Hoàn thành |
+| Persist chat draft theo conversation | Hoàn thành |
 
-## Tech stack va phien ban
+## Tech stack và phiên bản
 
 ### Frontend
 
-| Cong nghe | Phien ban |
+| Công nghệ | Phiên bản |
 | --- | --- |
 | React | `18.3.1` |
 | React DOM | `18.3.1` |
@@ -151,7 +151,7 @@ README nay huong den 3 muc tieu:
 
 ### Backend
 
-| Cong nghe | Phien ban |
+| Công nghệ | Phiên bản |
 | --- | --- |
 | Node.js | `>= 18` |
 | Express | `5.2.1` |
@@ -165,19 +165,19 @@ README nay huong den 3 muc tieu:
 | Helmet | `8.1.0` |
 | express-rate-limit | `8.3.2` |
 
-### Tooling va deploy
+### Tooling và deploy
 
-| Cong nghe | Vai tro |
+| Công nghệ | Vai trò |
 | --- | --- |
 | MongoDB Atlas | Database production |
-| Cloudinary | Luu tru media upload |
+| Cloudinary | Lưu trữ media upload |
 | Vercel | Deploy frontend |
 | Render | Deploy backend + websocket |
 | Nodemon | Dev server backend |
 
-## Kien truc he thong
+## Kiến trúc hệ thống
 
-### Kien truc tong the
+### Kiến trúc tổng thể
 
 ```mermaid
 flowchart LR
@@ -190,28 +190,28 @@ flowchart LR
   E --> H["Cloudinary"]
 ```
 
-### Nguyen tac thiet ke
+### Nguyên tắc thiết kế
 
-| Nguyen tac | Cach ap dung |
+| Nguyên tắc | Cách áp dụng |
 | --- | --- |
 | `OOP` | Chia theo controller / service / repository / model |
-| `SOLID` | Service xu ly nghiep vu, controller khong nhan qua nhieu logic |
-| `DRY` | Tien hanh tai su dung middleware, store, helper, response wrapper |
-| `KISS` | Han che nesting sau, flow route ngan gon |
-| `Modular Domain` | Moi domain co route, controller, service, repository, validator rieng |
+| `SOLID` | Service xử lý nghiệp vụ, controller không nhận quá nhiều logic |
+| `DRY` | Tái sử dụng middleware, store, helper, response wrapper |
+| `KISS` | Hạn chế nesting sâu, flow route ngắn gọn |
+| `Modular Domain` | Mỗi domain có route, controller, service, repository, validator riêng |
 
-### Data flow chinh
+### Data flow chính
 
-1. User thao tac tu giao dien React.
-2. Frontend gui request qua `Axios`.
-3. Route Express tiep nhan request.
-4. Controller dieu phoi service.
-5. Service xu ly business logic.
-6. Repository / model thao tac MongoDB.
-7. Response tra ve theo `ApiResponse`.
-8. Neu la chat / notification, Socket.io phat event realtime.
+1. User thao tác từ giao diện React.
+2. Frontend gửi request qua `Axios`.
+3. Route Express tiếp nhận request.
+4. Controller điều phối service.
+5. Service xử lý business logic.
+6. Repository / model thao tác MongoDB.
+7. Response trả về theo `ApiResponse`.
+8. Nếu là chat / notification, Socket.io phát event realtime.
 
-## Cau truc thu muc
+## Cấu trúc thư mục
 
 ```text
 Gundam_Universe_Store/
@@ -258,133 +258,133 @@ Gundam_Universe_Store/
 └─ README.md
 ```
 
-## Domain model va collection
+## Domain model và collection
 
-### Collection chinh
+### Collection chính
 
-| Collection | Vai tro |
+| Collection | Vai trò |
 | --- | --- |
-| `users` | Tai khoan, role, profile, reputation, avatar |
-| `categories` | Danh muc san pham |
+| `users` | Tài khoản, role, profile, reputation, avatar |
+| `categories` | Danh mục sản phẩm |
 | `products` | Catalog Gundam/Gunpla |
-| `carts` | Gio hang cua user |
-| `orders` | Don hang va snapshot item |
-| `reviews` | Danh gia san pham |
-| `wishlists` | Danh sach san pham yeu thich |
-| `tradeListings` | Tin dang trao doi |
-| `tradeOffers` | De nghi trao doi |
-| `conversations` | Cuoc hoi thoai chat |
-| `messages` | Tin nhan realtime |
-| `notifications` | Thong bao he thong |
-| `reports` | Bao cao vi pham |
+| `carts` | Giỏ hàng của user |
+| `orders` | Đơn hàng và snapshot item |
+| `reviews` | Đánh giá sản phẩm |
+| `wishlists` | Danh sách sản phẩm yêu thích |
+| `tradeListings` | Tin đăng trao đổi |
+| `tradeOffers` | Đề nghị trao đổi |
+| `conversations` | Cuộc hội thoại chat |
+| `messages` | Tin nhắn realtime |
+| `notifications` | Thông báo hệ thống |
+| `reports` | Báo cáo vi phạm |
 
-### Quan he giua cac entity
+### Quan hệ giữa các entity
 
-| Quan he | Kieu |
+| Quan hệ | Kiểu |
 | --- | --- |
 | `User -> Product` | one-to-many |
 | `User -> Order` | one-to-many |
 | `User -> Wishlist` | one-to-one |
 | `Product -> Review` | one-to-many |
 | `TradeListing -> TradeOffer` | one-to-many |
-| `TradeOffer -> Conversation` | one-to-one gan dung |
+| `TradeOffer -> Conversation` | one-to-one gần đúng |
 | `Conversation -> Message` | one-to-many |
 
-### Embed va reference
+### Embed và reference
 
-| Kieu | Vi tri | Ly do |
+| Kiểu | Vị trí | Lý do |
 | --- | --- | --- |
-| `Embed` | `order.items` | Snapshot gia / ten / hinh tai thoi diem mua |
-| `Embed` | `product.images` | Truy cap nhanh giao dien san pham |
-| `Embed` | `tradeListing.images` | Truy cap nhanh cho trade detail |
-| `Embed` | `tradeOffer.images` | Gan lien voi de nghi trade |
-| `Embed` | `shippingAddress` | Co dinh theo don hang |
-| `Reference` | `product.category` | Tai su dung category |
-| `Reference` | `product.seller` | Lien ket seller profile |
-| `Reference` | `wishlist.products` | Danh sach san pham dong |
-| `Reference` | `tradeListing.owner` | Lien ket owner |
-| `Reference` | `tradeOffer.offerer` | Lien ket nguoi gui offer |
+| `Embed` | `order.items` | Snapshot giá / tên / hình tại thời điểm mua |
+| `Embed` | `product.images` | Truy cập nhanh giao diện sản phẩm |
+| `Embed` | `tradeListing.images` | Truy cập nhanh cho trade detail |
+| `Embed` | `tradeOffer.images` | Gắn liền với đề nghị trade |
+| `Embed` | `shippingAddress` | Cố định theo đơn hàng |
+| `Reference` | `product.category` | Tái sử dụng category |
+| `Reference` | `product.seller` | Liên kết seller profile |
+| `Reference` | `wishlist.products` | Danh sách sản phẩm động |
+| `Reference` | `tradeListing.owner` | Liên kết owner |
+| `Reference` | `tradeOffer.offerer` | Liên kết người gửi offer |
 
-## API chinh
+## API chính
 
 ### Auth
 
-| Method | Endpoint | Mo ta |
+| Method | Endpoint | Mô tả |
 | --- | --- | --- |
-| `POST` | `/api/auth/register` | Dang ky |
-| `POST` | `/api/auth/login` | Dang nhap |
-| `POST` | `/api/auth/logout` | Dang xuat |
-| `POST` | `/api/auth/refresh-token` | Lam moi access token |
-| `POST` | `/api/auth/forgot-password` | Quen mat khau |
-| `POST` | `/api/auth/reset-password` | Dat lai mat khau |
-| `PUT` | `/api/auth/change-password` | Doi mat khau |
+| `POST` | `/api/auth/register` | Đăng ký |
+| `POST` | `/api/auth/login` | Đăng nhập |
+| `POST` | `/api/auth/logout` | Đăng xuất |
+| `POST` | `/api/auth/refresh-token` | Làm mới access token |
+| `POST` | `/api/auth/forgot-password` | Quên mật khẩu |
+| `POST` | `/api/auth/reset-password` | Đặt lại mật khẩu |
+| `PUT` | `/api/auth/change-password` | Đổi mật khẩu |
 
 ### Product / Store
 
-| Method | Endpoint | Mo ta |
+| Method | Endpoint | Mô tả |
 | --- | --- | --- |
 | `GET` | `/api/products` | Listing + search/filter/sort |
-| `GET` | `/api/products/:slug` | Chi tiet san pham |
-| `GET` | `/api/products/:slug/recommendations` | San pham lien quan |
-| `POST` | `/api/products` | Tao san pham |
-| `PUT` | `/api/products/:id` | Sua san pham |
-| `DELETE` | `/api/products/:id` | Xoa san pham |
+| `GET` | `/api/products/:slug` | Chi tiết sản phẩm |
+| `GET` | `/api/products/:slug/recommendations` | Sản phẩm liên quan |
+| `POST` | `/api/products` | Tạo sản phẩm |
+| `PUT` | `/api/products/:id` | Sửa sản phẩm |
+| `DELETE` | `/api/products/:id` | Xóa sản phẩm |
 
 ### Cart / Order
 
-| Method | Endpoint | Mo ta |
+| Method | Endpoint | Mô tả |
 | --- | --- | --- |
-| `GET` | `/api/cart` | Lay gio hang |
-| `POST` | `/api/cart/items` | Them item |
-| `PATCH` | `/api/cart/items/:productId` | Cap nhat so luong |
-| `DELETE` | `/api/cart/items/:productId` | Xoa item |
-| `POST` | `/api/orders/checkout` | Tao don hang |
-| `GET` | `/api/orders/history` | Lich su mua hang |
-| `GET` | `/api/orders/:id` | Chi tiet don hang |
-| `PATCH` | `/api/orders/:id/status` | Admin cap nhat status |
+| `GET` | `/api/cart` | Lấy giỏ hàng |
+| `POST` | `/api/cart/items` | Thêm item |
+| `PATCH` | `/api/cart/items/:productId` | Cập nhật số lượng |
+| `DELETE` | `/api/cart/items/:productId` | Xóa item |
+| `POST` | `/api/orders/checkout` | Tạo đơn hàng |
+| `GET` | `/api/orders/history` | Lịch sử mua hàng |
+| `GET` | `/api/orders/:id` | Chi tiết đơn hàng |
+| `PATCH` | `/api/orders/:id/status` | Admin cập nhật status |
 
 ### Trade / Chat / Moderation
 
-| Method | Endpoint | Mo ta |
+| Method | Endpoint | Mô tả |
 | --- | --- | --- |
 | `GET` | `/api/trades` | Listing trade |
-| `GET` | `/api/trades/:id` | Chi tiet trade |
-| `POST` | `/api/trades` | Tao trade listing |
-| `POST` | `/api/trades/:id/offers` | Tao trade offer |
-| `GET` | `/api/trades/:id/offers` | Lay offer cua listing |
+| `GET` | `/api/trades/:id` | Chi tiết trade |
+| `POST` | `/api/trades` | Tạo trade listing |
+| `POST` | `/api/trades/:id/offers` | Tạo trade offer |
+| `GET` | `/api/trades/:id/offers` | Lấy offer của listing |
 | `PATCH` | `/api/trades/:id/offers/:offerId/status` | Accept / reject offer |
-| `GET` | `/api/trades/offers/me` | Lay offer da gui |
+| `GET` | `/api/trades/offers/me` | Lấy offer đã gửi |
 | `GET` | `/api/trades/suggestions/me` | Trade suggestion |
-| `POST` | `/api/trades/:id/report` | Bao cao vi pham |
+| `POST` | `/api/trades/:id/report` | Báo cáo vi phạm |
 
 ### Seller / Admin / Notification
 
-| Method | Endpoint | Mo ta |
+| Method | Endpoint | Mô tả |
 | --- | --- | --- |
 | `GET` | `/api/seller/dashboard` | Dashboard seller |
-| `GET` | `/api/seller/products` | Quan ly product seller |
+| `GET` | `/api/seller/products` | Quản lý product seller |
 | `PATCH` | `/api/seller/products/:id` | Update stock / status / price |
-| `GET` | `/api/seller/orders` | Quan ly order cua seller |
-| `PATCH` | `/api/seller/orders/:id/status` | Seller doi status order |
+| `GET` | `/api/seller/orders` | Quản lý order của seller |
+| `PATCH` | `/api/seller/orders/:id/status` | Seller đổi status order |
 | `GET` | `/api/admin/stats` | Dashboard admin |
-| `GET` | `/api/admin/users` | Quan ly user |
-| `GET` | `/api/admin/orders` | Quan ly order |
+| `GET` | `/api/admin/users` | Quản lý user |
+| `GET` | `/api/admin/orders` | Quản lý order |
 | `GET` | `/api/admin/trades` | Moderation trade |
-| `PATCH` | `/api/admin/trades/:id/status` | Doi status trade |
-| `GET` | `/api/reports` | Lay danh sach report |
+| `PATCH` | `/api/admin/trades/:id/status` | Đổi status trade |
+| `GET` | `/api/reports` | Lấy danh sách report |
 | `PATCH` | `/api/reports/:id/status` | Resolve / dismiss report |
-| `GET` | `/api/notifications` | Lay notification |
+| `GET` | `/api/notifications` | Lấy notification |
 
-## Bao mat va hieu suat
+## Bảo mật và hiệu suất
 
-### Bao mat
+### Bảo mật
 
-| Hang muc | Ap dung |
+| Hạng mục | Áp dụng |
 | --- | --- |
 | Password hash | `bcrypt` |
 | Auth | `JWT access token + refresh token` |
-| Refresh rotation | Co |
-| Rate limit | Co |
+| Refresh rotation | Có |
+| Rate limit | Có |
 | Security headers | `helmet` |
 | NoSQL injection protection | `express-mongo-sanitize` |
 | HPP protection | `hpp` |
@@ -392,38 +392,38 @@ Gundam_Universe_Store/
 | Role guard | `guest / customer / seller / trader / admin` |
 | Upload safety | middleware + mime/size handling |
 
-### Hieu suat
+### Hiệu suất
 
-| Hang muc | Ghi chu |
+| Hạng mục | Ghi chú |
 | --- | --- |
-| Pagination | Product va trade listing |
+| Pagination | Product và trade listing |
 | MongoDB index | name, description, tags, category, seller, trade status |
 | Compression | `compression()` |
-| Code splitting | Route lazy-load tren frontend |
-| State persistence | Giam friction khi refresh / quay lai trang |
+| Code splitting | Route lazy-load trên frontend |
+| State persistence | Giảm friction khi refresh / quay lại trang |
 | Realtime room | Chat theo conversation room |
 
-## UI UX design direction
+## UI/UX design direction
 
-| Thanh phan | Dinh huong |
+| Thành phần | Định hướng |
 | --- | --- |
 | Mood | Mecha, sci-fi, tactical HUD, cockpit UI |
-| Mau chu dao | Navy / charcoal / metallic gray |
+| Màu chủ đạo | Navy / charcoal / metallic gray |
 | Accent | Cyan / red / amber |
 | Card | Border glow, panel control, contrast cao |
 | Motion | Framer Motion, fade/slide, hover glow |
-| Layout | Responsive, split-screen friendly, de scan thong tin |
+| Layout | Responsive, split-screen friendly, dễ scan thông tin |
 
-## Cai dat local
+## Cài đặt local
 
-### Yeu cau moi truong
+### Yêu cầu môi trường
 
-| Requirement | Gia tri |
+| Requirement | Giá trị |
 | --- | --- |
 | Node.js | `>= 18` |
-| npm | `>= 9` de tranh loi workspace/phu thuoc |
-| Database | MongoDB Atlas hoac MongoDB local |
-| Media | Cloudinary neu muon upload anh that |
+| npm | `>= 9` |
+| Database | MongoDB Atlas hoặc MongoDB local |
+| Media | Cloudinary nếu muốn upload ảnh thật |
 
 ### Clone repo
 
@@ -432,7 +432,7 @@ git clone https://github.com/KasierBach/Gundam_Universe_Store.git
 cd Gundam_Universe_Store
 ```
 
-### Cai dependency
+### Cài dependency
 
 ```bash
 cd server
@@ -442,34 +442,34 @@ cd ../client
 npm install
 ```
 
-### Chay backend
+### Chạy backend
 
 ```bash
 cd server
 npm run dev
 ```
 
-Backend mac dinh:
+Backend mặc định:
 
 - `http://localhost:5001`
 - Health check: `http://localhost:5001/api/health`
 
-### Chay frontend
+### Chạy frontend
 
 ```bash
 cd client
 npm run dev
 ```
 
-Frontend dev mac dinh:
+Frontend dev mặc định:
 
 - `http://localhost:4000`
 
-## Bien moi truong
+## Biến môi trường
 
 ### Backend
 
-File mau: [`server/.env.example`](./server/.env.example)
+File mẫu: [`server/.env.example`](./server/.env.example)
 
 ```env
 NODE_ENV=development
@@ -490,7 +490,7 @@ RATE_LIMIT_MAX_REQUESTS=100
 
 ### Frontend
 
-File mau: [`client/.env.example`](./client/.env.example)
+File mẫu: [`client/.env.example`](./client/.env.example)
 
 ```env
 VITE_API_URL=/api
@@ -498,7 +498,7 @@ VITE_SOCKET_URL=http://localhost:5001
 VITE_DEV_API_TARGET=http://localhost:5001
 ```
 
-## Seed du lieu
+## Seed dữ liệu
 
 ### Seed admin
 
@@ -507,34 +507,34 @@ cd server
 npm run seed:admin
 ```
 
-Tai khoan admin mac dinh:
+Tài khoản admin mặc định:
 
-| Truong | Gia tri |
+| Trường | Giá trị |
 | --- | --- |
 | Email | `admin@gundamuniverse.com` |
 | Password | `Admin@123456` |
 
-### Seed du lieu san pham
+### Seed dữ liệu sản phẩm
 
 ```bash
 cd server
 npm run seed:data
 ```
 
-Catalog seed hien tai da duoc thay bang bo san pham Gundam thuc te hon, phuc vu demo store va search/filter.
+Catalog seed hiện tại đã được thay bằng bộ sản phẩm Gundam thực tế hơn, phục vụ demo store và search/filter.
 
 ## Deploy
 
-Phuong an deploy duoc chot san:
+Phương án deploy được chốt sẵn:
 
-| Layer | Nen tang |
+| Layer | Nền tảng |
 | --- | --- |
 | Frontend | `Vercel` |
 | Backend + Socket.io | `Render` |
 | Database | `MongoDB Atlas` |
 | Media | `Cloudinary` |
 
-Tai lieu chi tiet:
+Tài liệu chi tiết:
 
 - [`DEPLOYMENT.md`](./DEPLOYMENT.md)
 
@@ -543,21 +543,21 @@ File deploy:
 - [`render.yaml`](./render.yaml)
 - [`client/vercel.json`](./client/vercel.json)
 
-## Trang thai hien tai
+## Trạng thái hiện tại
 
-Du an hien o muc:
+Dự án hiện ở mức:
 
-| Tieu chi | Danh gia |
+| Tiêu chí | Đánh giá |
 | --- | --- |
-| MVP full-stack | Manh |
-| Do hoa chu de Gundam | Ro rang |
-| Deploy friendly | Co |
-| Seller/Admin operations | Da co nen tang tot |
-| Moderation flow | Da co MVP |
-| Testing | Chua day du |
-| Production completeness | Chua 100% |
+| MVP full-stack | Mạnh |
+| Đồ họa chủ đề Gundam | Rõ ràng |
+| Deploy friendly | Có |
+| Seller/Admin operations | Đã có nền tảng tốt |
+| Moderation flow | Đã có MVP |
+| Testing | Chưa đầy đủ |
+| Production completeness | Chưa 100% |
 
-### Da co kha day du
+### Đã có khá đầy đủ
 
 - auth
 - profile
@@ -571,42 +571,35 @@ Du an hien o muc:
 - wishlist
 - notifications
 - seller operations
-- admin moderation co ban
+- admin moderation cơ bản
 
-### Chua full 100% production
+### Chưa full 100% production
 
-- test suite bai ban
-- dispute workflow sau hon
+- test suite bài bản
+- dispute workflow sâu hơn
 - community / social layer
-- recommendation engine thong minh hon
-- notification center realtime nang cao
+- recommendation engine thông minh hơn
+- notification center realtime nâng cao
 
-## Roadmap tiep theo
+## Roadmap tiếp theo
 
-| Uu tien | Hang muc |
+| Ưu tiên | Hạng mục |
 | --- | --- |
 | `P1` | Unit test / integration test / e2e |
-| `P1` | Dispute workflow nhieu buoc |
+| `P1` | Dispute workflow nhiều bước |
 | `P2` | Community feed / collector showcase |
-| `P2` | Recommendation engine theo hanh vi |
-| `P2` | Analytics nang cao cho seller/admin |
-| `P3` | Notification center realtime nang cao |
-| `P3` | Email service that cho reset password |
+| `P2` | Recommendation engine theo hành vi |
+| `P2` | Analytics nâng cao cho seller/admin |
+| `P3` | Notification center realtime nâng cao |
+| `P3` | Email service thật cho reset password |
 
 ---
 
-## Ghi chu
+## Ghi chú
 
-README nay duoc viet theo huong:
+Mình đã dùng bản README không dấu ở vòng trước để tránh lỗi encoding trong terminal, nhưng điều đó không phù hợp với tài liệu tiếng Việt trên GitHub. Bản hiện tại đã được trả lại đầy đủ dấu tiếng Việt và phù hợp hơn để:
 
-- de nop do an
-- de doc tren GitHub
-- de onboarding cho nguoi tiep quan repo
-- de lam tai lieu tong quan cho phase deploy va bao cao
-
-Neu can, co the tach tiep cac tai lieu sau:
-
-- `docs/architecture.md`
-- `docs/api-reference.md`
-- `docs/erd.md`
-- `docs/presentation-notes.md`
+- nộp đồ án
+- đọc trên GitHub
+- onboarding người tiếp quản repo
+- làm tài liệu tổng quan cho phase deploy và báo cáo
