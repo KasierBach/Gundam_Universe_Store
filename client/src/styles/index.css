@@ -1,0 +1,68 @@
+@import './gundam-theme.css';
+@import './animations.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-gundam-bg-primary text-gundam-text-primary font-inter;
+    background-image: 
+      radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.05) 0%, transparent 50%),
+      linear-gradient(rgba(10, 14, 26, 0.97), rgba(10, 14, 26, 0.97));
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-orbitron tracking-wider uppercase;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-6 py-2 rounded-lg font-orbitron font-bold uppercase tracking-widest transition-all duration-300 active:scale-95 disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-primary {
+    @apply bg-gundam-cyan text-gundam-bg-primary hover:bg-gundam-cyan-glow hover:shadow-cyan-glow;
+  }
+
+  .btn-outline {
+    @apply border border-gundam-cyan text-gundam-cyan hover:bg-gundam-cyan/10 hover:shadow-cyan-glow;
+  }
+
+  .btn-danger {
+    @apply bg-gundam-red text-white hover:bg-gundam-red-glow hover:shadow-red-glow;
+  }
+
+  .glass-card {
+    @apply bg-gundam-bg-secondary/80 backdrop-blur-md border border-gundam-border rounded-xl;
+  }
+
+  .glass-card-hover {
+    @apply hover:border-gundam-border-glow hover:shadow-cyan-glow transition-all duration-300;
+  }
+
+  .hud-line {
+    @apply h-px bg-gradient-to-r from-transparent via-gundam-cyan to-transparent opacity-30;
+  }
+
+  .mecha-border {
+    position: relative;
+    border: 1px solid theme('colors.gundam.border.DEFAULT');
+  }
+
+  .mecha-border::before,
+  .mecha-border::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-color: theme('colors.gundam.cyan.DEFAULT');
+  }
+}

@@ -1,0 +1,1 @@
+import{e as a}from"./index-Dxv0cKZI.js";const t={getStats:async()=>(await a.get("/admin/stats")).data.data,getUsers:async()=>(await a.get("/admin/users")).data.data,getOrders:async()=>(await a.get("/admin/orders")).data.data,getTrades:async()=>(await a.get("/admin/trades")).data.data};export{t as a};

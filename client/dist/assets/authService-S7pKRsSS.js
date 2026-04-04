@@ -1,0 +1,1 @@
+import{e as t}from"./index-Dxv0cKZI.js";const n={forgotPassword:async s=>(await t.post("/auth/forgot-password",{email:s})).data.data,resetPassword:async({token:s,newPassword:a,confirmNewPassword:o})=>(await t.post("/auth/reset-password",{token:s,newPassword:a,confirmNewPassword:o})).data.data};export{n as a};

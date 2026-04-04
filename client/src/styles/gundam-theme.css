@@ -1,0 +1,76 @@
+/* Gundam-specific theme effects (HUD, mecha grids) */
+
+.gundam-grid {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(6, 182, 212, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(6, 182, 212, 0.05) 1px, transparent 1px);
+}
+
+.mecha-corners {
+  position: relative;
+}
+
+.mecha-corners::before,
+.mecha-corners::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border: 2px solid theme('colors.gundam.cyan.DEFAULT');
+  pointer-events: none;
+}
+
+.mecha-corners::before {
+  top: -2px;
+  left: -2px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.mecha-corners::after {
+  bottom: -2px;
+  right: -2px;
+  border-left: none;
+  border-top: none;
+}
+
+.hud-scanline {
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to right, transparent, theme('colors.gundam.cyan.DEFAULT'), transparent);
+  opacity: 0.1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  animation: hud-scan 4s linear infinite;
+}
+
+.glow-text {
+  text-shadow: 0 0 10px theme('colors.gundam.cyan.DEFAULT');
+}
+
+.glow-border-active {
+  box-shadow: 0 0 15px theme('colors.gundam.border.glow');
+  border-color: theme('colors.gundam.cyan.DEFAULT');
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: theme('colors.gundam.bg.primary');
+}
+
+::-webkit-scrollbar-thumb {
+  background: theme('colors.gundam.bg.tertiary');
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: theme('colors.gundam.cyan.DEFAULT');
+}
