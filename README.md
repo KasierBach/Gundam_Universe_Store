@@ -593,12 +593,6 @@ Dự án hiện ở mức:
 | `P3` | Notification center realtime nâng cao |
 | `P3` | Email service thật cho reset password |
 
----
-
-## Ghi chú
-
-Mình đã dùng bản README không dấu ở vòng trước để tránh lỗi encoding trong terminal, nhưng điều đó không phù hợp với tài liệu tiếng Việt trên GitHub. Bản hiện tại đã được trả lại đầy đủ dấu tiếng Việt và phù hợp hơn để:
-
 - nộp đồ án
 - đọc trên GitHub
 - onboarding người tiếp quản repo
