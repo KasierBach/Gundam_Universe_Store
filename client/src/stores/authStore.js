@@ -2,12 +2,35 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import api from '../config/api'
 
+const REMEMBERED_EMAIL_KEY = 'gundam-remembered-email'
+
 const clearPersistedUserData = () => {
   localStorage.removeItem('auth-storage')
   localStorage.removeItem('gundam-cart-storage')
   localStorage.removeItem('gundam-order-storage')
   localStorage.removeItem('gundam-notification-storage')
   localStorage.removeItem('gundam-wishlist-storage')
+}
+
+const getRememberedEmail = () => {
+  if (typeof window === 'undefined') {
+    return ''
+  }
+
+  return localStorage.getItem(REMEMBERED_EMAIL_KEY) || ''
+}
+
+const persistRememberedEmail = (email, rememberMe) => {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  if (rememberMe && email) {
+    localStorage.setItem(REMEMBERED_EMAIL_KEY, email)
+    return
+  }
+
+  localStorage.removeItem(REMEMBERED_EMAIL_KEY)
 }
 
 const useAuthStore = create(
@@ -18,6 +41,8 @@ const useAuthStore = create(
       refreshToken: null,
       isAuthenticated: false,
       isLoading: false,
+      rememberMe: true,
+      rememberedEmail: getRememberedEmail(),
 
       setAuth: (user, accessToken, refreshToken) => set({
         user,
@@ -31,6 +56,25 @@ const useAuthStore = create(
         refreshToken,
       }),
 
+      setRememberMe: (rememberMe) => {
+        if (!rememberMe) {
+          persistRememberedEmail('', false)
+        }
+
+        set((state) => ({
+          rememberMe,
+          rememberedEmail: rememberMe ? state.rememberedEmail : '',
+        }))
+      },
+
+      setRememberedEmail: (email) => {
+        persistRememberedEmail(email, !!email)
+        set({
+          rememberedEmail: email,
+          rememberMe: !!email,
+        })
+      },
+
       clearAuthState: () => {
         set({
           user: null,
@@ -42,17 +86,21 @@ const useAuthStore = create(
         clearPersistedUserData()
       },
 
-      login: async (email, password) => {
+      login: async (email, password, options = {}) => {
+        const rememberMe = options.rememberMe ?? get().rememberMe
         set({ isLoading: true })
         try {
           const response = await api.post('/auth/login', { email, password })
           const { user, accessToken, refreshToken } = response.data.data
+          persistRememberedEmail(email, rememberMe)
           set({
             user,
             accessToken,
             refreshToken,
             isAuthenticated: true,
             isLoading: false,
+            rememberMe,
+            rememberedEmail: rememberMe ? email : '',
           })
           return response.data
         } catch (error) {
@@ -90,7 +138,20 @@ const useAuthStore = create(
       },
 
       checkAuth: async () => {
-        const { accessToken } = get()
+        let { accessToken, refreshToken } = get()
+
+        if (!accessToken && refreshToken) {
+          try {
+            const response = await api.post('/auth/refresh-token', { refreshToken })
+            accessToken = response.data.data.accessToken
+            refreshToken = response.data.data.refreshToken ?? refreshToken
+            get().setTokens(accessToken, refreshToken)
+          } catch (_error) {
+            get().clearAuthState()
+            return
+          }
+        }
+
         if (!accessToken) return
 
         try {
@@ -102,14 +163,7 @@ const useAuthStore = create(
           })
         } catch (error) {
           if (error.response?.status === 401) {
-            // Interceptor handles refresh, if it fails then logout is called there
-            set({
-              user: null,
-              accessToken: null,
-              refreshToken: null,
-              isAuthenticated: false,
-              isLoading: false,
-            })
+            get().clearAuthState()
           }
         }
       },
@@ -121,6 +175,8 @@ const useAuthStore = create(
         accessToken: state.accessToken,
         refreshToken: state.refreshToken,
         isAuthenticated: state.isAuthenticated,
+        rememberMe: state.rememberMe,
+        rememberedEmail: state.rememberedEmail,
       }),
     }
   )

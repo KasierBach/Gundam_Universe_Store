@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Mail, Lock, ShieldCheck, AlertCircle, Loader2, ArrowRight } from 'lucide-react'
@@ -9,18 +9,24 @@ const LoginPage = () => {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   
-  const { login, isLoading } = useAuthStore()
+  const { login, isLoading, rememberMe, rememberedEmail, setRememberMe } = useAuthStore()
   const navigate = useNavigate()
   const location = useLocation()
   
   const from = location.state?.from?.pathname || '/'
+
+  useEffect(() => {
+    if (rememberedEmail) {
+      setEmail(rememberedEmail)
+    }
+  }, [rememberedEmail])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
     
     try {
-      await login(email, password)
+      await login(email, password, { rememberMe })
       navigate(from, { replace: true })
     } catch (err) {
       setError(err.response?.data?.message || 'Authentication failed. Please check your credentials.')
@@ -100,6 +106,19 @@ const LoginPage = () => {
                 />
               </div>
             </div>
+
+            <label className="flex items-center justify-between gap-4 rounded-lg border border-gundam-border/60 bg-gundam-bg-tertiary/70 px-4 py-3 text-sm text-gundam-text-secondary">
+              <div>
+                <p className="font-orbitron text-[11px] uppercase tracking-[0.25em] text-gundam-text-primary">Remember Login</p>
+                <p className="mt-1 font-rajdhani text-xs text-gundam-text-muted">Keep your pilot email and session ready on this device.</p>
+              </div>
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="h-4 w-4 rounded border-gundam-border bg-gundam-bg-secondary text-gundam-cyan focus:ring-gundam-cyan/50"
+              />
+            </label>
 
             <button 
               type="submit" 
