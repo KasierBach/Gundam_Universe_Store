@@ -17,8 +17,10 @@ import {
 } from 'lucide-react';
 import productService from '../../services/productService';
 import categoryService from '../../services/categoryService';
+import sellerService from '../../services/sellerService';
 import { PRODUCT_GRADES } from '../../shared/constants/productConstants';
 import ModelKitImage from '../../components/shared/ModelKitImage';
+import useAuthStore from '../../stores/authStore';
 
 const ProductManagementPage = () => {
   const [products, setProducts] = useState([]);
@@ -28,6 +30,8 @@ const ProductManagementPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [imageFiles, setImageFiles] = useState([]);
+  const { user } = useAuthStore();
+  const isSellerMode = user?.role === 'seller';
   
   // Form State
   const [formData, setFormData] = useState({
@@ -45,16 +49,16 @@ const ProductManagementPage = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [isSellerMode]);
 
   const fetchData = async () => {
     try {
       setLoading(true);
       const [prodRes, catRes] = await Promise.all([
-        productService.getProducts({ limit: 100 }),
+        isSellerMode ? sellerService.getProducts() : productService.getProducts({ limit: 100 }),
         categoryService.getCategories()
       ]);
-      setProducts(prodRes?.results || []);
+      setProducts(isSellerMode ? (prodRes || []) : (prodRes?.results || []));
       setCategories(catRes || []);
     } catch (err) {
       console.error('Data acquisition failed:', err);
@@ -151,10 +155,10 @@ const ProductManagementPage = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
         <div>
           <h1 className="text-3xl font-orbitron text-white uppercase tracking-tighter glow-text italic">
-            Armory Management
+            {isSellerMode ? 'Seller Armory Deck' : 'Armory Management'}
           </h1>
           <p className="text-gundam-text-muted font-rajdhani uppercase tracking-[0.4em] mt-1 text-[10px] italic">
-            System Identity: Inventory Controller Alpha
+            {isSellerMode ? 'System Identity: Seller Inventory Control' : 'System Identity: Inventory Controller Alpha'}
           </p>
         </div>
         <button 

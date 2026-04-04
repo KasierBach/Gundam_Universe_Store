@@ -29,6 +29,12 @@ const queryListingSchema = {
   }),
 };
 
+const suggestionQuerySchema = {
+  query: Joi.object().keys({
+    limit: Joi.number().integer().min(1).max(12).default(6),
+  }),
+};
+
 const createOfferSchema = {
   body: Joi.object().keys({
     offeredItemsDescription: Joi.string().required().max(500).trim(),
@@ -56,6 +62,7 @@ const updateOfferStatusSchema = {
 module.exports = {
   createListingSchema,
   queryListingSchema,
+  suggestionQuerySchema,
   createOfferSchema,
   updateOfferStatusSchema,
 };

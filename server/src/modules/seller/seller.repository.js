@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Product = require('../product/product.model');
 const Order = require('../order/order.model');
+const TradeListing = require('../trade/tradeListing.model');
 
 class SellerRepository {
   async getProductStats(sellerId) {
@@ -163,6 +164,131 @@ class SellerRepository {
     return Product.find({ seller: sellerId })
       .populate('category', 'name slug')
       .sort({ createdAt: -1 })
+      .lean();
+  }
+
+  async getSellerProductById(productId) {
+    return Product.findById(productId)
+      .populate('category', 'name slug')
+      .lean();
+  }
+
+  async updateSellerProduct(productId, update) {
+    return Product.findByIdAndUpdate(
+      productId,
+      update,
+      { new: true, runValidators: true }
+    )
+      .populate('category', 'name slug')
+      .lean();
+  }
+
+  async getSellerOrders(sellerId, limit = 50) {
+    return Order.aggregate([
+      { $match: { status: { $ne: 'CANCELLED' } } },
+      { $unwind: '$items' },
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'items.product',
+          foreignField: '_id',
+          as: 'productDoc',
+        },
+      },
+      { $unwind: '$productDoc' },
+      { $match: { 'productDoc.seller': new mongoose.Types.ObjectId(sellerId) } },
+      {
+        $group: {
+          _id: '$_id',
+          createdAt: { $first: '$createdAt' },
+          status: { $first: '$status' },
+          user: { $first: '$user' },
+          shippingAddress: { $first: '$shippingAddress' },
+          paymentInfo: { $first: '$paymentInfo' },
+          sellerRevenue: {
+            $sum: { $multiply: ['$items.price', '$items.quantity'] },
+          },
+          soldUnits: { $sum: '$items.quantity' },
+          items: {
+            $push: {
+              product: '$items.product',
+              name: '$items.name',
+              quantity: '$items.quantity',
+              image: '$items.image',
+              price: '$items.price',
+              grade: '$items.grade',
+              series: '$items.series',
+            },
+          },
+        },
+      },
+      { $sort: { createdAt: -1 } },
+      { $limit: limit },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'user',
+          foreignField: '_id',
+          as: 'customer',
+        },
+      },
+      { $unwind: { path: '$customer', preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          _id: 1,
+          createdAt: 1,
+          status: 1,
+          shippingAddress: 1,
+          paymentInfo: 1,
+          sellerRevenue: 1,
+          soldUnits: 1,
+          items: 1,
+          customer: {
+            _id: '$customer._id',
+            displayName: '$customer.displayName',
+            email: '$customer.email',
+            avatar: '$customer.avatar',
+          },
+        },
+      },
+    ]);
+  }
+
+  async updateOrderStatus(orderId, status) {
+    return Order.findByIdAndUpdate(
+      orderId,
+      { status },
+      { new: true, runValidators: true }
+    )
+      .populate('user', 'displayName email avatar')
+      .lean();
+  }
+
+  async sellerCanAccessOrder(orderId, sellerId) {
+    const [match] = await Order.aggregate([
+      { $match: { _id: new mongoose.Types.ObjectId(orderId) } },
+      { $unwind: '$items' },
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'items.product',
+          foreignField: '_id',
+          as: 'productDoc',
+        },
+      },
+      { $unwind: '$productDoc' },
+      { $match: { 'productDoc.seller': new mongoose.Types.ObjectId(sellerId) } },
+      { $limit: 1 },
+      { $project: { _id: 1 } },
+    ]);
+
+    return !!match;
+  }
+
+  async getSellerTradeSignals(sellerId, limit = 4) {
+    return TradeListing.find({ owner: sellerId })
+      .sort({ createdAt: -1 })
+      .limit(limit)
       .lean();
   }
 }

@@ -140,9 +140,17 @@ const Navbar = () => {
                        <Heart size={14} /> Favorites
                     </Link>
                     {(user?.role === 'seller' || user?.role === 'admin') && (
-                      <Link to="/seller/dashboard" className="flex items-center gap-3 px-3 py-2 text-[10px] font-orbitron uppercase tracking-widest text-gundam-text-secondary hover:text-gundam-cyan hover:bg-white/5 transition-all rounded">
-                         <LayoutDashboard size={14} /> Seller Deck
-                      </Link>
+                      <>
+                        <Link to="/seller/dashboard" className="flex items-center gap-3 px-3 py-2 text-[10px] font-orbitron uppercase tracking-widest text-gundam-text-secondary hover:text-gundam-cyan hover:bg-white/5 transition-all rounded">
+                           <LayoutDashboard size={14} /> Seller Deck
+                        </Link>
+                        <Link to="/seller/products" className="flex items-center gap-3 px-3 py-2 text-[10px] font-orbitron uppercase tracking-widest text-gundam-text-secondary hover:text-gundam-cyan hover:bg-white/5 transition-all rounded">
+                           <Shield size={14} /> Seller Products
+                        </Link>
+                        <Link to="/seller/orders" className="flex items-center gap-3 px-3 py-2 text-[10px] font-orbitron uppercase tracking-widest text-gundam-text-secondary hover:text-gundam-cyan hover:bg-white/5 transition-all rounded">
+                           <ShoppingCart size={14} /> Seller Orders
+                        </Link>
+                      </>
                     )}
                     <Link to="/notifications" className="flex items-center gap-3 px-3 py-2 text-[10px] font-orbitron uppercase tracking-widest text-gundam-text-secondary hover:text-gundam-cyan hover:bg-white/5 transition-all rounded">
                        <Bell size={14} /> Alerts
@@ -223,9 +231,17 @@ const Navbar = () => {
                     <Bell size={20} /> Notifications
                   </Link>
                   {(user?.role === 'seller' || user?.role === 'admin') && (
-                    <Link to="/seller/dashboard" onClick={() => setIsOpen(false)} className="flex items-center gap-4 text-gundam-text-secondary">
-                      <LayoutDashboard size={20} /> Seller Deck
-                    </Link>
+                    <>
+                      <Link to="/seller/dashboard" onClick={() => setIsOpen(false)} className="flex items-center gap-4 text-gundam-text-secondary">
+                        <LayoutDashboard size={20} /> Seller Deck
+                      </Link>
+                      <Link to="/seller/products" onClick={() => setIsOpen(false)} className="flex items-center gap-4 text-gundam-text-secondary">
+                        <Shield size={20} /> Seller Products
+                      </Link>
+                      <Link to="/seller/orders" onClick={() => setIsOpen(false)} className="flex items-center gap-4 text-gundam-text-secondary">
+                        <ShoppingCart size={20} /> Seller Orders
+                      </Link>
+                    </>
                   )}
                   {user?.role === 'admin' && (
                     <Link to="/admin/reports" onClick={() => setIsOpen(false)} className="flex items-center gap-4 text-gundam-text-secondary">

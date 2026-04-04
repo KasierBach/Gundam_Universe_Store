@@ -30,6 +30,11 @@ class TradeController {
     res.status(200).json(ApiResponse.success(offers, 'Your trade offers fetched successfully'));
   });
 
+  getSuggestions = asyncHandler(async (req, res) => {
+    const suggestions = await tradeService.getSuggestedListings(req.user._id, Number(req.query.limit) || 6);
+    res.status(200).json(ApiResponse.success(suggestions, 'Trade suggestions fetched successfully'));
+  });
+
   getListingById = asyncHandler(async (req, res) => {
     const listing = await tradeService.getListingById(req.params.id);
     res.status(200).json(ApiResponse.success(listing, 'Listing fetched successfully'));

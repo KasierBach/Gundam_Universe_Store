@@ -2,18 +2,25 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import tradeService from '../../services/tradeService';
+import useAuthStore from '../../stores/authStore';
 
 const TradeMarketPage = () => {
   const [listings, setListings] = useState([]);
+  const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { isAuthenticated } = useAuthStore();
 
   useEffect(() => {
     const fetchListings = async () => {
       try {
         setLoading(true);
-        const data = await tradeService.getListings();
+        const [data, suggestionData] = await Promise.all([
+          tradeService.getListings(),
+          isAuthenticated ? tradeService.getSuggestions({ limit: 4 }) : Promise.resolve([]),
+        ]);
         setListings(data?.results || []);
+        setSuggestions(suggestionData || []);
       } catch (err) {
         setError('Failed to load trade data stream. Please re-initialize connection.');
         console.error('Fetch error:', err);
@@ -22,7 +29,7 @@ const TradeMarketPage = () => {
       }
     };
     fetchListings();
-  }, []);
+  }, [isAuthenticated]);
 
   return (
     <div className="pt-24 pb-12 px-4 max-w-7xl mx-auto min-h-screen bg-gundam-darker">
@@ -42,6 +49,33 @@ const TradeMarketPage = () => {
       {error && (
         <div className="bg-gundam-red/20 border border-gundam-red text-gundam-red p-4 mb-8 font-orbitron text-sm uppercase tracking-widest text-center">
           [ERROR] {error}
+        </div>
+      )}
+
+      {!loading && suggestions.length > 0 && (
+        <div className="mb-10 rounded-2xl border border-gundam-cyan/20 bg-gundam-dark-surface/60 p-5 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+            <div>
+              <h2 className="text-xl font-orbitron text-gundam-cyan uppercase tracking-widest">Suggested Trade Signals</h2>
+              <p className="text-gundam-text-secondary text-sm max-w-2xl">Generated from your wishlist and current collector profile for faster deal discovery.</p>
+            </div>
+            <span className="text-[10px] font-orbitron uppercase tracking-[0.25em] text-gundam-text-muted">Adaptive recommendation grid</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+            {suggestions.map((item) => (
+              <Link key={`suggestion-${item._id}`} to={`/trade/${item._id}`} className="rounded-xl border border-gundam-cyan/20 bg-black/20 p-4 hover:border-gundam-cyan/50 transition-all">
+                <div className="flex items-start justify-between gap-3">
+                  <p className="text-white font-orbitron uppercase tracking-tight line-clamp-2">{item.title}</p>
+                  <span className="rounded border border-gundam-cyan/20 px-2 py-1 text-[9px] font-orbitron text-gundam-cyan uppercase">Score {item.suggestionScore}</span>
+                </div>
+                <p className="mt-3 text-sm text-gundam-text-secondary line-clamp-2">{item.wantedItems}</p>
+                <div className="mt-4 flex items-center justify-between text-[10px] uppercase tracking-widest text-gundam-text-muted">
+                  <span>{item.condition}</span>
+                  <span>{item.owner?.displayName || 'Unknown Pilot'}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       )}
 

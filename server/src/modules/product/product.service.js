@@ -127,7 +127,12 @@ class ProductService extends BaseService {
     }
     // Increment views async
     this.repository.incrementViews(product._id);
-    return product;
+
+    const serializedProduct = product.toObject ? product.toObject() : product;
+    return {
+      ...serializedProduct,
+      marketIntel: this._estimateMarketIntel(serializedProduct),
+    };
   }
 
   async getRecommendationsBySlug(slug, limit = 4) {
@@ -166,6 +171,45 @@ class ProductService extends BaseService {
       publicId: image.publicId,
       isMain: index === 0,
     }));
+  }
+
+  _estimateMarketIntel(product) {
+    const rarityMultipliers = {
+      Common: 0.95,
+      Rare: 1.15,
+      'Super Rare': 1.28,
+      'Ultra Rare': 1.4,
+      Legendary: 1.58,
+    };
+
+    const conditionMultipliers = {
+      'New (MISB)': 1.08,
+      'Mint (BIB)': 1,
+      'Used / Pre-owned': 0.88,
+      'Damaged / Parts only': 0.55,
+    };
+
+    const rarityBoost = rarityMultipliers[product.rarity] || 1;
+    const conditionBoost = conditionMultipliers[product.condition] || 1;
+    const viewBoost = Math.min(1.12, 1 + ((product.views || 0) / 5000));
+    const ratingBoost = 1 + (((product.ratings?.average || 0) - 3) * 0.04);
+
+    const estimatedValue = Math.round(product.price * rarityBoost * conditionBoost * viewBoost * ratingBoost);
+    const minValue = Math.round(estimatedValue * 0.92);
+    const maxValue = Math.round(estimatedValue * 1.11);
+    const confidence = product.ratings?.count > 0 ? 'medium' : 'low';
+
+    return {
+      estimatedValue,
+      valueBand: { min: minValue, max: maxValue },
+      confidence,
+      signals: [
+        `rarity:${product.rarity}`,
+        `condition:${product.condition}`,
+        `views:${product.views || 0}`,
+        `rating:${product.ratings?.average || 0}`,
+      ],
+    };
   }
 }
 

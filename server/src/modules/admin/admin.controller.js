@@ -30,6 +30,12 @@ class AdminController extends BaseController {
     const trades = await this.service.getAllTrades();
     ApiResponse.success(trades, 'Mission overview retrieved').send(res);
   });
+
+  /** PATCH /api/admin/trades/:id/status */
+  updateTradeStatus = this.handler(async (req, res) => {
+    const trade = await this.service.updateTradeStatus(req.params.id, req.body.status);
+    ApiResponse.success(trade, 'Trade status updated').send(res);
+  });
 }
 
 module.exports = new AdminController();

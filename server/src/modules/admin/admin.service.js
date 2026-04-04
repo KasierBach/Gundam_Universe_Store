@@ -1,7 +1,7 @@
 const User = require('../user/user.model');
 const Order = require('../order/order.model');
 const TradeListing = require('../trade/tradeListing.model');
-const ApiResponse = require('../../shared/utils/ApiResponse');
+const ApiError = require('../../shared/utils/ApiError');
 
 class AdminService {
   async getStats() {
@@ -46,6 +46,20 @@ class AdminService {
     return TradeListing.find()
       .populate('owner', 'displayName email')
       .sort({ createdAt: -1 });
+  }
+
+  async updateTradeStatus(tradeId, status) {
+    const trade = await TradeListing.findByIdAndUpdate(
+      tradeId,
+      { status },
+      { new: true, runValidators: true }
+    ).populate('owner', 'displayName email');
+
+    if (!trade) {
+      throw ApiError.notFound('Trade listing not found');
+    }
+
+    return trade;
   }
 }
 

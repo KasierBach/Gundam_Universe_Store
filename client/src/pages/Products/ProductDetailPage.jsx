@@ -189,6 +189,23 @@ const ProductDetailPage = () => {
                </div>
             </div>
 
+            {product.marketIntel && (
+              <div className="mt-10 rounded-2xl border border-gundam-amber/20 bg-gundam-amber/5 p-6">
+                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                  <div>
+                    <p className="text-[10px] font-orbitron uppercase tracking-[0.3em] text-gundam-amber">Rare Item Valuation</p>
+                    <p className="mt-2 text-2xl font-orbitron text-white">${product.marketIntel.estimatedValue.toLocaleString()}</p>
+                    <p className="mt-2 text-sm text-gundam-text-secondary">
+                      Estimated band: ${product.marketIntel.valueBand.min.toLocaleString()} - ${product.marketIntel.valueBand.max.toLocaleString()}
+                    </p>
+                  </div>
+                  <span className="rounded border border-gundam-amber/30 px-3 py-2 text-[10px] font-orbitron uppercase tracking-widest text-gundam-amber">
+                    Confidence: {product.marketIntel.confidence}
+                  </span>
+                </div>
+              </div>
+            )}
+
             {/* Seller Info Placeholder */}
             <div className="mt-12 pt-8 border-t border-gundam-border/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">

@@ -5,6 +5,7 @@ const notificationService = require('../notification/notification.service');
 const { TRADE_LISTING_STATUS, TRADE_OFFER_STATUS } = require('../../shared/constants/tradeStatus');
 const ApiError = require('../../shared/utils/ApiError');
 const { uploadFilesToCloudinary } = require('../../shared/utils/cloudinaryAsset');
+const wishlistRepository = require('../wishlist/wishlist.repository');
 
 class TradeService {
   /**
@@ -192,6 +193,49 @@ class TradeService {
     }
 
     return tradeOfferRepository.findByListingId(listingId);
+  }
+
+  async getSuggestedListings(userId, limit = 6) {
+    const [wishlist, listings] = await Promise.all([
+      wishlistRepository.findByUserId(userId),
+      tradeListingRepository.findOpenExcludingOwner(userId, 30),
+    ]);
+
+    const wishlistProducts = wishlist?.products || [];
+    const keywordBag = wishlistProducts.flatMap((product) => {
+      const tokens = [
+        product?.name,
+        product?.series,
+        product?.grade,
+        product?.rarity,
+        ...(product?.tags || []),
+      ];
+
+      return tokens
+        .filter(Boolean)
+        .flatMap((value) => value.toString().toLowerCase().split(/[^a-z0-9]+/i))
+        .filter((token) => token.length > 2);
+    });
+
+    const uniqueKeywords = [...new Set(keywordBag)];
+
+    const scoredListings = listings.map((listing) => {
+      const haystack = `${listing.title} ${listing.description} ${listing.wantedItems}`.toLowerCase();
+      const keywordMatches = uniqueKeywords.reduce((score, keyword) => (
+        haystack.includes(keyword) ? score + 1 : score
+      ), 0);
+      const reputationBoost = listing.owner?.reputation?.score ? listing.owner.reputation.score / 50 : 0;
+      const freshnessBoost = listing.createdAt ? 1 / (1 + Math.max(1, (Date.now() - new Date(listing.createdAt).getTime()) / 86400000)) : 0;
+
+      return {
+        ...listing,
+        suggestionScore: Number((keywordMatches + reputationBoost + freshnessBoost).toFixed(2)),
+      };
+    });
+
+    return scoredListings
+      .sort((a, b) => b.suggestionScore - a.suggestionScore || new Date(b.createdAt) - new Date(a.createdAt))
+      .slice(0, limit);
   }
 
   async _resolveTradeImages(existingImages = [], files = [], folder) {

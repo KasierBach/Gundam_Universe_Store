@@ -2,6 +2,8 @@ const { Router } = require('express');
 const adminController = require('./admin.controller');
 const { authenticate } = require('../../shared/middlewares/auth.middleware');
 const { authorize } = require('../../shared/middlewares/role.middleware');
+const { validate } = require('../../shared/middlewares/validate.middleware');
+const { tradeModerationSchema } = require('./admin.validator');
 
 const router = Router();
 
@@ -20,5 +22,6 @@ router.get('/orders', adminController.getOrders);
 
 /** GET /api/admin/trades */
 router.get('/trades', adminController.getTrades);
+router.patch('/trades/:id/status', validate(tradeModerationSchema), adminController.updateTradeStatus);
 
 module.exports = router;

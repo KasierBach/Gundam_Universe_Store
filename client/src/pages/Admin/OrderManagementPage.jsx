@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { PackageCheck } from 'lucide-react'
 import adminService from '../../services/adminService'
 import orderService from '../../services/orderService'
+import sellerService from '../../services/sellerService'
+import useAuthStore from '../../stores/authStore'
 
 const ORDER_STATUSES = ['PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED']
 
@@ -9,10 +11,12 @@ const OrderManagementPage = () => {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
   const [updatingId, setUpdatingId] = useState(null)
+  const { user } = useAuthStore()
+  const isSellerMode = user?.role === 'seller'
 
   const loadOrders = async () => {
     try {
-      const data = await adminService.getOrders()
+      const data = isSellerMode ? await sellerService.getOrders() : await adminService.getOrders()
       setOrders(data)
     } finally {
       setLoading(false)
@@ -21,12 +25,16 @@ const OrderManagementPage = () => {
 
   useEffect(() => {
     loadOrders()
-  }, [])
+  }, [isSellerMode])
 
   const handleStatusChange = async (orderId, status) => {
     try {
       setUpdatingId(orderId)
-      await orderService.updateOrderStatus(orderId, status)
+      if (isSellerMode) {
+        await sellerService.updateOrderStatus(orderId, status)
+      } else {
+        await orderService.updateOrderStatus(orderId, status)
+      }
       await loadOrders()
     } finally {
       setUpdatingId(null)
@@ -36,8 +44,10 @@ const OrderManagementPage = () => {
   return (
     <div className="pt-24 pb-12 px-4 max-w-7xl mx-auto min-h-screen">
       <div className="mb-10">
-        <h1 className="text-3xl font-orbitron text-white uppercase tracking-tighter">Order Control</h1>
-        <p className="text-gundam-text-muted font-rajdhani uppercase tracking-[0.3em] text-xs mt-2">Monitor deployment status across all active pilots</p>
+        <h1 className="text-3xl font-orbitron text-white uppercase tracking-tighter">{isSellerMode ? 'Seller Order Command' : 'Order Control'}</h1>
+        <p className="text-gundam-text-muted font-rajdhani uppercase tracking-[0.3em] text-xs mt-2">
+          {isSellerMode ? 'Manage deployment status for orders tied to your armory inventory' : 'Monitor deployment status across all active pilots'}
+        </p>
       </div>
 
       <div className="glass-card border-gundam-border/30 p-6">
@@ -52,7 +62,7 @@ const OrderManagementPage = () => {
                     <th className="pb-4">Ref</th>
                     <th className="pb-4">Pilot</th>
                     <th className="pb-4">Items</th>
-                    <th className="pb-4">Total</th>
+                    <th className="pb-4">{isSellerMode ? 'Revenue' : 'Total'}</th>
                     <th className="pb-4">Created</th>
                     <th className="pb-4">Status</th>
                   </tr>
@@ -66,7 +76,7 @@ const OrderManagementPage = () => {
                         <div className="text-xs text-gundam-text-muted">{order.user?.email || 'No signal'}</div>
                       </td>
                       <td className="py-4 text-gundam-text-secondary text-sm">{order.items.length}</td>
-                      <td className="py-4 text-gundam-cyan font-orbitron">${order.totalAmount.toLocaleString()}</td>
+                      <td className="py-4 text-gundam-cyan font-orbitron">${(isSellerMode ? order.sellerRevenue : order.totalAmount).toLocaleString()}</td>
                       <td className="py-4 text-gundam-text-secondary text-sm">{new Date(order.createdAt).toLocaleDateString()}</td>
                       <td className="py-4">
                         <OrderStatusSelect order={order} updatingId={updatingId} onChange={handleStatusChange} />
@@ -94,8 +104,8 @@ const OrderManagementPage = () => {
                       <p className="text-gundam-text-secondary">{order.items.length}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] uppercase tracking-widest text-gundam-text-muted">Total</p>
-                      <p className="text-gundam-cyan font-orbitron">${order.totalAmount.toLocaleString()}</p>
+                      <p className="text-[10px] uppercase tracking-widest text-gundam-text-muted">{isSellerMode ? 'Revenue' : 'Total'}</p>
+                      <p className="text-gundam-cyan font-orbitron">${(isSellerMode ? order.sellerRevenue : order.totalAmount).toLocaleString()}</p>
                     </div>
                   </div>
                   <div className="mt-4">

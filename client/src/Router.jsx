@@ -179,6 +179,22 @@ const Router = () => {
               </RoleGuard>
             }
           />
+          <Route
+            path="/seller/products"
+            element={
+              <RoleGuard allowedRoles={['seller', 'admin']}>
+                <ProductManagementPage />
+              </RoleGuard>
+            }
+          />
+          <Route
+            path="/seller/orders"
+            element={
+              <RoleGuard allowedRoles={['seller', 'admin']}>
+                <OrderManagementPage />
+              </RoleGuard>
+            }
+          />
 
           {/* Admin Routes Example */}
           <Route

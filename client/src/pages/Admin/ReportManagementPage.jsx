@@ -7,6 +7,7 @@ const ReportManagementPage = () => {
   const [reports, setReports] = useState([])
   const [loading, setLoading] = useState(true)
   const [updatingId, setUpdatingId] = useState(null)
+  const [resolutionNotes, setResolutionNotes] = useState({})
 
   const loadReports = async () => {
     try {
@@ -24,7 +25,10 @@ const ReportManagementPage = () => {
   const handleStatusChange = async (reportId, status) => {
     try {
       setUpdatingId(reportId)
-      await reportService.updateStatus(reportId, { status })
+      await reportService.updateStatus(reportId, {
+        status,
+        resolutionNote: resolutionNotes[reportId] || '',
+      })
       await loadReports()
     } finally {
       setUpdatingId(null)
@@ -49,6 +53,7 @@ const ReportManagementPage = () => {
                 <th className="pb-4">Reporter</th>
                 <th className="pb-4">Target</th>
                 <th className="pb-4">Details</th>
+                <th className="pb-4">Resolution</th>
                 <th className="pb-4">Status</th>
               </tr>
             </thead>
@@ -62,6 +67,18 @@ const ReportManagementPage = () => {
                   </td>
                   <td className="py-4 text-gundam-cyan text-sm">{report.targetType} / {String(report.targetId).slice(-8)}</td>
                   <td className="py-4 text-gundam-text-secondary text-sm max-w-md">{report.details}</td>
+                  <td className="py-4">
+                    <textarea
+                      rows="3"
+                      value={resolutionNotes[report._id] ?? report.resolutionNote ?? ''}
+                      onChange={(event) => setResolutionNotes((current) => ({
+                        ...current,
+                        [report._id]: event.target.value,
+                      }))}
+                      className="min-w-[220px] rounded-lg border border-gundam-border/20 bg-black/30 px-3 py-2 text-sm text-white focus:outline-none focus:border-gundam-cyan"
+                      placeholder="Moderator note, evidence summary, action taken..."
+                    />
+                  </td>
                   <td className="py-4">
                     <select
                       value={report.status}

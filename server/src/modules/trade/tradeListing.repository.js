@@ -35,6 +35,20 @@ class TradeListingRepository extends BaseRepository {
   async findWithDetails(id) {
     return this.model.findById(id).populate('owner', 'displayName avatar reputation phone email');
   }
+
+  async findOpenExcludingOwner(ownerId, limit = 24) {
+    const filter = { status: 'open' };
+
+    if (ownerId) {
+      filter.owner = { $ne: ownerId };
+    }
+
+    return this.model.find(filter)
+      .populate('owner', 'displayName avatar reputation')
+      .sort({ createdAt: -1, views: -1 })
+      .limit(limit)
+      .lean();
+  }
 }
 
 module.exports = new TradeListingRepository();

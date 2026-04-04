@@ -2,22 +2,35 @@ import { useEffect, useState } from 'react'
 import { Repeat, ShieldAlert } from 'lucide-react'
 import adminService from '../../services/adminService'
 
+const TRADE_STATUSES = ['open', 'in-negotiation', 'completed', 'closed']
+
 const TradeModerationPage = () => {
   const [trades, setTrades] = useState([])
   const [loading, setLoading] = useState(true)
+  const [updatingId, setUpdatingId] = useState(null)
+
+  const loadTrades = async () => {
+    try {
+      const data = await adminService.getTrades()
+      setTrades(data)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    const loadTrades = async () => {
-      try {
-        const data = await adminService.getTrades()
-        setTrades(data)
-      } finally {
-        setLoading(false)
-      }
-    }
-
     loadTrades()
   }, [])
+
+  const handleStatusChange = async (tradeId, status) => {
+    try {
+      setUpdatingId(tradeId)
+      await adminService.updateTradeStatus(tradeId, status)
+      await loadTrades()
+    } finally {
+      setUpdatingId(null)
+    }
+  }
 
   return (
     <div className="pt-24 pb-12 px-4 max-w-7xl mx-auto min-h-screen">
@@ -36,9 +49,16 @@ const TradeModerationPage = () => {
                 <h2 className="text-xl text-white font-orbitron uppercase tracking-tight">{trade.title}</h2>
                 <p className="text-xs text-gundam-text-muted mt-1">Owner: {trade.owner?.displayName || 'Unknown Pilot'}</p>
               </div>
-              <span className="px-3 py-1 text-[10px] uppercase font-orbitron rounded border border-gundam-cyan/30 text-gundam-cyan">
-                {trade.status}
-              </span>
+              <select
+                value={trade.status}
+                disabled={updatingId === trade._id}
+                onChange={(event) => handleStatusChange(trade._id, event.target.value)}
+                className="rounded border border-gundam-cyan/30 bg-black/40 px-3 py-2 text-[10px] uppercase font-orbitron text-gundam-cyan focus:outline-none"
+              >
+                {TRADE_STATUSES.map((status) => (
+                  <option key={status} value={status}>{status}</option>
+                ))}
+              </select>
             </div>
 
             <p className="text-gundam-text-secondary text-sm mb-4 line-clamp-3">{trade.description}</p>

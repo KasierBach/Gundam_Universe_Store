@@ -20,6 +20,11 @@ const adminService = {
     const response = await api.get('/admin/trades');
     return response.data.data;
   },
+
+  updateTradeStatus: async (tradeId, status) => {
+    const response = await api.patch(`/admin/trades/${tradeId}/status`, { status });
+    return response.data.data;
+  },
 };
 
 export default adminService;

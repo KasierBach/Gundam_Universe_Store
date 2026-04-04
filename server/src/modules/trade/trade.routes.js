@@ -14,6 +14,7 @@ const router = express.Router();
  * Trade Listing Routes
  */
 router.get('/offers/me', authenticate, tradeController.getMyOffers);
+router.get('/suggestions/me', authenticate, validate(tradeValidator.suggestionQuerySchema), tradeController.getSuggestions);
 
 router.route('/')
   .post(

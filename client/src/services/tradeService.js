@@ -75,6 +75,11 @@ const tradeService = {
     return response.data.data
   },
 
+  getSuggestions: async (params) => {
+    const response = await api.get('/trades/suggestions/me', { params })
+    return response.data.data
+  },
+
   reportListing: async (listingId, payload) => {
     const response = await api.post(`/trades/${listingId}/report`, payload)
     return response.data.data

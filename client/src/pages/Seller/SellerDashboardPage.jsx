@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { BarChart3, Boxes, PackageSearch, Rocket, ShoppingBag } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import sellerService from '../../services/sellerService'
 
 const SellerDashboardPage = () => {
@@ -33,6 +34,14 @@ const SellerDashboardPage = () => {
           <p className="mt-2 text-gundam-text-muted font-rajdhani uppercase tracking-[0.35em] text-xs">
             Revenue, inventory and deployment telemetry
           </p>
+          <div className="mt-5 flex flex-col sm:flex-row gap-3">
+            <Link to="/seller/products" className="inline-flex items-center justify-center rounded-lg border border-gundam-cyan/30 bg-gundam-cyan/10 px-5 py-3 text-[10px] font-orbitron uppercase tracking-[0.25em] text-gundam-cyan hover:bg-gundam-cyan/20 transition-all">
+              Manage Products
+            </Link>
+            <Link to="/seller/orders" className="inline-flex items-center justify-center rounded-lg border border-gundam-border/40 bg-black/20 px-5 py-3 text-[10px] font-orbitron uppercase tracking-[0.25em] text-white hover:border-gundam-cyan/30 transition-all">
+              Review Orders
+            </Link>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-10">
@@ -130,6 +139,31 @@ const SellerDashboardPage = () => {
                   <span className="text-gundam-text-secondary">Stock: {product.stock}</span>
                   <span className="text-gundam-cyan font-orbitron">${product.price.toLocaleString()}</span>
                 </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="glass-card border-gundam-border/30 p-6 mt-8">
+          <div className="flex items-center justify-between gap-4 mb-6">
+            <h2 className="text-lg font-orbitron text-white uppercase tracking-widest">Trade Signal Monitor</h2>
+            <Link to="/profile/trades" className="text-[10px] font-orbitron uppercase tracking-[0.2em] text-gundam-cyan hover:underline">Open trade logs</Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+            {(dashboard?.recentTrades || []).length === 0 ? (
+              <div className="md:col-span-2 xl:col-span-4">
+                <EmptySellerBlock text="No trade missions logged yet. Launch a listing to build collector traction." />
+              </div>
+            ) : dashboard.recentTrades.map((trade) => (
+              <div key={trade._id} className="rounded-xl border border-gundam-border/20 bg-black/20 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-white font-orbitron uppercase tracking-tight line-clamp-2">{trade.title}</p>
+                    <p className="mt-2 text-[10px] text-gundam-text-muted uppercase tracking-[0.2em]">{trade.condition}</p>
+                  </div>
+                  <span className="rounded border border-gundam-cyan/20 px-2 py-1 text-[9px] font-orbitron uppercase tracking-widest text-gundam-cyan">{trade.status}</span>
+                </div>
+                <p className="mt-3 text-sm text-gundam-text-secondary line-clamp-2">{trade.wantedItems}</p>
               </div>
             ))}
           </div>
