@@ -1,1 +1,7 @@
 /logs
+**/node_modules/
+client/dist/
+**/.env
+!server/.env.example
+!client/.env.example
+*.log

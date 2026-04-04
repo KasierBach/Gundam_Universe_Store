@@ -1,7 +1,19 @@
 import { io } from 'socket.io-client';
 import useAuthStore from '../stores/authStore';
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5001';
+const deriveSocketUrl = () => {
+  if (import.meta.env.VITE_SOCKET_URL) {
+    return import.meta.env.VITE_SOCKET_URL;
+  }
+
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL.replace(/\/api\/?$/, '');
+  }
+
+  return import.meta.env.DEV ? 'http://localhost:5001' : window.location.origin;
+};
+
+const SOCKET_URL = deriveSocketUrl();
 
 let socket = null;
 

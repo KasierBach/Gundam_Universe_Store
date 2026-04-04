@@ -1,6 +1,20 @@
 const dotenv = require('dotenv');
 dotenv.config();
 
+const normalizeOrigin = (origin) => origin.trim().replace(/\/$/, '');
+
+const parseOrigins = (...values) => values
+  .filter(Boolean)
+  .flatMap((value) => value.split(','))
+  .map(normalizeOrigin)
+  .filter(Boolean);
+
+const clientOrigins = parseOrigins(
+  process.env.CLIENT_URLS,
+  process.env.CLIENT_URL,
+  'http://localhost:4000',
+);
+
 const env = {
   NODE_ENV: process.env.NODE_ENV || 'development',
   PORT: parseInt(process.env.PORT, 10) || 5000,
@@ -20,7 +34,9 @@ const env = {
   CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
 
   // Client
-  CLIENT_URL: process.env.CLIENT_URL || 'http://localhost:4000',
+  CLIENT_URL: clientOrigins[0],
+  CLIENT_URLS: process.env.CLIENT_URLS || clientOrigins.join(','),
+  CLIENT_ORIGINS: clientOrigins,
 
   // Rate Limiting
   RATE_LIMIT_WINDOW_MS: parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 900000,
@@ -32,6 +48,14 @@ const env = {
 
   isProduction() {
     return this.NODE_ENV === 'production';
+  },
+
+  isAllowedOrigin(origin) {
+    if (!origin) {
+      return true;
+    }
+
+    return this.CLIENT_ORIGINS.includes(normalizeOrigin(origin));
   },
 };
 

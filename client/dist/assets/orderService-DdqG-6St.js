@@ -1,1 +1,0 @@
-import{e as r}from"./index-Dxv0cKZI.js";const o={createOrder:async e=>(await r.post("/orders/checkout",e)).data.data,getHistory:async()=>(await r.get("/orders/history")).data.data,getOrderDetail:async e=>(await r.get(`/orders/${e}`)).data.data,updateOrderStatus:async(e,t)=>(await r.patch(`/orders/${e}/status`,{status:t})).data.data};export{o};
