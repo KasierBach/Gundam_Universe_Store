@@ -26,25 +26,29 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config
+    const isRefreshRequest = originalRequest?.url?.includes('/auth/refresh-token')
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && originalRequest && !originalRequest._retry && !isRefreshRequest) {
       originalRequest._retry = true
 
       try {
         const { refreshToken: refresh } = useAuthStore.getState()
+        if (!refresh) {
+          throw error
+        }
+
         const response = await axios.post(
           `${api.defaults.baseURL}/auth/refresh-token`,
           { refreshToken: refresh },
           { withCredentials: true }
         )
-        const { accessToken } = response.data.data
+        const { accessToken, refreshToken } = response.data.data
 
-        useAuthStore.getState().setTokens(accessToken, refresh)
-        
+        useAuthStore.getState().setTokens(accessToken, refreshToken ?? refresh)
         originalRequest.headers.Authorization = `Bearer ${accessToken}`
         return api(originalRequest)
       } catch (refreshError) {
-        useAuthStore.getState().logout()
+        useAuthStore.getState().clearAuthState()
         return Promise.reject(refreshError)
       }
     }

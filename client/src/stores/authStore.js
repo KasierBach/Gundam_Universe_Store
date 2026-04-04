@@ -2,6 +2,14 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import api from '../config/api'
 
+const clearPersistedUserData = () => {
+  localStorage.removeItem('auth-storage')
+  localStorage.removeItem('gundam-cart-storage')
+  localStorage.removeItem('gundam-order-storage')
+  localStorage.removeItem('gundam-notification-storage')
+  localStorage.removeItem('gundam-wishlist-storage')
+}
+
 const useAuthStore = create(
   persist(
     (set, get) => ({
@@ -22,6 +30,17 @@ const useAuthStore = create(
         accessToken,
         refreshToken,
       }),
+
+      clearAuthState: () => {
+        set({
+          user: null,
+          accessToken: null,
+          refreshToken: null,
+          isAuthenticated: false,
+          isLoading: false,
+        })
+        clearPersistedUserData()
+      },
 
       login: async (email, password) => {
         set({ isLoading: true })
@@ -66,17 +85,7 @@ const useAuthStore = create(
         try {
           await api.post('/auth/logout', { refreshToken })
         } finally {
-          set({
-            user: null,
-            accessToken: null,
-            refreshToken: null,
-            isAuthenticated: false,
-          })
-          localStorage.removeItem('auth-storage')
-          localStorage.removeItem('gundam-cart-storage')
-          localStorage.removeItem('gundam-order-storage')
-          localStorage.removeItem('gundam-notification-storage')
-          localStorage.removeItem('gundam-wishlist-storage')
+          get().clearAuthState()
         }
       },
 
