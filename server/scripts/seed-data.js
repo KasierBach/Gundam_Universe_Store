@@ -20,7 +20,7 @@ const CATEGORIES = [
   { name: 'Tools & Acc', description: 'Tools, waterslides and accessories for builders and collectors.' },
 ];
 
-// Price references were checked from Gundam Planet product listings on April 4, 2026.
+// Price references were checked from Gundam Planet product listings on April 5, 2026.
 // Prices and availability may change, so these are treated as realistic seed references.
 const PRODUCTS = [
   {
@@ -62,6 +62,82 @@ const PRODUCTS = [
     tags: ['Calibarn', 'Suletta Mercury', 'Witch from Mercury', 'Final battle'],
   },
   {
+    name: 'HG Gundam Schwarzette',
+    price: 24.95,
+    stock: 12,
+    description: 'A dramatic late-line Witch from Mercury high grade with broad sword equipment, angular armor surfaces and strong shelf impact for a compact 1/144 display.',
+    grade: PRODUCT_GRADES.HG,
+    series: 'Mobile Suit Gundam: The Witch from Mercury',
+    rarity: PRODUCT_RARITIES.RARE,
+    condition: PRODUCT_CONDITIONS.NEW,
+    specs: { scale: '1/144', material: 'PS, PE', dimensions: 'Approx. 12.5 in box length', weight: '0.36kg' },
+    images: [
+      {
+        url: 'https://www.gundamplanet.com/cdn/shop/files/hg-gundam-schwarzette-00001.jpg?v=1737716034',
+        publicId: 'source/gundamplanet/hg-gundam-schwarzette',
+        isMain: true,
+      },
+    ],
+    tags: ['Schwarzette', 'Witch from Mercury', 'Jeturk', 'Large sword'],
+  },
+  {
+    name: 'HGCE ZGMF-X20A Strike Freedom Gundam',
+    price: 24.95,
+    stock: 15,
+    description: 'A refreshed Cosmic Era high grade with gold frame highlights, iconic wing silhouette and a clean build profile that still reads premium on display.',
+    grade: PRODUCT_GRADES.HG,
+    series: 'Mobile Suit Gundam SEED Destiny',
+    rarity: PRODUCT_RARITIES.RARE,
+    condition: PRODUCT_CONDITIONS.NEW,
+    specs: { scale: '1/144', material: 'PS, PE', dimensions: 'Approx. 12.3 in box length', weight: '0.34kg' },
+    images: [
+      {
+        url: 'https://www.gundamplanet.com/cdn/shop/files/hgce-zgmf-x20a-strike-freedom-gundam-revive-01.jpg?v=1737665029',
+        publicId: 'source/gundamplanet/hgce-strike-freedom',
+        isMain: true,
+      },
+    ],
+    tags: ['Kira Yamato', 'Strike Freedom', 'Cosmic Era', 'Dragoon'],
+  },
+  {
+    name: 'HGCE STTS-808 Immortal Justice Gundam',
+    price: 26.95,
+    stock: 11,
+    description: 'A modern SEED Freedom line release with aggressive flight mode styling, strong color breakup and a silhouette that looks especially sharp in aerial poses.',
+    grade: PRODUCT_GRADES.HG,
+    series: 'Mobile Suit Gundam SEED Freedom',
+    rarity: PRODUCT_RARITIES.RARE,
+    condition: PRODUCT_CONDITIONS.NEW,
+    specs: { scale: '1/144', material: 'PS, PE', dimensions: 'Approx. 12.8 in box length', weight: '0.37kg' },
+    images: [
+      {
+        url: 'https://www.gundamplanet.com/cdn/shop/files/re_hg-immortal-justice-gundam-00001.jpg?v=1737728207',
+        publicId: 'source/gundamplanet/hgce-immortal-justice',
+        isMain: true,
+      },
+    ],
+    tags: ['Shinn Asuka', 'Immortal Justice', 'SEED Freedom', 'Flight mode'],
+  },
+  {
+    name: 'HGCE ZGMF/A-262PD-P Mighty Strike Freedom Gundam',
+    price: 34.95,
+    stock: 8,
+    description: 'A flashy SEED Freedom kit that pushes the wing silhouette further with premium visual presence, effect-driven posing potential and collector appeal above a standard HG.',
+    grade: PRODUCT_GRADES.HG,
+    series: 'Mobile Suit Gundam SEED Freedom',
+    rarity: PRODUCT_RARITIES.SUPER_RARE,
+    condition: PRODUCT_CONDITIONS.NEW,
+    specs: { scale: '1/144', material: 'PS, PE', dimensions: 'Approx. 13.0 in box length', weight: '0.42kg' },
+    images: [
+      {
+        url: 'https://www.gundamplanet.com/cdn/shop/files/th_hgce-zgmf-a-262pd-p-mighty-strike-freedom-gundam-00001.jpg?v=1737734523',
+        publicId: 'source/gundamplanet/hgce-mighty-strike-freedom',
+        isMain: true,
+      },
+    ],
+    tags: ['Kira Yamato', 'Mighty Strike Freedom', 'SEED Freedom', 'Dragoon'],
+  },
+  {
     name: 'RG RX-93 Nu Gundam',
     price: 56.95,
     stock: 9,
@@ -79,6 +155,25 @@ const PRODUCTS = [
       },
     ],
     tags: ['Amuro Ray', 'Londo Bell', 'Nu Gundam', 'Universal Century'],
+  },
+  {
+    name: 'RG OZ-13MS Gundam Epyon',
+    price: 54.95,
+    stock: 7,
+    description: 'A sleek modern Real Grade with whip and sword loadout, transformable presence and a dramatic silhouette that makes it a standout AC-era display unit.',
+    grade: PRODUCT_GRADES.RG,
+    series: 'Mobile Suit Gundam Wing',
+    rarity: PRODUCT_RARITIES.SUPER_RARE,
+    condition: PRODUCT_CONDITIONS.NEW,
+    specs: { scale: '1/144', material: 'PS, ABS, PP', dimensions: 'Approx. 14.2 in box length', weight: '0.49kg' },
+    images: [
+      {
+        url: 'https://www.gundamplanet.com/cdn/shop/files/rg-oz-13ms-gundam-epyon-00001.jpg?v=1737721287',
+        publicId: 'source/gundamplanet/rg-gundam-epyon',
+        isMain: true,
+      },
+    ],
+    tags: ['Zechs Merquise', 'Gundam Wing', 'Epyon', 'Beam sword'],
   },
   {
     name: 'RG GF13-017NJII God Gundam',
@@ -117,6 +212,25 @@ const PRODUCTS = [
       },
     ],
     tags: ['Char Aznable', 'Neo Zeon', 'Sazabi', 'Universal Century'],
+  },
+  {
+    name: 'MGSD Freedom Gundam',
+    price: 54.95,
+    stock: 9,
+    description: 'A premium super-deformed release with dense surface detail, metallic accents and an unexpectedly high-end build feel that appeals to both SD fans and collectors.',
+    grade: PRODUCT_GRADES.SD,
+    series: 'Mobile Suit Gundam SEED',
+    rarity: PRODUCT_RARITIES.SUPER_RARE,
+    condition: PRODUCT_CONDITIONS.NEW,
+    specs: { scale: 'SD', material: 'PS, ABS', dimensions: 'Approx. 12.6 in box length', weight: '0.44kg' },
+    images: [
+      {
+        url: 'https://www.gundamplanet.com/cdn/shop/files/mgsd-freedom-gundam-01.jpg?v=1737713041',
+        publicId: 'source/gundamplanet/mgsd-freedom-gundam',
+        isMain: true,
+      },
+    ],
+    tags: ['Kira Yamato', 'SD', 'MGSD', 'Freedom Gundam'],
   },
   {
     name: 'MG ASW-G-08 Gundam Barbatos',
