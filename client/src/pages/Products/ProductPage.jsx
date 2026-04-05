@@ -16,12 +16,13 @@ import {
 import productService from '../../services/productService'
 import categoryService from '../../services/categoryService'
 import ProductCard from '../../components/product/ProductCard'
+import SeoHead from '../../components/shared/SeoHead'
 import { cn } from '../../utils/cn'
 import { PRODUCT_GRADES } from '../../shared/constants/productConstants'
 import { useI18n } from '../../i18n/I18nProvider'
 
 const ProductPage = () => {
-  const { t, tv } = useI18n()
+  const { t, tv, locale } = useI18n()
   const [searchParams, setSearchParams] = useSearchParams()
   const [products, setProducts] = useState([])
   const [categories, setCategories] = useState([])
@@ -127,6 +128,31 @@ const ProductPage = () => {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gundam-bg-primary pb-20 pt-20">
+      <SeoHead
+        locale={locale}
+        path="/shop"
+        type="CollectionPage"
+        title={locale === 'vi' ? 'Cửa hàng Gundam và catalog Gunpla' : 'Gundam shop and Gunpla catalog'}
+        description={
+          locale === 'vi'
+            ? 'Duyệt catalog Gundam theo grade, danh mục và khoảng giá. Trang cửa hàng được tối ưu cho desktop, tablet, mobile và chia đôi màn hình.'
+            : 'Browse the Gundam catalog by grade, category, and price range. The storefront is tuned for desktop, tablet, mobile, and split-screen workflows.'
+        }
+        keywords={
+          locale === 'vi'
+            ? 'cửa hàng Gundam, catalog Gunpla, mua mô hình Gundam, HG RG MG PG'
+            : 'Gundam shop, Gunpla catalog, HG RG MG PG, buy Gundam model kits'
+        }
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'CollectionPage',
+          name: locale === 'vi' ? 'Cửa hàng Gundam' : 'Gundam Shop',
+          description:
+            locale === 'vi'
+              ? 'Catalog Gundam công khai với bộ lọc theo grade, category và giá.'
+              : 'Public Gundam catalog with filters for grade, category, and price.',
+        }}
+      />
       <div className="pointer-events-none absolute inset-0 opacity-[0.04]">
         <div className="absolute left-[8%] top-20 h-72 w-72 rounded-full border border-gundam-cyan" />
         <div className="absolute bottom-24 right-[8%] h-[28rem] w-[28rem] rounded-full border border-gundam-cyan" />

@@ -1,14 +1,199 @@
 import { motion } from 'framer-motion'
-import { ChevronRight, LayoutGrid, Repeat, Rocket, Shield, Users, Zap } from 'lucide-react'
+import { ChevronRight, LayoutGrid, Repeat, Rocket, Shield, Users, Zap, ArrowUpRight } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import categoryService from '../../services/categoryService'
+import productService from '../../services/productService'
+import tradeService from '../../services/tradeService'
 import CategoryList from '../../components/product/CategoryList'
+import SeoHead from '../../components/shared/SeoHead'
 import { useI18n } from '../../i18n/I18nProvider'
 
 const HomePage = () => {
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
+  const [systemSnapshot, setSystemSnapshot] = useState({
+    catalogCount: null,
+    tradeCount: null,
+    categoryCount: null,
+    syncedAt: null,
+    isLoading: true,
+  })
+
+  useEffect(() => {
+    let active = true
+
+    const loadSystemSnapshot = async () => {
+      const [productsResult, tradesResult, categoriesResult] = await Promise.allSettled([
+        productService.getProducts({ page: 1, limit: 1 }),
+        tradeService.getListings({ page: 1, limit: 1, status: 'open' }),
+        categoryService.getCategories(),
+      ])
+
+      if (!active) return
+
+      setSystemSnapshot({
+        catalogCount: productsResult.status === 'fulfilled' ? productsResult.value?.totalResults ?? 0 : null,
+        tradeCount: tradesResult.status === 'fulfilled' ? tradesResult.value?.totalResults ?? 0 : null,
+        categoryCount: categoriesResult.status === 'fulfilled' ? categoriesResult.value?.length ?? 0 : null,
+        syncedAt: new Date().toISOString(),
+        isLoading: false,
+      })
+    }
+
+    loadSystemSnapshot()
+
+    return () => {
+      active = false
+    }
+  }, [])
+
+  const formatter = useMemo(
+    () => new Intl.NumberFormat(locale === 'vi' ? 'vi-VN' : 'en-US'),
+    [locale]
+  )
+
+  const readinessCopy = locale === 'vi'
+    ? {
+      badge: 'Bảng trạng thái triển khai',
+      title: 'Hệ thống đã sẵn sàng cho',
+      highlight: 'catalog, giao dịch và vận hành thực tế',
+      description:
+        'Thay vì KPI giả, khu vực này hiển thị những tín hiệu đang lấy từ dữ liệu public của hệ thống và những năng lực đã được nối thật trong MVP.',
+      metrics: [
+        {
+          label: 'Kit đang đồng bộ',
+          description: 'Lấy từ catalog public đang mở bán trong hệ thống.',
+          value: systemSnapshot.catalogCount,
+        },
+        {
+          label: 'Tin trao đổi đang mở',
+          description: 'Số listing đang ở trạng thái có thể thương lượng.',
+          value: systemSnapshot.tradeCount,
+        },
+        {
+          label: 'Nhóm danh mục hoạt động',
+          description: 'Những sector đang hiển thị cho người dùng public.',
+          value: systemSnapshot.categoryCount,
+        },
+      ],
+      liveTitle: 'Tín hiệu vận hành hiện có',
+      liveState: 'Đang trực tuyến',
+      capabilities: [
+        {
+          title: 'Auth và phiên đăng nhập',
+          description: 'JWT, refresh rotation và ghi nhớ phiên đã được nối vào app.',
+          icon: Shield,
+        },
+        {
+          title: 'Sàn trao đổi và chat',
+          description: 'Offer, trạng thái giao dịch và console realtime đang hoạt động.',
+          icon: Repeat,
+        },
+        {
+          title: 'Catalog responsive',
+          description: 'Giao diện shop và chi tiết sản phẩm đã tối ưu cho mobile lẫn split-screen.',
+          icon: LayoutGrid,
+        },
+      ],
+      syncLabel: 'Đồng bộ lúc',
+      syncPending: 'Đang lấy snapshot từ hệ thống...',
+      primaryAction: 'Vào kho sản phẩm',
+      secondaryAction: 'Tạo tài khoản',
+    }
+    : {
+      badge: 'Deployment readiness panel',
+      title: 'The platform is ready for',
+      highlight: 'catalog, trading, and real operational flows',
+      description:
+        'Instead of fake KPIs, this zone reflects public system data and the core capabilities that are already wired into the MVP.',
+      metrics: [
+        {
+          label: 'Catalog units synced',
+          description: 'Pulled from the active public storefront catalog.',
+          value: systemSnapshot.catalogCount,
+        },
+        {
+          label: 'Open trade signals',
+          description: 'Listings currently available for negotiation.',
+          value: systemSnapshot.tradeCount,
+        },
+        {
+          label: 'Active catalog sectors',
+          description: 'Public-facing category groups currently online.',
+          value: systemSnapshot.categoryCount,
+        },
+      ],
+      liveTitle: 'Live operational signals',
+      liveState: 'Online now',
+      capabilities: [
+        {
+          title: 'Auth and session memory',
+          description: 'JWT, refresh rotation, and remembered sessions are already connected.',
+          icon: Shield,
+        },
+        {
+          title: 'Trade and chat layer',
+          description: 'Offers, trade states, and the realtime console are functioning.',
+          icon: Repeat,
+        },
+        {
+          title: 'Responsive catalog surface',
+          description: 'Shop and product detail views are tuned for mobile and split-screen use.',
+          icon: LayoutGrid,
+        },
+      ],
+      syncLabel: 'Last sync',
+      syncPending: 'Pulling the latest public snapshot...',
+      primaryAction: 'Open catalog',
+      secondaryAction: 'Create account',
+    }
+
+  const formatMetric = (value) => {
+    if (typeof value !== 'number') {
+      return '—'
+    }
+
+    return formatter.format(value)
+  }
+
+  const syncedLabel = systemSnapshot.syncedAt
+    ? new Intl.DateTimeFormat(locale === 'vi' ? 'vi-VN' : 'en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      day: '2-digit',
+      month: '2-digit',
+    }).format(new Date(systemSnapshot.syncedAt))
+    : readinessCopy.syncPending
 
   return (
     <div className="pt-16">
+      <SeoHead
+        locale={locale}
+        path="/"
+        title={locale === 'vi' ? 'Trang chủ mua bán và trao đổi Gundam' : 'Gundam store and trade hub homepage'}
+        description={
+          locale === 'vi'
+            ? 'Khám phá Gundam Universe, website mua bán và sàn trao đổi Gundam với catalog responsive, chat realtime, wishlist và dashboard seller/admin chuẩn triển khai.'
+            : 'Explore Gundam Universe, a Gundam marketplace and trade hub with responsive catalog views, realtime chat, wishlists, and deploy-ready seller/admin tools.'
+        }
+        keywords={
+          locale === 'vi'
+            ? 'Gundam Universe, mua bán Gundam, sàn trao đổi Gundam, Gunpla Việt Nam, website Gundam'
+            : 'Gundam Universe, Gundam marketplace, Gunpla trade hub, mecha ecommerce, Gundam store'
+        }
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'WebSite',
+          name: 'Gundam Universe',
+          url: 'https://gundam-universe-store.vercel.app',
+          inLanguage: locale === 'vi' ? 'vi-VN' : 'en-US',
+          potentialAction: {
+            '@type': 'SearchAction',
+            target: 'https://gundam-universe-store.vercel.app/shop?name={search_term_string}',
+            'query-input': 'required name=search_term_string',
+          },
+        }}
+      />
       <section className="relative flex h-[90vh] items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-gundam-bg-primary">
           <motion.div
@@ -110,28 +295,98 @@ const HomePage = () => {
       </section>
 
       <section className="py-24">
-        <div className="group glass-card relative mx-auto overflow-hidden rounded-2xl border border-gundam-border/30 p-8 md:p-12 container">
-          <div className="hud-line absolute left-0 top-0 w-full opacity-50" />
-          <div className="relative z-10 flex flex-col items-center justify-between gap-12 md:flex-row">
-            <div className="flex-1">
-              <h2 className="mb-6 text-3xl font-bold md:text-5xl">
-                {t('home.status.title')}: <span className="text-gundam-emerald">{t('home.status.online')}</span>
-              </h2>
-              <div className="grid grid-cols-2 gap-8 font-rajdhani">
-                <StatusItem label={t('home.status.activePilots')} value="12,842" />
-                <StatusItem label={t('home.status.modelsTraded')} value="54,204" />
-                <StatusItem label={t('home.status.marketIndex')} value="+4.2%" />
-                <StatusItem label={t('home.status.uptime')} value="99.9%" />
+        <div className="container">
+          <div className="group glass-card relative overflow-hidden rounded-[2rem] border border-gundam-border/30 p-8 md:p-12">
+            <div className="hud-line absolute left-0 top-0 w-full opacity-50" />
+            <div className="absolute right-0 top-0 h-64 w-64 rounded-full bg-gundam-cyan/10 blur-3xl transition-colors group-hover:bg-gundam-cyan/15" />
+            <div className="relative z-10 grid gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,420px)] lg:items-start">
+              <div>
+                <div className="mb-5 inline-flex items-center gap-3 rounded-full border border-gundam-cyan/20 bg-gundam-cyan/10 px-4 py-2 text-[11px] font-orbitron uppercase tracking-[0.28em] text-gundam-cyan">
+                  <span className="h-2 w-2 rounded-full bg-gundam-emerald shadow-[0_0_12px_rgba(29,185,84,0.75)]" />
+                  {readinessCopy.badge}
+                </div>
+                <h2 className="max-w-4xl text-3xl font-black leading-tight text-gundam-text-primary md:text-5xl">
+                  {readinessCopy.title}{' '}
+                  <span className="glow-text text-gundam-cyan">{readinessCopy.highlight}</span>
+                </h2>
+                <p className="mt-5 max-w-3xl text-base leading-relaxed text-gundam-text-secondary md:text-lg">
+                  {readinessCopy.description}
+                </p>
+
+                <div className="mt-8 grid gap-4 md:grid-cols-3">
+                  {readinessCopy.metrics.map((metric) => (
+                    <StatusItem
+                      key={metric.label}
+                      label={metric.label}
+                      description={metric.description}
+                      value={systemSnapshot.isLoading ? '...' : formatMetric(metric.value)}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="rounded-[1.75rem] border border-gundam-border/40 bg-gundam-bg-tertiary/80 p-6 shadow-[0_0_0_1px_rgba(34,211,238,0.06)]">
+                  <div className="mb-5 flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-[11px] font-orbitron uppercase tracking-[0.28em] text-gundam-text-muted">
+                        {readinessCopy.liveTitle}
+                      </p>
+                      <p className="mt-2 text-lg font-semibold text-gundam-text-primary">
+                        {readinessCopy.liveState}
+                      </p>
+                    </div>
+                    <div className="inline-flex items-center gap-2 rounded-full border border-gundam-emerald/30 bg-gundam-emerald/10 px-3 py-1 text-[11px] font-orbitron uppercase tracking-[0.2em] text-gundam-emerald">
+                      <span className="relative flex h-2.5 w-2.5">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gundam-emerald opacity-75" />
+                        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-gundam-emerald" />
+                      </span>
+                      Live
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    {readinessCopy.capabilities.map(({ title, description, icon: Icon }) => (
+                      <div
+                        key={title}
+                        className="flex gap-4 rounded-2xl border border-gundam-border/30 bg-gundam-bg-primary/70 px-4 py-4"
+                      >
+                        <div className="mt-0.5 flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl border border-gundam-cyan/20 bg-gundam-cyan/10 text-gundam-cyan">
+                          <Icon size={18} />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-gundam-text-primary">{title}</p>
+                          <p className="mt-1 text-sm leading-relaxed text-gundam-text-secondary">
+                            {description}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-5 flex items-center justify-between gap-4 border-t border-gundam-border/20 pt-4 text-sm text-gundam-text-muted">
+                    <span>{readinessCopy.syncLabel}</span>
+                    <span className="font-medium text-gundam-text-secondary">{syncedLabel}</span>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <Link
+                    to="/shop"
+                    className="btn btn-primary flex flex-1 items-center justify-center gap-2 px-6 py-4"
+                  >
+                    {readinessCopy.primaryAction} <ArrowUpRight size={18} />
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="btn btn-outline flex flex-1 items-center justify-center gap-2 px-6 py-4"
+                  >
+                    {readinessCopy.secondaryAction} <Zap size={18} />
+                  </Link>
+                </div>
               </div>
             </div>
-            <div className="flex-shrink-0">
-              <Link to="/register" className="group btn-primary flex aspect-square w-48 flex-col items-center justify-center gap-2 rounded-full px-8 py-8 shadow-cyan-glow transition-transform hover:scale-105">
-                <Zap size={32} className="fill-current" />
-                <span className="font-orbitron text-sm font-bold tracking-tighter">{t('home.status.enlist')}</span>
-              </Link>
-            </div>
           </div>
-          <div className="absolute bottom-0 right-0 -z-10 h-64 w-64 rounded-full bg-gundam-cyan/5 blur-3xl transition-colors group-hover:bg-gundam-cyan/10" />
         </div>
       </section>
     </div>
@@ -154,10 +409,11 @@ const FeatureCard = ({ icon, title, description, cta }) => (
   </motion.div>
 )
 
-const StatusItem = ({ label, value }) => (
-  <div className="flex flex-col gap-1">
-    <span className="text-xs uppercase tracking-widest text-gundam-text-muted">{label}</span>
-    <span className="text-2xl font-bold tracking-tight text-gundam-text-primary">{value}</span>
+const StatusItem = ({ label, description, value }) => (
+  <div className="rounded-[1.5rem] border border-gundam-border/30 bg-gundam-bg-secondary/50 p-5">
+    <span className="text-[11px] uppercase tracking-[0.24em] text-gundam-text-muted">{label}</span>
+    <span className="mt-3 block text-3xl font-black tracking-tight text-gundam-text-primary">{value}</span>
+    <p className="mt-2 text-sm leading-relaxed text-gundam-text-secondary">{description}</p>
   </div>
 )
 

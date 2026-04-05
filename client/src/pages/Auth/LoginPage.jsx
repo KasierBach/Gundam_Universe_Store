@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { AlertCircle, ArrowRight, Loader2, Lock, Mail, ShieldCheck } from 'lucide-react'
+import SeoHead from '../../components/shared/SeoHead'
 import useAuthStore from '../../stores/authStore'
 import { useI18n } from '../../i18n/I18nProvider'
 
 const LoginPage = () => {
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -36,6 +37,17 @@ const LoginPage = () => {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 pb-12 pt-24">
+      <SeoHead
+        locale={locale}
+        path="/login"
+        robots="noindex, nofollow"
+        title={locale === 'vi' ? 'Đăng nhập hệ thống' : 'Pilot login'}
+        description={
+          locale === 'vi'
+            ? 'Trang đăng nhập để truy cập tài khoản Gundam Universe, giỏ hàng, trade hub, chat và dashboard quản trị.'
+            : 'Login page for accessing Gundam Universe accounts, carts, trade tools, chat, and dashboard features.'
+        }
+      />
       <div className="absolute left-1/2 top-1/2 -z-10 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gundam-cyan/5 blur-[100px]" />
 
       <motion.div

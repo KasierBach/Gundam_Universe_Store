@@ -2,11 +2,12 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { AlertCircle, ArrowRight, Loader2, Lock, Mail, User, UserPlus } from 'lucide-react'
+import SeoHead from '../../components/shared/SeoHead'
 import useAuthStore from '../../stores/authStore'
 import { useI18n } from '../../i18n/I18nProvider'
 
 const RegisterPage = () => {
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -40,6 +41,17 @@ const RegisterPage = () => {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 pb-12 pt-24">
+      <SeoHead
+        locale={locale}
+        path="/register"
+        robots="noindex, nofollow"
+        title={locale === 'vi' ? 'Đăng ký tài khoản Gundam Universe' : 'Create a Gundam Universe account'}
+        description={
+          locale === 'vi'
+            ? 'Tạo tài khoản Gundam Universe để mua sản phẩm, lưu wishlist, tham gia sàn trao đổi và mở khóa seller/admin workflow.'
+            : 'Create a Gundam Universe account to buy products, save wishlists, join the trade hub, and unlock seller/admin workflows.'
+        }
+      />
       <div className="absolute left-1/2 top-1/2 -z-10 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gundam-cyan/5 blur-[100px]" />
 
       <motion.div

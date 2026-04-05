@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Gundam Universe social preview">
+  <defs>
+    <linearGradient id="bg" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#07101d" />
+      <stop offset="60%" stop-color="#081625" />
+      <stop offset="100%" stop-color="#020814" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" x2="100%" y1="0%" y2="0%">
+      <stop offset="0%" stop-color="#00e5ff" />
+      <stop offset="100%" stop-color="#13f0bb" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="18" result="coloredBlur" />
+      <feMerge>
+        <feMergeNode in="coloredBlur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)" />
+  <g opacity="0.16">
+    <path d="M0 140h1200M0 315h1200M0 490h1200M180 0v630M600 0v630M1020 0v630" stroke="#16c7ff" stroke-width="2" />
+  </g>
+  <circle cx="965" cy="170" r="120" fill="#00e5ff" opacity="0.12" />
+  <circle cx="965" cy="170" r="72" fill="none" stroke="#00e5ff" stroke-width="2" opacity="0.45" />
+  <path d="M915 120h100l-28 58h42l-80 96 22-66h-40z" fill="url(#accent)" filter="url(#glow)" />
+  <rect x="70" y="78" width="180" height="180" rx="38" fill="#091827" stroke="#00e5ff" stroke-width="6" />
+  <path d="M115 120h70l-28 40c34 2 58 24 58 57 0 39-30 68-76 68-31 0-55-14-67-37l29-16c6 12 20 20 38 20 24 0 41-12 41-31 0-17-14-29-36-29h-15v-33l19-39h-33z" fill="url(#accent)" />
+  <text x="295" y="205" fill="#eef5ff" font-family="Orbitron, 'Be Vietnam Pro', sans-serif" font-size="72" font-weight="800" letter-spacing="2">
+    GUNDAM UNIVERSE
+  </text>
+  <text x="295" y="288" fill="#00e5ff" font-family="'Be Vietnam Pro', Inter, sans-serif" font-size="34" font-weight="700" letter-spacing="3">
+    MECHA STORE · TRADE HUB · REALTIME NEGOTIATION
+  </text>
+  <text x="78" y="420" fill="#d8e3f1" font-family="'Be Vietnam Pro', Inter, sans-serif" font-size="38" font-weight="700">
+    Website mua bán và sàn trao đổi Gundam theo phong cách tactical HUD
+  </text>
+  <text x="78" y="476" fill="#92a7c6" font-family="'Be Vietnam Pro', Inter, sans-serif" font-size="28">
+    Catalog responsive · Trade offer · Chat realtime · Seller/Admin dashboard
+  </text>
+  <rect x="78" y="528" width="250" height="12" rx="6" fill="#00e5ff" opacity="0.9" />
+  <rect x="346" y="528" width="138" height="12" rx="6" fill="#13f0bb" opacity="0.9" />
+</svg>

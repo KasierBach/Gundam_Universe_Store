@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import tradeService from '../../services/tradeService'
+import SeoHead from '../../components/shared/SeoHead'
 import useAuthStore from '../../stores/authStore'
 import { useI18n } from '../../i18n/I18nProvider'
 
 const TradeMarketPage = () => {
-  const { t, tv } = useI18n()
+  const { t, tv, locale } = useI18n()
   const [listings, setListings] = useState([])
   const [suggestions, setSuggestions] = useState([])
   const [loading, setLoading] = useState(true)
@@ -35,6 +36,22 @@ const TradeMarketPage = () => {
 
   return (
     <div className="mx-auto min-h-screen max-w-7xl bg-gundam-darker px-4 pb-12 pt-24">
+      <SeoHead
+        locale={locale}
+        path="/trade"
+        type="CollectionPage"
+        title={locale === 'vi' ? 'Sàn trao đổi Gundam' : 'Gundam trade hub'}
+        description={
+          locale === 'vi'
+            ? 'Tham gia sàn trao đổi Gundam để đăng listing, gửi offer, thương lượng qua chat realtime và khám phá đề xuất giao dịch phù hợp.'
+            : 'Join the Gundam trade hub to post listings, send offers, negotiate in realtime chat, and discover matching trade suggestions.'
+        }
+        keywords={
+          locale === 'vi'
+            ? 'sàn trao đổi Gundam, trade Gunpla, đổi mô hình Gundam'
+            : 'Gundam trade hub, Gunpla exchange, trade model kits'
+        }
+      />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

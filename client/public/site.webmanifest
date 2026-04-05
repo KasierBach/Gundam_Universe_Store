@@ -1,0 +1,17 @@
+{
+  "name": "Gundam Universe",
+  "short_name": "Gundam",
+  "description": "Website mua bán và sàn trao đổi Gundam với giao diện mecha futuristic, trade realtime và catalog responsive.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07101d",
+  "theme_color": "#05d9ff",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

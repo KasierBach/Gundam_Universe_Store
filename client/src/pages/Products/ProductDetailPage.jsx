@@ -18,6 +18,7 @@ import AddToCartButton from '../../components/cart/AddToCartButton'
 import ProductCard from '../../components/product/ProductCard'
 import ReviewSection from '../../components/product/ReviewSection'
 import WishlistButton from '../../components/wishlist/WishlistButton'
+import SeoHead from '../../components/shared/SeoHead'
 import { cn } from '../../utils/cn'
 import ModelKitImage from '../../components/shared/ModelKitImage'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -57,6 +58,7 @@ const ProductDetailPage = () => {
   const mainImages = useMemo(() => (product?.images?.length ? product.images : [{ url: '', isMain: true }]), [product])
   const stockTone = product?.stock > 6 ? 'safe' : product?.stock > 0 ? 'warning' : 'danger'
   const productDescription = locale === 'vi' && product?.descriptionVi ? product.descriptionVi : product?.description
+  const seoDescription = productDescription?.slice(0, 155)
 
   if (loading) {
     return (
@@ -80,6 +82,47 @@ const ProductDetailPage = () => {
 
   return (
     <div className="min-h-screen bg-gundam-bg-primary pb-24 pt-24">
+      <SeoHead
+        locale={locale}
+        path={`/products/${slug}`}
+        type="product"
+        title={product.name}
+        description={
+          seoDescription ||
+          (locale === 'vi'
+            ? 'Chi tiết sản phẩm Gundam với hình ảnh, thông số, định giá mô phỏng và gợi ý sản phẩm liên quan.'
+            : 'Detailed Gundam product page with gallery, specs, simulated valuation, and related recommendations.')
+        }
+        keywords={`${product.name}, ${product.series}, ${product.grade}, ${product.rarity}, Gundam, Gunpla`}
+        image={mainImages[0]?.url || '/og-cover.svg'}
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'Product',
+          name: product.name,
+          description: productDescription,
+          image: mainImages.map((image) => image.url).filter(Boolean),
+          sku: product._id,
+          category: product.category?.name,
+          brand: {
+            '@type': 'Brand',
+            name: 'Bandai / Gunpla',
+          },
+          offers: {
+            '@type': 'Offer',
+            priceCurrency: 'USD',
+            price: product.price,
+            availability: product.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+            url: `https://gundam-universe-store.vercel.app/products/${slug}`,
+          },
+          aggregateRating: product.ratings?.count
+            ? {
+              '@type': 'AggregateRating',
+              ratingValue: product.ratings.average,
+              reviewCount: product.ratings.count,
+            }
+            : undefined,
+        }}
+      />
       <div className="mx-auto max-w-7xl px-4">
         <div className="mb-8 flex flex-wrap items-center gap-2 text-[10px] font-orbitron uppercase tracking-[0.28em] text-gundam-text-muted">
           <Link to="/" className="hover:text-gundam-cyan">{t('product.detail.home')}</Link>
