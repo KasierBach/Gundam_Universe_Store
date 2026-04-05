@@ -21,6 +21,21 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-orbitron tracking-wider uppercase;
   }
+
+  html[lang='vi'] body {
+    @apply font-bevietnam;
+  }
+
+  html[lang='vi'] h1,
+  html[lang='vi'] h2,
+  html[lang='vi'] h3,
+  html[lang='vi'] h4,
+  html[lang='vi'] h5,
+  html[lang='vi'] h6 {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    letter-spacing: 0.02em;
+    text-transform: none;
+  }
 }
 
 @layer components {
@@ -64,5 +79,22 @@
     width: 10px;
     height: 10px;
     border-color: theme('colors.gundam.cyan.DEFAULT');
+  }
+
+  html[lang='vi'] .btn {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    letter-spacing: 0.08em;
+    text-transform: none;
+  }
+
+  html[lang='vi'] .font-orbitron {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    letter-spacing: 0.04em;
+    text-transform: none;
+  }
+
+  html[lang='vi'] .font-rajdhani {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    letter-spacing: 0.01em;
   }
 }

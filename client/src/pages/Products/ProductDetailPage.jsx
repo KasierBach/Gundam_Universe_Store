@@ -24,7 +24,7 @@ import { useI18n } from '../../i18n/I18nProvider'
 
 const ProductDetailPage = () => {
   const { slug } = useParams()
-  const { t, tv } = useI18n()
+  const { locale, t, tv } = useI18n()
   const [product, setProduct] = useState(null)
   const [loading, setLoading] = useState(true)
   const [selectedImage, setSelectedImage] = useState(0)
@@ -56,6 +56,7 @@ const ProductDetailPage = () => {
 
   const mainImages = useMemo(() => (product?.images?.length ? product.images : [{ url: '', isMain: true }]), [product])
   const stockTone = product?.stock > 6 ? 'safe' : product?.stock > 0 ? 'warning' : 'danger'
+  const productDescription = locale === 'vi' && product?.descriptionVi ? product.descriptionVi : product?.description
 
   if (loading) {
     return (
@@ -204,7 +205,7 @@ const ProductDetailPage = () => {
                   </div>
                 </div>
 
-                <p className="mt-6 text-base leading-7 text-gundam-text-secondary">{product.description}</p>
+                <p className="mt-6 text-base leading-7 text-gundam-text-secondary">{productDescription}</p>
 
                 <div className="mt-6 grid gap-4 sm:grid-cols-2">
                   <SignalCard label={t('product.detail.scale')} value={product.specs?.scale || 'N/A'} />

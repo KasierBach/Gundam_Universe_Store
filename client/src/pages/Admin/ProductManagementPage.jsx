@@ -42,6 +42,7 @@ const ProductManagementPage = () => {
     grade: 'NONE',
     series: 'Universal Century',
     description: '',
+    descriptionVi: '',
     images: [{ url: '', publicId: 'manually_added', isMain: true }]
   });
 
@@ -78,6 +79,7 @@ const ProductManagementPage = () => {
         grade: product.grade || 'NONE',
         series: product.series || 'Universal Century',
         description: product.description,
+        descriptionVi: product.descriptionVi || '',
         images: product.images.length > 0 ? product.images : [{ url: '', publicId: 'manually_added', isMain: true }]
       });
       setImageFiles([]);
@@ -91,6 +93,7 @@ const ProductManagementPage = () => {
         grade: PRODUCT_GRADES.NONE,
         series: 'Universal Century',
         description: '',
+        descriptionVi: '',
         images: []
       });
       setImageFiles([]);
@@ -109,6 +112,7 @@ const ProductManagementPage = () => {
       payload.append('grade', formData.grade);
       payload.append('series', formData.series);
       payload.append('description', formData.description);
+      payload.append('descriptionVi', formData.descriptionVi);
 
       if (editingProduct && imageFiles.length === 0) {
         payload.append('images', JSON.stringify(formData.images));
@@ -392,6 +396,17 @@ const ProductManagementPage = () => {
                      placeholder="Detailed model specifications..."
                      value={formData.description}
                      onChange={(e) => setFormData({...formData, description: e.target.value})}
+                   ></textarea>
+                </div>
+
+                <div className="space-y-2">
+                   <label className="text-[10px] text-gundam-cyan font-orbitron uppercase tracking-widest">Vietnamese Specs (Description VI)</label>
+                   <textarea 
+                     rows="3"
+                     className="w-full bg-black/50 border border-white/10 p-4 text-white focus:border-gundam-cyan outline-none rounded transition-all font-bevietnam"
+                     placeholder="Mô tả tiếng Việt hiển thị khi người dùng chọn VI..."
+                     value={formData.descriptionVi}
+                     onChange={(e) => setFormData({...formData, descriptionVi: e.target.value})}
                    ></textarea>
                 </div>
 

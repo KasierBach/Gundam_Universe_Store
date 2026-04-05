@@ -20,6 +20,11 @@ const productSchema = new mongoose.Schema(
       required: [true, 'Description is required'],
       trim: true,
     },
+    descriptionVi: {
+      type: String,
+      trim: true,
+      default: '',
+    },
     price: {
       type: Number,
       required: [true, 'Price is required'],
@@ -97,7 +102,7 @@ const productSchema = new mongoose.Schema(
 );
 
 // Indexes for performance
-productSchema.index({ name: 'text', description: 'text', tags: 'text' });
+productSchema.index({ name: 'text', description: 'text', descriptionVi: 'text', tags: 'text' });
 productSchema.index({ category: 1, status: 1 });
 productSchema.index({ price: 1 });
 productSchema.index({ grade: 1, series: 1 });

@@ -43,6 +43,7 @@ export default {
       },
       fontFamily: {
         orbitron: ['Orbitron', 'sans-serif'],
+        bevietnam: ['"Be Vietnam Pro"', 'sans-serif'],
         inter: ['Inter', 'sans-serif'],
         rajdhani: ['Rajdhani', 'sans-serif'],
       },
