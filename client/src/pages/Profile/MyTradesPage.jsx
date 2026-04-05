@@ -5,14 +5,50 @@ import { Repeat, CheckCircle, ChevronRight, MessageSquare, AlertTriangle } from 
 import tradeService from '../../services/tradeService';
 import useAuthStore from '../../stores/authStore';
 import ModelKitImage from '../../components/shared/ModelKitImage';
+import { useI18n } from '../../i18n/I18nProvider';
+import { normalizeLocaleCopy } from '../../i18n/normalizeLocaleCopy';
 
 const MyTradesPage = () => {
+  const { locale } = useI18n();
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const [myListings, setMyListings] = useState([]);
   const [myOffers, setMyOffers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('listings'); // or 'offers'
+  const copy = normalizeLocaleCopy(locale === 'vi'
+    ? {
+      loading: 'Đang quét dữ liệu giao dịch...',
+      title: 'BẢNG ĐIỀU KHIỂN GIAO DỊCH',
+      subtitle: 'Nhật ký nhiệm vụ và quản lý trao đổi',
+      newMission: 'Tạo giao dịch mới',
+      stats: ['Tin đang mở', 'Đề nghị đã gửi', 'Giao dịch thành công'],
+      tabs: ['Tin của tôi', 'Đề nghị đã gửi'],
+      emptyListings: 'Chưa có tin trao đổi nào trong khu vực của bạn.',
+      launchMission: 'Đăng tin mới',
+      emptyOffers: 'Bạn chưa gửi đề nghị trao đổi nào.',
+      enterHub: 'Vào sàn trao đổi',
+      searchingFor: 'Đang tìm',
+      createdAt: 'Ngày tạo',
+      unknownPilot: 'Phi công chưa xác định',
+      status: 'Trạng thái',
+    }
+    : {
+      loading: 'Scanning Personnel Fleet...',
+      title: 'Command Dashboard',
+      subtitle: 'Mission Logs & Fleet Management',
+      newMission: 'New Mission',
+      stats: ['Active Listings', 'Sent Proposals', 'Successful Trades'],
+      tabs: ['My Trade Listings', 'My Sent Proposals'],
+      emptyListings: 'No active trade missions detected in your sector.',
+      launchMission: 'Launch New Mission',
+      emptyOffers: "You haven't dispatched any trade proposals yet.",
+      enterHub: 'Enter Trade Hub',
+      searchingFor: 'Searching for',
+      createdAt: 'Created At',
+      unknownPilot: 'Unknown Pilot',
+      status: 'Status',
+    })
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,32 +67,32 @@ const MyTradesPage = () => {
     if (user) fetchData();
   }, [user]);
 
-  if (loading) return <div className="pt-32 text-center text-gundam-cyan font-orbitron animate-pulse">Scanning Personnel Fleet...</div>;
+  if (loading) return <div className="pt-32 text-center text-gundam-cyan font-orbitron animate-pulse">{copy.loading}</div>;
 
   return (
     <div className="pt-24 pb-12 px-4 max-w-7xl mx-auto min-h-screen">
       <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <h1 className="text-3xl md:text-5xl font-orbitron text-white uppercase tracking-tighter glow-text italic">
-            Command Dashboard
+            {copy.title}
           </h1>
           <p className="text-gundam-text-muted font-rajdhani uppercase tracking-[0.4em] mt-2 flex items-center gap-2 italic">
-            <span className="w-1.5 h-1.5 bg-gundam-cyan rounded-full animate-ping" /> Mission Logs & Fleet Management
+            <span className="w-1.5 h-1.5 bg-gundam-cyan rounded-full animate-ping" /> {copy.subtitle}
           </p>
         </div>
         <Link 
           to="/trade/new" 
           className="px-8 py-3 bg-gundam-cyan text-black font-orbitron font-bold uppercase tracking-widest hover:bg-white transition-all shadow-cyan-glow"
         >
-          New Mission
+          {copy.newMission}
         </Link>
       </div>
 
       {/* Stats Summary HUD */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-         <StatCard label="Active Listings" value={myListings.length} icon={<Repeat className="text-gundam-cyan" />} />
-         <StatCard label="Sent Proposals" value={myOffers.length} icon={<MessageSquare className="text-gundam-amber" />} />
-         <StatCard label="Successful Trades" value={myListings.filter((item) => item.status === 'completed').length} icon={<CheckCircle className="text-gundam-emerald" />} />
+         <StatCard label={copy.stats[0]} value={myListings.length} icon={<Repeat className="text-gundam-cyan" />} />
+         <StatCard label={copy.stats[1]} value={myOffers.length} icon={<MessageSquare className="text-gundam-amber" />} />
+         <StatCard label={copy.stats[2]} value={myListings.filter((item) => item.status === 'completed').length} icon={<CheckCircle className="text-gundam-emerald" />} />
       </div>
 
       {/* Tabs */}
@@ -65,14 +101,14 @@ const MyTradesPage = () => {
            onClick={() => setActiveTab('listings')}
            className={`pb-4 px-2 font-orbitron text-xs uppercase tracking-widest transition-all relative ${activeTab === 'listings' ? 'text-gundam-cyan font-bold' : 'text-gundam-text-muted hover:text-white'}`}
          >
-           My Trade Listings
+           {copy.tabs[0]}
            {activeTab === 'listings' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gundam-cyan shadow-[0_0_10px_#00f3ff]" />}
          </button>
          <button 
            onClick={() => setActiveTab('offers')}
            className={`pb-4 px-2 font-orbitron text-xs uppercase tracking-widest transition-all relative ${activeTab === 'offers' ? 'text-gundam-cyan font-bold' : 'text-gundam-text-muted hover:text-white'}`}
          >
-           My Sent Proposals
+           {copy.tabs[1]}
            {activeTab === 'offers' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gundam-cyan shadow-[0_0_10px_#00f3ff]" />}
          </button>
       </div>
@@ -81,7 +117,7 @@ const MyTradesPage = () => {
       <div className="space-y-4">
         {activeTab === 'listings' ? (
           myListings.length === 0 ? (
-            <EmptyState message="No active trade missions detected in your sector." linkText="Launch New Mission" linkTo="/trade/new" />
+            <EmptyState message={copy.emptyListings} linkText={copy.launchMission} linkTo="/trade/new" />
           ) : (
             myListings.map(listing => (
               <TradeItemCard key={listing._id} item={listing} type="listing" />
@@ -89,10 +125,10 @@ const MyTradesPage = () => {
           )
         ) : (
           myOffers.length === 0 ? (
-            <EmptyState message="You haven't dispatched any trade proposals yet." linkText="Enter Trade Hub" linkTo="/trade" />
+            <EmptyState message={copy.emptyOffers} linkText={copy.enterHub} linkTo="/trade" />
           ) : (
             myOffers.map((offer) => (
-              <TradeItemCard key={offer._id} item={offer.listing} subtitle={`Status: ${offer.status}`} />
+              <TradeItemCard key={offer._id} item={offer.listing} subtitle={`${copy.status}: ${offer.status}`} locale={locale} />
             ))
           )
         )}
@@ -113,8 +149,11 @@ const StatCard = ({ label, value, icon }) => (
   </div>
 );
 
-const TradeItemCard = ({ item, subtitle }) => {
+const TradeItemCard = ({ item, subtitle, locale = 'en' }) => {
   const navigate = useNavigate();
+  const copy = locale === 'vi'
+    ? { searchingFor: 'Đang tìm', createdAt: 'Ngày tạo' }
+    : { searchingFor: 'Searching for', createdAt: 'Created At' }
   return (
     <motion.div 
       initial={{ opacity: 0, y: 10 }}
@@ -142,11 +181,11 @@ const TradeItemCard = ({ item, subtitle }) => {
            </span>
         </div>
         <h4 className="text-lg font-orbitron text-white uppercase tracking-tight line-clamp-1">{item.title}</h4>
-        <p className="text-xs text-gundam-text-muted font-rajdhani line-clamp-1 italic px-0.5">{subtitle || `Searching for: ${item.wantedItems}`}</p>
+        <p className="text-xs text-gundam-text-muted font-rajdhani line-clamp-1 italic px-0.5">{subtitle || `${copy.searchingFor}: ${item.wantedItems}`}</p>
       </div>
 
       <div className="flex flex-col items-start sm:items-end gap-2 sm:pr-4">
-         <span className="text-[10px] font-orbitron text-gundam-text-muted uppercase tracking-widest opacity-60">Created At</span>
+         <span className="text-[10px] font-orbitron text-gundam-text-muted uppercase tracking-widest opacity-60">{copy.createdAt}</span>
          <span className="text-xs font-orbitron text-white tracking-widest opacity-80">{new Date(item.createdAt).toLocaleDateString()}</span>
       </div>
 

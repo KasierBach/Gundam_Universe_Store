@@ -4,12 +4,48 @@ import { motion } from 'framer-motion'
 import { CheckCircle2, ChevronRight, Clock3, Package, Truck } from 'lucide-react'
 import useOrderStore from '../../stores/orderStore'
 import ModelKitImage from '../../components/shared/ModelKitImage'
+import { useI18n } from '../../i18n/I18nProvider'
+import { normalizeLocaleCopy } from '../../i18n/normalizeLocaleCopy'
 
 const ORDER_STAGES = ['PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED']
 
 const OrderDetailPage = () => {
+  const { locale } = useI18n()
   const { id } = useParams()
   const { currentOrder, fetchOrderDetail, loading, resetCurrentOrder } = useOrderStore()
+  const copy = normalizeLocaleCopy(locale === 'vi'
+    ? {
+      loading: 'Đang đồng bộ chi tiết đơn hàng...',
+      logs: 'Nhật ký đơn hàng',
+      title: 'Theo dõi đơn hàng',
+      reference: 'Mã tham chiếu',
+      loadedUnits: 'Sản phẩm trong đơn',
+      qty: 'SL',
+      shipping: 'Thông tin giao hàng',
+      pilot: 'Người nhận',
+      phone: 'Số điện thoại',
+      dropZone: 'Địa chỉ',
+      payment: 'Thanh toán',
+      method: 'Phương thức',
+      status: 'Trạng thái',
+      total: 'Tổng cộng',
+    }
+    : {
+      loading: 'Syncing mission log...',
+      logs: 'Mission logs',
+      title: 'Deployment Tracking',
+      reference: 'Reference',
+      loadedUnits: 'Loaded Units',
+      qty: 'Qty',
+      shipping: 'Shipping Data',
+      pilot: 'Pilot',
+      phone: 'Phone',
+      dropZone: 'Drop zone',
+      payment: 'Payment Status',
+      method: 'Method',
+      status: 'Status',
+      total: 'Total power',
+    });
 
   useEffect(() => {
     fetchOrderDetail(id)
@@ -24,34 +60,47 @@ const OrderDetailPage = () => {
       <div className="min-h-screen pt-32 flex items-center justify-center bg-gundam-bg-primary">
         <div className="text-center">
           <Clock3 className="mx-auto text-gundam-cyan animate-pulse" size={48} />
-          <p className="mt-4 text-gundam-cyan font-orbitron text-xs uppercase tracking-[0.3em]">Syncing mission log...</p>
+          <p className="mt-4 text-gundam-cyan font-orbitron text-xs uppercase tracking-[0.3em]">{copy.loading}</p>
         </div>
       </div>
     )
   }
 
   const currentStageIndex = Math.max(ORDER_STAGES.indexOf(currentOrder.status), 0)
+  const getStatusLabel = (status) => {
+    if (locale !== 'vi') return status
+
+    const labels = {
+      PENDING: 'Chờ xác nhận',
+      PROCESSING: 'Đang xử lý',
+      SHIPPED: 'Đang giao',
+      DELIVERED: 'Đã giao',
+      CANCELLED: 'Đã hủy',
+    }
+
+    return labels[status] || status
+  }
 
   return (
     <div className="pt-24 pb-16 min-h-screen bg-gundam-bg-primary">
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex items-center gap-2 text-[10px] font-orbitron uppercase tracking-widest text-gundam-text-muted mb-8">
-          <Link to="/orders" className="hover:text-gundam-cyan">Mission logs</Link>
+          <Link to="/orders" className="hover:text-gundam-cyan">{copy.logs}</Link>
           <ChevronRight size={12} />
-          <span className="text-gundam-cyan">Deployment {currentOrder._id.slice(-8)}</span>
+          <span className="text-gundam-cyan">{locale === 'vi' ? 'Đơn' : 'Deployment'} {currentOrder._id.slice(-8)}</span>
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-[1.2fr_0.8fr] gap-8">
           <section className="glass-card border-gundam-border/30 p-8">
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
               <div>
-                <h1 className="text-3xl font-orbitron text-white uppercase tracking-tight">Deployment Tracking</h1>
+                <h1 className="text-3xl font-orbitron text-white uppercase tracking-tight">{copy.title}</h1>
                 <p className="mt-2 text-gundam-text-muted text-xs uppercase tracking-[0.3em]">
-                  Reference: {currentOrder._id}
+                  {copy.reference}: {currentOrder._id}
                 </p>
               </div>
               <span className="px-4 py-2 rounded border border-gundam-cyan/30 text-gundam-cyan font-orbitron text-[10px] uppercase tracking-widest">
-                {currentOrder.status}
+                {getStatusLabel(currentOrder.status)}
               </span>
             </div>
 
@@ -72,7 +121,7 @@ const OrderDetailPage = () => {
                       {index === 2 && <Truck size={18} className={completed ? 'text-gundam-cyan' : 'text-gundam-text-muted'} />}
                       {index === 3 && <CheckCircle2 size={18} className={completed ? 'text-gundam-cyan' : 'text-gundam-text-muted'} />}
                       <span className={`font-orbitron text-[11px] uppercase tracking-widest ${completed ? 'text-white' : 'text-gundam-text-muted'}`}>
-                        {stage}
+                        {getStatusLabel(stage)}
                       </span>
                     </div>
                   </motion.div>
@@ -81,7 +130,7 @@ const OrderDetailPage = () => {
             </div>
 
             <div className="mt-10">
-              <h2 className="text-lg font-orbitron text-white uppercase tracking-widest mb-5">Loaded Units</h2>
+              <h2 className="text-lg font-orbitron text-white uppercase tracking-widest mb-5">{copy.loadedUnits}</h2>
               <div className="space-y-4">
                 {currentOrder.items.map((item, index) => (
                   <div key={`${item.product}-${index}`} className="flex flex-col sm:flex-row gap-4 border border-gundam-border/20 rounded-xl p-4 bg-black/20">
@@ -95,7 +144,7 @@ const OrderDetailPage = () => {
                       </p>
                     </div>
                     <div className="text-left sm:text-right">
-                      <p className="text-gundam-text-muted text-[10px] uppercase tracking-widest">Qty {item.quantity}</p>
+                      <p className="text-gundam-text-muted text-[10px] uppercase tracking-widest">{copy.qty} {item.quantity}</p>
                       <p className="mt-2 text-gundam-cyan font-orbitron text-lg">${(item.price * item.quantity).toLocaleString()}</p>
                     </div>
                   </div>
@@ -106,20 +155,20 @@ const OrderDetailPage = () => {
 
           <aside className="space-y-6">
             <div className="glass-card border-gundam-border/30 p-6">
-              <h2 className="text-lg font-orbitron text-white uppercase tracking-widest">Shipping Data</h2>
+              <h2 className="text-lg font-orbitron text-white uppercase tracking-widest">{copy.shipping}</h2>
               <div className="mt-5 space-y-3 text-sm text-gundam-text-secondary">
-                <p><span className="text-gundam-text-muted uppercase text-[10px] tracking-widest">Pilot</span><br />{currentOrder.shippingAddress.fullName}</p>
-                <p><span className="text-gundam-text-muted uppercase text-[10px] tracking-widest">Phone</span><br />{currentOrder.shippingAddress.phone}</p>
-                <p><span className="text-gundam-text-muted uppercase text-[10px] tracking-widest">Drop zone</span><br />{currentOrder.shippingAddress.address}, {currentOrder.shippingAddress.city}</p>
+                <p><span className="text-gundam-text-muted uppercase text-[10px] tracking-widest">{copy.pilot}</span><br />{currentOrder.shippingAddress.fullName}</p>
+                <p><span className="text-gundam-text-muted uppercase text-[10px] tracking-widest">{copy.phone}</span><br />{currentOrder.shippingAddress.phone}</p>
+                <p><span className="text-gundam-text-muted uppercase text-[10px] tracking-widest">{copy.dropZone}</span><br />{currentOrder.shippingAddress.address}, {currentOrder.shippingAddress.city}</p>
               </div>
             </div>
 
             <div className="glass-card border-gundam-border/30 p-6">
-              <h2 className="text-lg font-orbitron text-white uppercase tracking-widest">Payment Status</h2>
+              <h2 className="text-lg font-orbitron text-white uppercase tracking-widest">{copy.payment}</h2>
               <div className="mt-5 space-y-3 text-sm text-gundam-text-secondary">
-                <p><span className="text-gundam-text-muted uppercase text-[10px] tracking-widest">Method</span><br />{currentOrder.paymentInfo?.method}</p>
-                <p><span className="text-gundam-text-muted uppercase text-[10px] tracking-widest">Status</span><br />{currentOrder.paymentInfo?.status}</p>
-                <p><span className="text-gundam-text-muted uppercase text-[10px] tracking-widest">Total power</span><br /><span className="text-gundam-cyan font-orbitron text-2xl">${currentOrder.totalAmount.toLocaleString()}</span></p>
+                <p><span className="text-gundam-text-muted uppercase text-[10px] tracking-widest">{copy.method}</span><br />{currentOrder.paymentInfo?.method}</p>
+                <p><span className="text-gundam-text-muted uppercase text-[10px] tracking-widest">{copy.status}</span><br />{currentOrder.paymentInfo?.status}</p>
+                <p><span className="text-gundam-text-muted uppercase text-[10px] tracking-widest">{copy.total}</span><br /><span className="text-gundam-cyan font-orbitron text-2xl">${currentOrder.totalAmount.toLocaleString()}</span></p>
               </div>
             </div>
           </aside>

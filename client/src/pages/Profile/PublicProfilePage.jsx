@@ -2,11 +2,32 @@ import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { User, MapPin, Phone, Shield } from 'lucide-react'
 import userService from '../../services/userService'
+import { useI18n } from '../../i18n/I18nProvider'
 
 const PublicProfilePage = () => {
+  const { locale } = useI18n()
   const { id } = useParams()
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
+  const copy = locale === 'vi'
+    ? {
+      loading: 'Đang tải hồ sơ người bán...',
+      notFound: 'Không tìm thấy hồ sơ người dùng.',
+      unknownSector: 'Khu vực chưa xác định',
+      noComms: 'Chưa có liên hệ',
+      reputation: 'Uy tín',
+      ratings: 'Lượt đánh giá',
+      back: 'Quay lại sàn trao đổi',
+    }
+    : {
+      loading: 'Loading pilot dossier...',
+      notFound: 'Pilot data not found.',
+      unknownSector: 'Unknown sector',
+      noComms: 'No comm link',
+      reputation: 'Reputation',
+      ratings: 'Ratings',
+      back: 'Back to trade hub',
+    }
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -22,11 +43,11 @@ const PublicProfilePage = () => {
   }, [id])
 
   if (loading) {
-    return <div className="pt-32 text-center text-gundam-cyan font-orbitron text-xs uppercase tracking-widest">Loading pilot dossier...</div>
+    return <div className="pt-32 text-center text-gundam-cyan font-orbitron text-xs uppercase tracking-widest">{copy.loading}</div>
   }
 
   if (!profile) {
-    return <div className="pt-32 text-center text-gundam-red font-orbitron text-xs uppercase tracking-widest">Pilot data not found.</div>
+    return <div className="pt-32 text-center text-gundam-red font-orbitron text-xs uppercase tracking-widest">{copy.notFound}</div>
   }
 
   return (
@@ -45,20 +66,20 @@ const PublicProfilePage = () => {
             <h1 className="text-3xl font-orbitron text-white uppercase tracking-tight">{profile.displayName}</h1>
             <div className="flex flex-wrap gap-4 mt-4 text-sm text-gundam-text-secondary">
               <span className="inline-flex items-center gap-2"><Shield size={16} className="text-gundam-cyan" /> {profile.role}</span>
-              <span className="inline-flex items-center gap-2"><MapPin size={16} className="text-gundam-cyan" /> {profile.address?.city || 'Unknown sector'}</span>
-              <span className="inline-flex items-center gap-2"><Phone size={16} className="text-gundam-cyan" /> {profile.phone || 'No comm link'}</span>
+              <span className="inline-flex items-center gap-2"><MapPin size={16} className="text-gundam-cyan" /> {profile.address?.city || copy.unknownSector}</span>
+              <span className="inline-flex items-center gap-2"><Phone size={16} className="text-gundam-cyan" /> {profile.phone || copy.noComms}</span>
             </div>
 
             <div className="mt-6 grid grid-cols-2 gap-4">
-              <StatCard label="Reputation" value={`${profile.reputation?.score || 0}%`} />
-              <StatCard label="Ratings" value={profile.reputation?.totalRatings || 0} />
+              <StatCard label={copy.reputation} value={`${profile.reputation?.score || 0}%`} />
+              <StatCard label={copy.ratings} value={profile.reputation?.totalRatings || 0} />
             </div>
           </div>
         </div>
       </div>
 
       <div className="mt-6">
-        <Link to="/trade" className="text-gundam-cyan font-orbitron text-xs uppercase tracking-widest hover:underline">Back to trade hub</Link>
+        <Link to="/trade" className="text-gundam-cyan font-orbitron text-xs uppercase tracking-widest hover:underline">{copy.back}</Link>
       </div>
     </div>
   )

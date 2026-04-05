@@ -16,10 +16,66 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import adminService from '../../services/adminService';
+import { useI18n } from '../../i18n/I18nProvider';
+import { normalizeLocaleCopy } from '../../i18n/normalizeLocaleCopy';
 
 const AdminDashboard = () => {
+  const { locale } = useI18n();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const copy = normalizeLocaleCopy(locale === 'vi'
+    ? {
+      loading: 'Đang truy cập trung tâm chỉ huy...',
+      title: 'TRUNG TÂM CHỈ HUY CHIẾN THUẬT',
+      subtitle: 'Ủy quyền hệ thống: ADMIN CẤP 10',
+      statLabels: ['Tổng người dùng', 'Tổng doanh thu', 'Giao dịch đang hoạt động', 'Độ ổn định hệ thống'],
+      statTrends: ['+12% chu kỳ này', '+5.4% hiệu quả', 'Ổn định', 'Vận hành bình thường'],
+      activityTitle: 'Nhật ký đơn hàng gần đây',
+      table: {
+        pilot: 'Người dùng',
+        mission: 'Mã đơn',
+        resources: 'Giá trị',
+        status: 'Trạng thái',
+        sync: 'Thời gian',
+      },
+      controlTitle: 'Điều phối hệ thống',
+      quickActions: [
+        'Quản lý sản phẩm',
+        'Quản lý danh mục',
+        'Phân quyền người dùng',
+        'Điều phối đơn hàng',
+        'Giám sát giao dịch',
+        'Báo cáo vi phạm',
+      ],
+      healthTitle: 'Tình trạng lõi hệ thống',
+      healthLabels: ['Tải CPU', 'Bộ nhớ', 'Độ trễ tín hiệu'],
+    }
+    : {
+      loading: 'Accessing Command Center...',
+      title: 'TACTICAL COMMAND CENTER',
+      subtitle: 'System Authorization: LEVEL 10 ADMIN',
+      statLabels: ['Total Registered Pilots', 'Total Fleet Revenue', 'Active Trade Missions', 'System Integrity'],
+      statTrends: ['+12% this cycle', '+5.4% efficiency', 'Stable', 'Nominal'],
+      activityTitle: 'Recent Deployment Activity',
+      table: {
+        pilot: 'Pilot',
+        mission: 'Mission ID',
+        resources: 'Resources',
+        status: 'Status',
+        sync: 'Sync',
+      },
+      controlTitle: 'Operational Control',
+      quickActions: [
+        'Manage Armory (Products)',
+        'Protocol Categories',
+        'Pilot Authorization',
+        'Deployment Orders',
+        'Oversee Missions',
+        'Violation Reports',
+      ],
+      healthTitle: 'Reactor Core Health',
+      healthLabels: ['CPU Load', 'Memory Unit', 'Signal Latency'],
+    });
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -35,17 +91,17 @@ const AdminDashboard = () => {
     fetchStats();
   }, []);
 
-  if (loading) return <div className="pt-32 text-center text-gundam-red font-orbitron animate-pulse">Accessing Command Center...</div>;
+  if (loading) return <div className="pt-32 text-center text-gundam-red font-orbitron animate-pulse">{copy.loading}</div>;
 
   return (
     <div className="pt-24 pb-12 px-4 max-w-[1600px] mx-auto min-h-screen">
       <div className="mb-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div>
           <h1 className="text-3xl md:text-5xl font-orbitron text-white uppercase tracking-tighter glow-text-red italic">
-            TACTICAL COMMAND CENTER
+            {copy.title}
           </h1>
           <p className="text-gundam-text-muted font-rajdhani uppercase tracking-[0.4em] mt-2 flex items-center gap-2 italic">
-            <span className="w-2 h-2 bg-gundam-red rounded-full animate-ping" /> System Authorization: LEVEL 10 ADMIN
+            <span className="w-2 h-2 bg-gundam-red rounded-full animate-ping" /> {copy.subtitle}
           </p>
         </div>
         <div className="flex gap-4 self-start lg:self-auto">
@@ -61,32 +117,32 @@ const AdminDashboard = () => {
       {/* Main HUD Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
         <AdminStatCard 
-          label="Total Registered Pilots" 
+          label={copy.statLabels[0]}
           value={stats?.overview.totalPilots || 0} 
           icon={<Users size={24} />} 
           color="text-gundam-cyan"
-          trend="+12% this cycle"
+          trend={copy.statTrends[0]}
         />
         <AdminStatCard 
-          label="Total Fleet Revenue" 
+          label={copy.statLabels[1]}
           value={`$${stats?.overview.totalRevenue.toLocaleString() || 0}`} 
           icon={<ShoppingBag size={24} />} 
           color="text-gundam-emerald"
-          trend="+5.4% efficiency"
+          trend={copy.statTrends[1]}
         />
         <AdminStatCard 
-          label="Active Trade Missions" 
+          label={copy.statLabels[2]}
           value={stats?.overview.activeMissions || 0} 
           icon={<Repeat size={24} />} 
           color="text-gundam-amber"
-          trend="Stable"
+          trend={copy.statTrends[2]}
         />
         <AdminStatCard 
-          label="System Integrity" 
+          label={copy.statLabels[3]}
           value={stats?.overview.systemUptime || '99.9%'} 
           icon={<Activity size={24} />} 
           color="text-gundam-red"
-          trend="Nominal"
+          trend={copy.statTrends[3]}
         />
       </div>
 
@@ -95,18 +151,18 @@ const AdminDashboard = () => {
         <div className="xl:col-span-2 space-y-6">
            <div className="bg-gundam-dark-surface/50 border border-white/10 p-6 rounded-lg backdrop-blur-md">
               <h3 className="text-xl font-orbitron text-white uppercase tracking-wider mb-6 flex items-center gap-2">
-                 <BarChart3 size={20} className="text-gundam-cyan" /> Recent Deployment Activity
+                 <BarChart3 size={20} className="text-gundam-cyan" /> {copy.activityTitle}
               </h3>
               
               <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-left font-rajdhani">
                    <thead>
                       <tr className="border-b border-white/10 text-[10px] font-orbitron text-gundam-text-muted uppercase tracking-widest">
-                         <th className="pb-4">Pilot</th>
-                         <th className="pb-4">Mission ID</th>
-                         <th className="pb-4">Resources</th>
-                         <th className="pb-4">Status</th>
-                         <th className="pb-4 text-right">Sync</th>
+                         <th className="pb-4">{copy.table.pilot}</th>
+                         <th className="pb-4">{copy.table.mission}</th>
+                         <th className="pb-4">{copy.table.resources}</th>
+                         <th className="pb-4">{copy.table.status}</th>
+                         <th className="pb-4 text-right">{copy.table.sync}</th>
                       </tr>
                    </thead>
                    <tbody className="divide-y divide-white/5">
@@ -178,25 +234,25 @@ const AdminDashboard = () => {
         <div className="space-y-6">
            <div className="bg-gundam-dark-surface/50 border border-gundam-red/20 p-6 rounded-lg backdrop-blur-md">
               <h3 className="text-lg font-orbitron text-white uppercase tracking-tight mb-6 flex items-center gap-2">
-                 <ShieldAlert size={18} className="text-gundam-red" /> Operational Control
+                 <ShieldAlert size={18} className="text-gundam-red" /> {copy.controlTitle}
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                 <AdminQuickAction to="/admin/products" icon={<Package size={16} />} label="Manage Armory (Products)" color="bg-gundam-cyan/10 text-gundam-cyan hover:bg-gundam-cyan/20" />
-                 <AdminQuickAction to="/admin/categories" icon={<LayoutGrid size={16} />} label="Protocol Categories" color="bg-gundam-cyan/10 text-gundam-cyan hover:bg-gundam-cyan/20" />
-                 <AdminQuickAction to="/admin/users" icon={<UserCheck size={16} />} label="Pilot Authorization" color="bg-gundam-emerald/10 text-gundam-emerald hover:bg-gundam-emerald/20" />
-                 <AdminQuickAction to="/admin/orders" icon={<ShoppingBag size={16} />} label="Deployment Orders" color="bg-gundam-emerald/10 text-gundam-emerald hover:bg-gundam-emerald/20" />
-                 <AdminQuickAction to="/admin/trades" icon={<Repeat size={16} />} label="Oversee Missions" color="bg-gundam-amber/10 text-gundam-amber hover:bg-gundam-amber/20" />
-                 <AdminQuickAction to="/admin/reports" icon={<ShieldAlert size={16} />} label="Violation Reports" color="bg-gundam-red/10 text-gundam-red hover:bg-gundam-red/20" />
+                 <AdminQuickAction to="/admin/products" icon={<Package size={16} />} label={copy.quickActions[0]} color="bg-gundam-cyan/10 text-gundam-cyan hover:bg-gundam-cyan/20" />
+                 <AdminQuickAction to="/admin/categories" icon={<LayoutGrid size={16} />} label={copy.quickActions[1]} color="bg-gundam-cyan/10 text-gundam-cyan hover:bg-gundam-cyan/20" />
+                 <AdminQuickAction to="/admin/users" icon={<UserCheck size={16} />} label={copy.quickActions[2]} color="bg-gundam-emerald/10 text-gundam-emerald hover:bg-gundam-emerald/20" />
+                 <AdminQuickAction to="/admin/orders" icon={<ShoppingBag size={16} />} label={copy.quickActions[3]} color="bg-gundam-emerald/10 text-gundam-emerald hover:bg-gundam-emerald/20" />
+                 <AdminQuickAction to="/admin/trades" icon={<Repeat size={16} />} label={copy.quickActions[4]} color="bg-gundam-amber/10 text-gundam-amber hover:bg-gundam-amber/20" />
+                 <AdminQuickAction to="/admin/reports" icon={<ShieldAlert size={16} />} label={copy.quickActions[5]} color="bg-gundam-red/10 text-gundam-red hover:bg-gundam-red/20" />
               </div>
            </div>
 
            {/* System Health HUD */}
            <div className="bg-black/40 border border-white/5 p-6 rounded-lg">
-              <h4 className="text-[10px] font-orbitron text-gundam-text-muted uppercase tracking-[0.3em] mb-4">Reactor Core Health</h4>
+              <h4 className="text-[10px] font-orbitron text-gundam-text-muted uppercase tracking-[0.3em] mb-4">{copy.healthTitle}</h4>
               <div className="space-y-4">
-                 <HealthBar label="CPU Load" percent={45} color="bg-gundam-cyan" />
-                 <HealthBar label="Memory Unit" percent={62} color="bg-gundam-amber" />
-                 <HealthBar label="Signal Latency" percent={12} color="bg-gundam-emerald" />
+                 <HealthBar label={copy.healthLabels[0]} percent={45} color="bg-gundam-cyan" />
+                 <HealthBar label={copy.healthLabels[1]} percent={62} color="bg-gundam-amber" />
+                 <HealthBar label={copy.healthLabels[2]} percent={12} color="bg-gundam-emerald" />
               </div>
            </div>
         </div>

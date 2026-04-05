@@ -3,13 +3,39 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Mail, ArrowRight, AlertCircle, ShieldQuestion } from 'lucide-react'
 import authService from '../../services/authService'
+import { useI18n } from '../../i18n/I18nProvider'
+import { normalizeLocaleCopy } from '../../i18n/normalizeLocaleCopy'
 
 const ForgotPasswordPage = () => {
+  const { locale } = useI18n()
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [resetToken, setResetToken] = useState('')
   const [loading, setLoading] = useState(false)
+  const copy = normalizeLocaleCopy(locale === 'vi'
+    ? {
+      error: 'Không thể khởi tạo quy trình đặt lại mật khẩu.',
+      title: 'KHÔI PHỤC TRUY CẬP',
+      subtitle: 'Giao thức lấy lại mật khẩu',
+      email: 'Email',
+      send: 'GỬI LIÊN KẾT ĐẶT LẠI',
+      syncing: 'ĐANG GỬI...',
+      remembered: 'Đã nhớ lại rồi?',
+      back: 'Quay lại đăng nhập',
+      demoToken: 'Mã reset demo',
+    }
+    : {
+      error: 'Reset protocol initialization failed.',
+      title: 'RESET ACCESS',
+      subtitle: 'Password recovery protocol',
+      email: 'Email',
+      send: 'SEND RESET LINK',
+      syncing: 'SYNCING...',
+      remembered: 'Remembered it?',
+      back: 'Return to login',
+      demoToken: 'Demo reset token',
+    })
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -22,7 +48,7 @@ const ForgotPasswordPage = () => {
       setSuccess(result.message)
       setResetToken(result.resetToken || '')
     } catch (error) {
-      setError(error.response?.data?.message || 'Reset protocol initialization failed.')
+      setError(error.response?.data?.message || copy.error)
     } finally {
       setLoading(false)
     }
@@ -37,8 +63,8 @@ const ForgotPasswordPage = () => {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gundam-cyan/10 border border-gundam-cyan/30 mb-6 shadow-cyan-glow">
             <ShieldQuestion size={30} className="text-gundam-cyan" />
           </div>
-          <h1 className="text-3xl font-orbitron font-black tracking-widest text-gundam-text-primary">RESET ACCESS</h1>
-          <p className="text-gundam-text-secondary mt-2 font-rajdhani uppercase tracking-widest text-xs">Password recovery protocol</p>
+          <h1 className="text-3xl font-orbitron font-black tracking-widest text-gundam-text-primary">{copy.title}</h1>
+          <p className="text-gundam-text-secondary mt-2 font-rajdhani uppercase tracking-widest text-xs">{copy.subtitle}</p>
         </div>
 
         <div className="glass-card p-8 border-gundam-border/50">
@@ -54,13 +80,13 @@ const ForgotPasswordPage = () => {
               <div className="bg-gundam-cyan/10 border border-gundam-cyan/30 text-gundam-text-primary text-sm p-4 rounded-lg space-y-2">
                 <p>{success}</p>
                 {resetToken ? (
-                  <p className="text-xs font-mono break-all text-gundam-cyan">Demo reset token: {resetToken}</p>
+                  <p className="text-xs font-mono break-all text-gundam-cyan">{copy.demoToken}: {resetToken}</p>
                 ) : null}
               </div>
             ) : null}
 
             <div className="space-y-2">
-              <label className="text-xs font-orbitron tracking-widest text-gundam-text-secondary uppercase">Email</label>
+              <label className="text-xs font-orbitron tracking-widest text-gundam-text-secondary uppercase">{copy.email}</label>
               <div className="relative">
                 <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gundam-text-muted" />
                 <input
@@ -75,13 +101,13 @@ const ForgotPasswordPage = () => {
             </div>
 
             <button type="submit" disabled={loading} className="btn btn-primary w-full py-4 flex items-center justify-center gap-2 border-none">
-              {loading ? 'SYNCING...' : 'SEND RESET LINK'}
+              {loading ? copy.syncing : copy.send}
               <ArrowRight size={18} />
             </button>
           </form>
 
           <p className="text-center mt-8 text-gundam-text-secondary font-rajdhani text-sm">
-            Remembered it? <Link to="/login" className="text-gundam-cyan font-bold hover:underline">Return to login</Link>
+            {copy.remembered} <Link to="/login" className="text-gundam-cyan font-bold hover:underline">{copy.back}</Link>
           </p>
         </div>
       </motion.div>

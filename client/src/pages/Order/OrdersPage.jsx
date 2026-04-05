@@ -4,9 +4,35 @@ import { FiPackage, FiCalendar, FiDollarSign, FiClock, FiChevronRight, FiCheckCi
 import useOrderStore from '../../stores/orderStore';
 import { Link } from 'react-router-dom';
 import ModelKitImage from '../../components/shared/ModelKitImage';
+import { useI18n } from '../../i18n/I18nProvider';
+import { normalizeLocaleCopy } from '../../i18n/normalizeLocaleCopy';
 
 const OrdersPage = () => {
+  const { locale } = useI18n();
   const { orders, fetchOrders, loading } = useOrderStore();
+  const copy = normalizeLocaleCopy(locale === 'vi'
+    ? {
+      loading: 'Đang tải nhật ký đơn hàng...',
+      title: 'NHẬT KÝ ĐƠN HÀNG',
+      subtitle: 'Đã đồng bộ với trung tâm điều phối',
+      total: 'Tổng đơn hàng',
+      emptyTitle: 'Chưa có đơn hàng nào',
+      emptyDescription: 'Hãy bắt đầu đơn hàng đầu tiên của bạn từ cửa hàng.',
+      openShop: 'VÀO CỬA HÀNG',
+      power: 'Giá trị đơn',
+      viewDetails: 'Xem chi tiết',
+    }
+    : {
+      loading: 'Retrieving Mission Logs...',
+      title: 'Mission Logs',
+      subtitle: 'Synchronized with Command Center',
+      total: 'Total Deployments',
+      emptyTitle: 'No Registered Deployments',
+      emptyDescription: 'Start your first mission today from the shop.',
+      openShop: 'ACCESS TACTICAL SHOP',
+      power: 'Power Consumed',
+      viewDetails: 'View Details',
+    });
 
   useEffect(() => {
     fetchOrders();
@@ -23,11 +49,25 @@ const OrdersPage = () => {
     return colors[status] || 'text-gray-400 bg-gray-400/10 border-gray-400/30';
   };
 
+  const getStatusLabel = (status) => {
+    if (locale !== 'vi') return status;
+
+    const labels = {
+      PENDING: 'Chờ xác nhận',
+      PROCESSING: 'Đang xử lý',
+      SHIPPED: 'Đang giao',
+      DELIVERED: 'Đã giao',
+      CANCELLED: 'Đã hủy',
+    };
+
+    return labels[status] || status;
+  };
+
   if (loading && orders.length === 0) {
     return (
       <div className="min-h-screen pt-32 flex flex-col items-center justify-center bg-gundam-bg-primary gap-4">
         <div className="w-12 h-12 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin" />
-        <span className="font-orbitron text-xs tracking-widest text-cyan-500 opacity-50 uppercase italic">Retrieving Mission Logs...</span>
+        <span className="font-orbitron text-xs tracking-widest text-cyan-500 opacity-50 uppercase italic">{copy.loading}</span>
       </div>
     );
   }
@@ -38,22 +78,22 @@ const OrdersPage = () => {
         {/* Page Header */}
         <div className="mb-12 border-b border-white/10 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-             <h1 className="text-4xl font-black font-orbitron tracking-tighter text-white uppercase italic">Mission Logs</h1>
+             <h1 className="text-4xl font-black font-orbitron tracking-tighter text-white uppercase italic">{copy.title}</h1>
              <p className="text-gray-500 font-rajdhani text-sm uppercase tracking-[0.4em] mt-2 italic flex items-center gap-2">
-               <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-ping" /> Synchronized with Command Center
+               <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-ping" /> {copy.subtitle}
              </p>
           </div>
           <div className="text-[10px] font-mono text-gray-500 uppercase tracking-widest bg-white/5 px-4 py-2 rounded-lg border border-white/5">
-             Total Deployments: {String(orders.length).padStart(2, '0')}
+             {copy.total}: {String(orders.length).padStart(2, '0')}
           </div>
         </div>
 
         {orders.length === 0 ? (
           <div className="py-32 flex flex-col items-center justify-center text-center glass-card border-dashed border-cyan-500/20">
             <FiPackage size={64} className="text-gray-600 mb-6 opacity-30" />
-            <h2 className="text-xl font-orbitron font-bold text-gray-500 uppercase tracking-widest">No Registered Deployments</h2>
-            <p className="mt-4 text-gray-600 font-rajdhani mb-8">Start your first mission today from the shop.</p>
-            <Link to="/shop" className="btn btn-primary px-8">ACCESS TACTICAL SHOP</Link>
+            <h2 className="text-xl font-orbitron font-bold text-gray-500 uppercase tracking-widest">{copy.emptyTitle}</h2>
+            <p className="mt-4 text-gray-600 font-rajdhani mb-8">{copy.emptyDescription}</p>
+            <Link to="/shop" className="btn btn-primary px-8">{copy.openShop}</Link>
           </div>
         ) : (
           <div className="space-y-6">
@@ -72,7 +112,7 @@ const OrdersPage = () => {
                   {/* Status & ID */}
                   <div className="lg:w-1/4 space-y-3">
                      <div className={`inline-flex items-center gap-2 px-3 py-1 rounded text-[10px] font-orbitron border font-bold uppercase tracking-[0.2em] ${getStatusColor(order.status)}`}>
-                        {order.status}
+                        {getStatusLabel(order.status)}
                      </div>
                      <div className="text-xs font-mono text-gray-400">
                         REF: <span className="text-cyan-400 uppercase">{order._id.slice(-12)}</span>
@@ -106,11 +146,11 @@ const OrdersPage = () => {
                   {/* Summary & Price */}
                   <div className="lg:w-1/4 border-t lg:border-t-0 lg:border-l border-white/5 pt-6 lg:pt-0 lg:pl-8 flex flex-row lg:flex-col justify-between lg:items-end gap-4">
                      <div>
-                        <div className="text-[10px] text-gray-500 uppercase tracking-widest font-orbitron italic mb-1 text-right">Power Consumed</div>
+                        <div className="text-[10px] text-gray-500 uppercase tracking-widest font-orbitron italic mb-1 text-right">{copy.power}</div>
                         <div className="text-2xl font-mono font-bold text-white tracking-widest">${order.totalAmount.toLocaleString()}</div>
                      </div>
                      <Link to={`/orders/${order._id}`} className="px-6 py-2 border border-cyan-500/30 text-cyan-400 text-[10px] uppercase font-orbitron tracking-widest rounded hover:bg-cyan-500 hover:text-black transition-all group flex items-center gap-2">
-                        View Details <FiChevronRight className="group-hover:translate-x-1 transition-transform" />
+                        {copy.viewDetails} <FiChevronRight className="group-hover:translate-x-1 transition-transform" />
                      </Link>
                   </div>
                 </div>

@@ -3,8 +3,11 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Lock, ArrowRight, AlertCircle, ShieldCheck } from 'lucide-react'
 import authService from '../../services/authService'
+import { useI18n } from '../../i18n/I18nProvider'
+import { normalizeLocaleCopy } from '../../i18n/normalizeLocaleCopy'
 
 const ResetPasswordPage = () => {
+  const { locale } = useI18n()
   const [searchParams] = useSearchParams()
   const tokenFromQuery = useMemo(() => searchParams.get('token') || '', [searchParams])
   const [token, setToken] = useState(tokenFromQuery)
@@ -13,6 +16,31 @@ const ResetPasswordPage = () => {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
+  const copy = normalizeLocaleCopy(locale === 'vi'
+    ? {
+      error: 'Không thể đặt lại mật khẩu.',
+      title: 'KHÓA TRUY CẬP MỚI',
+      subtitle: 'Hoàn tất quy trình đặt lại mật khẩu',
+      token: 'Mã xác nhận',
+      newPassword: 'Mật khẩu mới',
+      confirm: 'Xác nhận mật khẩu',
+      updating: 'ĐANG CẬP NHẬT...',
+      submit: 'ĐẶT LẠI MẬT KHẨU',
+      back: 'Quay lại',
+      login: 'đăng nhập',
+    }
+    : {
+      error: 'Reset execution failed.',
+      title: 'NEW ACCESS KEY',
+      subtitle: 'Finalize password reset',
+      token: 'Reset Token',
+      newPassword: 'New Password',
+      confirm: 'Confirm Password',
+      updating: 'UPDATING...',
+      submit: 'RESET PASSWORD',
+      back: 'Back to',
+      login: 'login',
+    })
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -26,7 +54,7 @@ const ResetPasswordPage = () => {
       setNewPassword('')
       setConfirmNewPassword('')
     } catch (error) {
-      setError(error.response?.data?.message || 'Reset execution failed.')
+      setError(error.response?.data?.message || copy.error)
     } finally {
       setLoading(false)
     }
@@ -41,8 +69,8 @@ const ResetPasswordPage = () => {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gundam-red/10 border border-gundam-red/30 mb-6 shadow-red-glow">
             <ShieldCheck size={30} className="text-gundam-red" />
           </div>
-          <h1 className="text-3xl font-orbitron font-black tracking-widest text-gundam-text-primary">NEW ACCESS KEY</h1>
-          <p className="text-gundam-text-secondary mt-2 font-rajdhani uppercase tracking-widest text-xs">Finalize password reset</p>
+          <h1 className="text-3xl font-orbitron font-black tracking-widest text-gundam-text-primary">{copy.title}</h1>
+          <p className="text-gundam-text-secondary mt-2 font-rajdhani uppercase tracking-widest text-xs">{copy.subtitle}</p>
         </div>
 
         <div className="glass-card p-8 border-gundam-border/50">
@@ -60,18 +88,18 @@ const ResetPasswordPage = () => {
               </div>
             ) : null}
 
-            <AuthField label="Reset Token" value={token} onChange={setToken} />
-            <PasswordField label="New Password" value={newPassword} onChange={setNewPassword} />
-            <PasswordField label="Confirm Password" value={confirmNewPassword} onChange={setConfirmNewPassword} />
+            <AuthField label={copy.token} value={token} onChange={setToken} />
+            <PasswordField label={copy.newPassword} value={newPassword} onChange={setNewPassword} />
+            <PasswordField label={copy.confirm} value={confirmNewPassword} onChange={setConfirmNewPassword} />
 
             <button type="submit" disabled={loading} className="btn btn-primary w-full py-4 flex items-center justify-center gap-2 border-none">
-              {loading ? 'UPDATING...' : 'RESET PASSWORD'}
+              {loading ? copy.updating : copy.submit}
               <ArrowRight size={18} />
             </button>
           </form>
 
           <p className="text-center mt-8 text-gundam-text-secondary font-rajdhani text-sm">
-            Back to <Link to="/login" className="text-gundam-cyan font-bold hover:underline">login</Link>
+            {copy.back} <Link to="/login" className="text-gundam-cyan font-bold hover:underline">{copy.login}</Link>
           </p>
         </div>
       </motion.div>

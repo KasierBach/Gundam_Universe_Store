@@ -6,8 +6,11 @@ import chatService from '../../services/chatService';
 import { initiateSocketConnection, disconnectSocket, joinConversation, leaveConversation } from '../../utils/socket';
 import useAuthStore from '../../stores/authStore';
 import useUiStore from '../../stores/uiStore';
+import { useI18n } from '../../i18n/I18nProvider';
+import { normalizeLocaleCopy } from '../../i18n/normalizeLocaleCopy';
 
 const ChatConsole = () => {
+  const { locale } = useI18n();
   const { user } = useAuthStore();
   const { chatDrafts, setChatDraft, clearChatDraft, lastConversationId, setLastConversationId } = useUiStore();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -20,6 +23,29 @@ const ChatConsole = () => {
   const scrollRef = useRef(null);
   const socketRef = useRef(null);
   const getCounterparty = (conversation) => conversation?.participants?.find((participant) => participant._id !== user?._id) || conversation?.participants?.[0];
+  const copy = normalizeLocaleCopy(locale === 'vi'
+    ? {
+      title: 'Liên lạc',
+      subtitle: 'Kênh bảo mật đã thiết lập',
+      loading: 'Đang tải hội thoại...',
+      unknownPilot: 'Phi công chưa xác định',
+      terminate: 'Kết thúc phiên liên lạc',
+      inputPlaceholder: 'Nhập tin nhắn tại đây...',
+      send: 'Gửi',
+      waiting: 'Đang chờ tín hiệu liên lạc',
+      incomingSignal: 'Tín hiệu đến',
+    }
+    : {
+      title: 'Communication',
+      subtitle: 'Secure Link Established',
+      loading: 'Loading channels...',
+      unknownPilot: 'Unknown Pilot',
+      terminate: 'Terminate Mission',
+      inputPlaceholder: 'Input your message here...',
+      send: 'Send',
+      waiting: 'Waiting for communication signal',
+      incomingSignal: 'Incoming Signal',
+    });
 
   useEffect(() => {
     // 1. Initialize Socket
@@ -42,7 +68,7 @@ const ChatConsole = () => {
     // 3. Setup global notification listener
     socketRef.current?.on('new_message_notification', (notif) => {
       // In a real app, show a toast or update conversation list
-      console.log('Incoming Signal:', notif);
+      console.log(copy.incomingSignal, notif);
       // Refresh conversation list to show last message
       fetchConversations();
     });
@@ -131,12 +157,12 @@ const ChatConsole = () => {
           {/* Sidebar: Conversations */}
           <div className={`${showConversationList || !activeChat ? 'flex' : 'hidden'} md:flex w-full md:w-80 md:min-w-80 border-r border-gundam-cyan/10 flex-col bg-black/40`}>
              <div className="p-6 border-b border-gundam-cyan/10">
-                <h2 className="text-xl font-orbitron text-gundam-cyan glow-text tracking-widest uppercase">Communication</h2>
-                <div className="text-[10px] text-gundam-text-secondary mt-1 uppercase font-orbitron tracking-tighter">Secure Link Established</div>
+                <h2 className="text-xl font-orbitron text-gundam-cyan glow-text tracking-widest uppercase">{copy.title}</h2>
+                <div className="text-[10px] text-gundam-text-secondary mt-1 uppercase font-orbitron tracking-tighter">{copy.subtitle}</div>
              </div>
              <div className="flex-1 overflow-y-auto custom-scrollbar">
                 {loading ? (
-                  <div className="p-6 text-center text-gundam-cyan font-orbitron text-xs uppercase tracking-widest">Loading channels...</div>
+                  <div className="p-6 text-center text-gundam-cyan font-orbitron text-xs uppercase tracking-widest">{copy.loading}</div>
                 ) : conversations.map((conv) => {
                   const counterparty = getCounterparty(conv);
 
@@ -157,7 +183,7 @@ const ChatConsole = () => {
                         </div>
                         <div className="flex-1 min-w-0">
                            <div className="flex justify-between items-center mb-1">
-                              <span className="text-white font-bold text-sm truncate">{counterparty?.displayName || 'Unknown Pilot'}</span>
+                              <span className="text-white font-bold text-sm truncate">{counterparty?.displayName || copy.unknownPilot}</span>
                               <span className="text-[9px] text-gundam-text-secondary font-orbitron">12:45</span>
                            </div>
                            <p className="text-xs text-gundam-text-secondary truncate">{conv.lastMessage?.text}</p>
@@ -185,11 +211,11 @@ const ChatConsole = () => {
                          </button>
                          <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]"></div>
                          <span className="text-white font-orbitron uppercase tracking-widest text-sm sm:text-base">
-                           {getCounterparty(activeChat)?.displayName || 'Unknown Pilot'}
+                           {getCounterparty(activeChat)?.displayName || copy.unknownPilot}
                          </span>
                       </div>
                       <div className="flex gap-4">
-                         <button className="text-gundam-cyan text-[10px] font-orbitron uppercase tracking-widest hover:text-white transition-colors hidden sm:inline-flex">Terminate Mission</button>
+                         <button className="text-gundam-cyan text-[10px] font-orbitron uppercase tracking-widest hover:text-white transition-colors hidden sm:inline-flex">{copy.terminate}</button>
                       </div>
                    </div>
 
@@ -220,7 +246,7 @@ const ChatConsole = () => {
                       <div className="flex flex-col sm:flex-row gap-3 relative">
                          <input 
                             className="flex-1 bg-gundam-dark-surface border border-gundam-cyan/30 p-4 text-sm text-white focus:border-gundam-cyan outline-none transition-all rounded-lg"
-                            placeholder="Input your message here..."
+                            placeholder={copy.inputPlaceholder}
                              value={newMessage}
                             onChange={(e) => {
                               setNewMessage(e.target.value)
@@ -233,7 +259,7 @@ const ChatConsole = () => {
                             type="submit"
                             className="px-8 py-4 sm:py-0 bg-gundam-cyan text-black font-orbitron font-bold uppercase tracking-widest hover:bg-white transition-all rounded-lg shadow-[0_0_15px_rgba(0,243,255,0.3)]"
                          >
-                            Send
+                            {copy.send}
                          </button>
                       </div>
                    </form>
@@ -249,7 +275,7 @@ const ChatConsole = () => {
                    <div className="w-16 h-16 border-2 border-gundam-cyan/20 rounded-full flex items-center justify-center mb-4">
                       <span className="w-8 h-8 border border-gundam-cyan/40 rounded-full animate-ping"></span>
                    </div>
-                   <p className="font-orbitron uppercase tracking-[0.3em] text-xs">Waiting for communication signal</p>
+                   <p className="font-orbitron uppercase tracking-[0.3em] text-xs">{copy.waiting}</p>
                 </div>
              )}
           </div>

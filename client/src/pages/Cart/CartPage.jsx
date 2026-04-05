@@ -4,8 +4,11 @@ import { motion } from 'framer-motion'
 import { ArrowRight, Minus, Plus, ShieldAlert, ShoppingCart, Trash2 } from 'lucide-react'
 import useCartStore from '../../stores/cartStore'
 import ModelKitImage from '../../components/shared/ModelKitImage'
+import { useI18n } from '../../i18n/I18nProvider'
+import { normalizeLocaleCopy } from '../../i18n/normalizeLocaleCopy'
 
 const CartPage = () => {
+  const { locale } = useI18n()
   const {
     items,
     totalItems,
@@ -16,6 +19,43 @@ const CartPage = () => {
     removeFromCart,
     clearCart,
   } = useCartStore()
+  const copy = normalizeLocaleCopy(locale === 'vi'
+    ? {
+      title: 'Giỏ hàng',
+      subtitle: 'Kho vật phẩm đang chờ xác nhận',
+      unitsQueued: 'Sản phẩm đã chọn',
+      emptyTitle: 'Chưa có sản phẩm trong giỏ',
+      emptyDescription: 'Hãy thêm model kit tiếp theo từ kho sản phẩm.',
+      returnShop: 'Quay lại cửa hàng',
+      remove: 'Xóa',
+      unitTotal: 'Thành tiền',
+      summary: 'Tóm tắt đơn hàng',
+      items: 'Số món',
+      shipping: 'Vận chuyển',
+      free: 'Miễn phí',
+      total: 'Tổng cộng',
+      checkout: 'Tiến hành thanh toán',
+      clear: 'Xóa toàn bộ giỏ',
+      notice: 'Sản phẩm chỉ được giữ sau khi thanh toán thành công. Các mẫu hiếm có thể hết hàng trong lúc xác nhận.',
+    }
+    : {
+      title: 'Supply Cart',
+      subtitle: 'Tactical inventory staged for deployment',
+      unitsQueued: 'Units queued',
+      emptyTitle: 'No units in queue',
+      emptyDescription: 'Load your next mobile suit purchase from the tactical armory.',
+      returnShop: 'Return to shop',
+      remove: 'Remove',
+      unitTotal: 'Unit total',
+      summary: 'Deployment Summary',
+      items: 'Items',
+      shipping: 'Shipping',
+      free: 'Free',
+      total: 'Total Power',
+      checkout: 'Proceed to checkout',
+      clear: 'Clear cart',
+      notice: 'Stock is reserved only after successful checkout. High-rarity units may sell out during pilot confirmation.',
+    })
 
   useEffect(() => {
     fetchCart()
@@ -26,23 +66,23 @@ const CartPage = () => {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 border-b border-gundam-border/20 pb-8">
           <div>
-            <h1 className="text-4xl font-orbitron text-white uppercase tracking-tight">Supply Cart</h1>
+            <h1 className="text-4xl font-orbitron text-white uppercase tracking-tight">{copy.title}</h1>
             <p className="mt-2 text-gundam-text-muted font-rajdhani uppercase tracking-[0.35em] text-xs">
-              Tactical inventory staged for deployment
+              {copy.subtitle}
             </p>
           </div>
           <div className="text-[10px] font-orbitron uppercase tracking-widest text-gundam-cyan">
-            Units queued: {String(totalItems).padStart(2, '0')}
+            {copy.unitsQueued}: {String(totalItems).padStart(2, '0')}
           </div>
         </div>
 
         {items.length === 0 && !loading ? (
           <div className="glass-card border-dashed border-gundam-cyan/20 p-16 text-center">
             <ShoppingCart size={54} className="mx-auto text-gundam-cyan/40 mb-6" />
-            <h2 className="text-2xl font-orbitron text-white uppercase tracking-tight">No units in queue</h2>
-            <p className="mt-3 text-gundam-text-secondary font-rajdhani">Load your next mobile suit purchase from the tactical armory.</p>
+            <h2 className="text-2xl font-orbitron text-white uppercase tracking-tight">{copy.emptyTitle}</h2>
+            <p className="mt-3 text-gundam-text-secondary font-rajdhani">{copy.emptyDescription}</p>
             <Link to="/shop" className="inline-flex items-center gap-2 mt-8 btn btn-primary px-8 py-3">
-              Return to shop <ArrowRight size={16} />
+              {copy.returnShop} <ArrowRight size={16} />
             </Link>
           </div>
         ) : (
@@ -82,7 +122,7 @@ const CartPage = () => {
                           onClick={() => removeFromCart(item.product?._id)}
                           className="inline-flex items-center gap-2 text-gundam-red text-xs font-orbitron uppercase tracking-widest hover:text-white"
                         >
-                          <Trash2 size={14} /> Remove
+                          <Trash2 size={14} /> {copy.remove}
                         </button>
                       </div>
 
@@ -106,7 +146,7 @@ const CartPage = () => {
                         </div>
 
                         <div className="text-right">
-                          <p className="text-[10px] uppercase tracking-widest text-gundam-text-muted">Unit total</p>
+                          <p className="text-[10px] uppercase tracking-widest text-gundam-text-muted">{copy.unitTotal}</p>
                           <p className="text-2xl font-orbitron text-gundam-cyan">
                             ${((item.product?.price || 0) * item.quantity).toLocaleString()}
                           </p>
@@ -119,24 +159,24 @@ const CartPage = () => {
             </div>
 
             <aside className="glass-card border-gundam-border/30 p-6 h-fit sticky top-24">
-              <h2 className="text-lg font-orbitron text-white uppercase tracking-widest">Deployment Summary</h2>
+              <h2 className="text-lg font-orbitron text-white uppercase tracking-widest">{copy.summary}</h2>
               <div className="mt-6 space-y-3 text-sm">
                 <div className="flex justify-between text-gundam-text-secondary uppercase tracking-widest text-[10px]">
-                  <span>Items</span>
+                  <span>{copy.items}</span>
                   <span>{totalItems}</span>
                 </div>
                 <div className="flex justify-between text-gundam-text-secondary uppercase tracking-widest text-[10px]">
-                  <span>Shipping</span>
-                  <span className="text-gundam-emerald">Free</span>
+                  <span>{copy.shipping}</span>
+                  <span className="text-gundam-emerald">{copy.free}</span>
                 </div>
                 <div className="pt-4 border-t border-gundam-border/20 flex justify-between items-end">
-                  <span className="text-white font-orbitron uppercase tracking-widest text-xs">Total Power</span>
+                  <span className="text-white font-orbitron uppercase tracking-widest text-xs">{copy.total}</span>
                   <span className="text-3xl font-orbitron text-gundam-cyan">${totalPrice.toLocaleString()}</span>
                 </div>
               </div>
 
               <Link to="/checkout" className="mt-8 w-full btn btn-primary py-4 flex items-center justify-center gap-2">
-                Proceed to checkout <ArrowRight size={16} />
+                {copy.checkout} <ArrowRight size={16} />
               </Link>
 
               <button
@@ -144,13 +184,13 @@ const CartPage = () => {
                 onClick={clearCart}
                 className="mt-4 w-full py-3 border border-gundam-red/40 text-gundam-red font-orbitron text-xs uppercase tracking-widest hover:bg-gundam-red/10 transition-all rounded-lg"
               >
-                Clear cart
+                {copy.clear}
               </button>
 
               <div className="mt-6 flex items-start gap-3 rounded-lg border border-gundam-amber/20 bg-gundam-amber/5 p-4">
                 <ShieldAlert size={18} className="text-gundam-amber mt-0.5" />
                 <p className="text-xs text-gundam-text-secondary leading-relaxed">
-                  Stock is reserved only after successful checkout. High-rarity units may sell out during pilot confirmation.
+                  {copy.notice}
                 </p>
               </div>
             </aside>

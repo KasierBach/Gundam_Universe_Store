@@ -1,13 +1,30 @@
 import { useEffect, useState } from 'react'
 import { Repeat, ShieldAlert } from 'lucide-react'
 import adminService from '../../services/adminService'
+import { useI18n } from '../../i18n/I18nProvider'
 
 const TRADE_STATUSES = ['open', 'in-negotiation', 'completed', 'closed']
 
 const TradeModerationPage = () => {
+  const { locale } = useI18n()
   const [trades, setTrades] = useState([])
   const [loading, setLoading] = useState(true)
   const [updatingId, setUpdatingId] = useState(null)
+  const copy = locale === 'vi'
+    ? {
+      title: 'Điều phối giao dịch',
+      subtitle: 'Rà soát hoạt động trao đổi trên toàn bộ sàn',
+      loading: 'Đang lập bản đồ tín hiệu giao dịch...',
+      owner: 'Người đăng',
+      unknownPilot: 'Phi công chưa xác định',
+    }
+    : {
+      title: 'Trade Oversight',
+      subtitle: 'Review trade activity across the hub',
+      loading: 'Mapping trade signals...',
+      owner: 'Owner',
+      unknownPilot: 'Unknown Pilot',
+    }
 
   const loadTrades = async () => {
     try {
@@ -35,19 +52,19 @@ const TradeModerationPage = () => {
   return (
     <div className="pt-24 pb-12 px-4 max-w-7xl mx-auto min-h-screen">
       <div className="mb-10">
-        <h1 className="text-3xl font-orbitron text-white uppercase tracking-tighter">Trade Oversight</h1>
-        <p className="text-gundam-text-muted font-rajdhani uppercase tracking-[0.3em] text-xs mt-2">Review trade activity across the hub</p>
+        <h1 className="text-3xl font-orbitron text-white uppercase tracking-tighter">{copy.title}</h1>
+        <p className="text-gundam-text-muted font-rajdhani uppercase tracking-[0.3em] text-xs mt-2">{copy.subtitle}</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {loading ? (
-          <div className="lg:col-span-2 p-10 text-center text-gundam-cyan font-orbitron text-xs uppercase tracking-widest">Mapping trade signals...</div>
+          <div className="lg:col-span-2 p-10 text-center text-gundam-cyan font-orbitron text-xs uppercase tracking-widest">{copy.loading}</div>
         ) : trades.map((trade) => (
           <div key={trade._id} className="glass-card p-6 border-gundam-border/40">
             <div className="flex items-start justify-between gap-4 mb-4">
               <div>
                 <h2 className="text-xl text-white font-orbitron uppercase tracking-tight">{trade.title}</h2>
-                <p className="text-xs text-gundam-text-muted mt-1">Owner: {trade.owner?.displayName || 'Unknown Pilot'}</p>
+                <p className="text-xs text-gundam-text-muted mt-1">{copy.owner}: {trade.owner?.displayName || copy.unknownPilot}</p>
               </div>
               <select
                 value={trade.status}
