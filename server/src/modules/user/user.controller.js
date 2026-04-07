@@ -26,6 +26,13 @@ class UserController extends BaseController {
   });
 
   /** GET /api/users/:id */
+  discoverUsers = this.handler(async (req, res) => {
+    const { q = '', limit = 8 } = req.query;
+    const users = await this.service.discoverUsers(req.user._id, q, Number(limit) || 8);
+    ApiResponse.success(users, 'Discoverable users').send(res);
+  });
+
+  /** GET /api/users/:id */
   getPublicProfile = this.handler(async (req, res) => {
     const user = await this.service.getPublicProfile(req.params.id);
     ApiResponse.success(user, 'User profile').send(res);

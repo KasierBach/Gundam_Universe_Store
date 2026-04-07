@@ -23,6 +23,10 @@ class UserService extends BaseService {
     return publicData;
   }
 
+  async discoverUsers(currentUserId, query, limit = 8) {
+    return this.repository.searchDirectory(query, currentUserId, limit);
+  }
+
   async updateProfile(userId, updateData) {
     const user = await this.repository.updateById(userId, updateData);
     if (!user) throw ApiError.notFound('User not found');

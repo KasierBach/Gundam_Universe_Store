@@ -9,6 +9,7 @@ const router = Router();
 
 // Protected routes
 router.get('/me', authenticate, userController.getMe);
+router.get('/discover', authenticate, userController.discoverUsers);
 router.put('/me', authenticate, validate(updateProfileSchema), userController.updateMe);
 router.put('/me/avatar', authenticate, uploadSingle, userController.updateAvatar);
 

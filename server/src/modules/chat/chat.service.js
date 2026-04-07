@@ -28,12 +28,14 @@ class ChatService {
       return existingConversation;
     }
 
-    return conversationRepository.create({
+    const createdConversation = await conversationRepository.create({
       kind: 'direct',
       participants: participantIds,
       relatedProduct: context.productId || null,
       relatedTradeListing: context.tradeListingId || null,
     });
+
+    return conversationRepository.findDetailedById(createdConversation._id);
   }
 
   /**

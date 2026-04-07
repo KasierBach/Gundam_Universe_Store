@@ -22,6 +22,15 @@ class ConversationRepository extends BaseRepository {
       .populate('relatedTradeListing', 'title');
   }
 
+  async findDetailedById(conversationId) {
+    return this.model.findById(conversationId)
+      .populate('participants', 'displayName avatar role reputation address')
+      .populate('relatedOffer')
+      .populate('relatedProduct', 'name slug images')
+      .populate('relatedTradeListing', 'title')
+      .populate('lastMessage');
+  }
+
   async findUserConversations(userId) {
     return this.model.find({
       participants: userId

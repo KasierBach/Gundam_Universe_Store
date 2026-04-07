@@ -26,6 +26,16 @@ const userService = {
     const response = await api.get(`/users/${userId}`);
     return response.data.data;
   },
+
+  discoverUsers: async (query = '', limit = 8) => {
+    const response = await api.get('/users/discover', {
+      params: {
+        q: query,
+        limit,
+      },
+    });
+    return response.data.data;
+  },
 };
 
 export default userService;

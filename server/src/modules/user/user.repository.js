@@ -48,6 +48,29 @@ class UserRepository extends BaseRepository {
       $set: { refreshTokens: [] },
     });
   }
+
+  async searchDirectory(query = '', currentUserId, limit = 8) {
+    const normalizedQuery = query.trim();
+    const filter = {
+      _id: { $ne: currentUserId },
+      isActive: true,
+    };
+
+    if (normalizedQuery) {
+      filter.$or = [
+        { displayName: { $regex: normalizedQuery, $options: 'i' } },
+        { email: { $regex: normalizedQuery, $options: 'i' } },
+        { role: { $regex: normalizedQuery, $options: 'i' } },
+        { 'address.city': { $regex: normalizedQuery, $options: 'i' } },
+      ];
+    }
+
+    return this.model.find(filter)
+      .select('displayName email avatar role reputation address phone')
+      .sort({ 'reputation.score': -1, displayName: 1 })
+      .limit(limit)
+      .lean();
+  }
 }
 
 module.exports = new UserRepository();
