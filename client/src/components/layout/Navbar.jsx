@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   AlertOctagon,
@@ -29,6 +29,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [isCartOpen, setIsCartOpen] = useState(false)
   const navigate = useNavigate()
+  const location = useLocation()
   const { locale, setLocale, t } = useI18n()
 
   const navLinks = useMemo(
@@ -54,6 +55,11 @@ const Navbar = () => {
       }
     }
   }, [fetchCart, fetchNotifications, isAuthenticated, isLoaded])
+
+  useEffect(() => {
+    setIsOpen(false)
+    setIsCartOpen(false)
+  }, [location.pathname])
 
   return (
     <nav className="fixed left-0 top-0 z-[100] w-full border-b border-gundam-border/30 bg-gundam-bg-primary/80 backdrop-blur-md">
