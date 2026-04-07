@@ -12,12 +12,24 @@ class ConversationRepository extends BaseRepository {
     }).populate('participants', 'displayName avatar');
   }
 
+  async findDirectConversation(participantIds) {
+    return this.model.findOne({
+      kind: 'direct',
+      participants: { $all: participantIds, $size: participantIds.length },
+    })
+      .populate('participants', 'displayName avatar')
+      .populate('relatedProduct', 'name slug images')
+      .populate('relatedTradeListing', 'title');
+  }
+
   async findUserConversations(userId) {
     return this.model.find({
       participants: userId
     })
     .populate('participants', 'displayName avatar')
     .populate('relatedOffer')
+    .populate('relatedProduct', 'name slug images')
+    .populate('relatedTradeListing', 'title')
     .populate('lastMessage')
     .sort({ updatedAt: -1 });
   }

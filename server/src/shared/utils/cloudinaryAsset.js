@@ -5,7 +5,10 @@ const MANAGED_PREFIX = 'gundam-universe/';
 const uploadBufferToCloudinary = (file, options = {}) =>
   new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
-      options,
+      {
+        resource_type: 'auto',
+        ...options,
+      },
       (error, result) => {
         if (error) {
           reject(error);
@@ -16,6 +19,10 @@ const uploadBufferToCloudinary = (file, options = {}) =>
           url: result.secure_url,
           publicId: result.public_id,
           isMain: false,
+          resourceType: result.resource_type,
+          bytes: result.bytes,
+          format: result.format,
+          duration: result.duration || null,
         });
       }
     );

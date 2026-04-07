@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import productService from '../../services/productService'
 import AddToCartButton from '../../components/cart/AddToCartButton'
+import StartConversationButton from '../../components/chat/StartConversationButton'
 import ProductCard from '../../components/product/ProductCard'
 import ReviewSection from '../../components/product/ReviewSection'
 import WishlistButton from '../../components/wishlist/WishlistButton'
@@ -358,12 +359,20 @@ const ProductDetailPage = () => {
                   </div>
 
                   {product.seller?._id ? (
-                    <Link
-                      to={`/seller/${product.seller._id}`}
-                      className="text-[10px] font-orbitron uppercase tracking-[0.24em] text-gundam-cyan hover:underline"
-                    >
-                      {t('product.detail.sellerProfile')}
-                    </Link>
+                    <div className="flex flex-col items-start gap-3 sm:items-end">
+                      <StartConversationButton
+                        recipientId={product.seller._id}
+                        context={{ productId: product._id }}
+                        variant="ghost"
+                        className="w-full sm:w-auto"
+                      />
+                      <Link
+                        to={`/seller/${product.seller._id}`}
+                        className="text-[10px] font-orbitron uppercase tracking-[0.24em] text-gundam-cyan hover:underline"
+                      >
+                        {t('product.detail.sellerProfile')}
+                      </Link>
+                    </div>
                   ) : null}
                 </div>
               </div>

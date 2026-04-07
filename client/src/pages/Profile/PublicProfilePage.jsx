@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { User, MapPin, Phone, Shield } from 'lucide-react'
 import userService from '../../services/userService'
 import { useI18n } from '../../i18n/I18nProvider'
+import StartConversationButton from '../../components/chat/StartConversationButton'
 
 const PublicProfilePage = () => {
   const { locale } = useI18n()
@@ -73,6 +74,16 @@ const PublicProfilePage = () => {
             <div className="mt-6 grid grid-cols-2 gap-4">
               <StatCard label={copy.reputation} value={`${profile.reputation?.score || 0}%`} />
               <StatCard label={copy.ratings} value={profile.reputation?.totalRatings || 0} />
+            </div>
+
+            <div className="mt-6">
+              <StartConversationButton
+                recipientId={profile._id}
+                variant="ghost"
+                className="w-full md:w-auto"
+                label={locale === 'vi' ? 'Nhắn trực tiếp' : 'Send direct message'}
+                selfLabel={locale === 'vi' ? 'Đây là hồ sơ của bạn' : 'This is your profile'}
+              />
             </div>
           </div>
         </div>

@@ -10,6 +10,17 @@ const chatService = {
   },
 
   /**
+   * Create or reopen a direct conversation with another user.
+   */
+  startDirectConversation: async (recipientId, context = {}) => {
+    const response = await api.post('/chat/conversations/direct', {
+      recipientId,
+      ...context,
+    })
+    return response.data.data
+  },
+
+  /**
    * Get messages for a specific conversation
    */
   getMessages: async (conversationId, params) => {
@@ -20,8 +31,15 @@ const chatService = {
   /**
    * Send a message via REST (as fallback or for simple text)
    */
-  sendMessage: async (conversationId, text) => {
-    const response = await api.post(`/chat/conversations/${conversationId}/messages`, { text })
+  sendMessage: async (conversationId, payload) => {
+    const isMultipart = payload instanceof FormData
+    const response = await api.post(`/chat/conversations/${conversationId}/messages`, payload, isMultipart
+      ? {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      : undefined)
     return response.data.data
   },
 

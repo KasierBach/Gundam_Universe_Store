@@ -72,8 +72,10 @@ class TradeService {
 
     // 2. Create a Conversation for the offer
     const conversation = await conversationRepository.create({
+      kind: 'trade_offer',
       participants: [listing.owner, offererId],
       relatedOffer: offer._id,
+      relatedTradeListing: listingId,
     });
 
     // 3. Update the offer with the conversation ID

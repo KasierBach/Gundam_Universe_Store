@@ -3,12 +3,13 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useNavigate, useParams } from 'react-router-dom'
 import tradeService from '../../services/tradeService'
 import useAuthStore from '../../stores/authStore'
+import StartConversationButton from '../../components/chat/StartConversationButton'
 import { useI18n } from '../../i18n/I18nProvider'
 
 const TradeDetailPage = () => {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { t, tv } = useI18n()
+  const { locale, t, tv } = useI18n()
   const { user } = useAuthStore()
 
   const [listing, setListing] = useState(null)
@@ -25,6 +26,7 @@ const TradeDetailPage = () => {
   const [reportReason, setReportReason] = useState('')
   const [reportDetails, setReportDetails] = useState('')
   const [submittingReport, setSubmittingReport] = useState(false)
+  const messageOwnerLabel = locale === 'vi' ? 'Nhắn người đăng' : 'Message owner'
 
   const isOwner = user && listing && user._id === listing.owner._id
 
@@ -201,11 +203,18 @@ const TradeDetailPage = () => {
               <div className="w-full rounded border border-gundam-cyan/30 bg-gundam-cyan/5 p-4 text-center text-xs font-orbitron uppercase tracking-widest italic text-gundam-cyan animate-pulse">
                 {t('trade.detail.waiting')}
               </div>
-            ) : (
-              <>
-                <button
-                  disabled={listing.status !== 'open'}
-                  onClick={() => setShowOfferModal(true)}
+              ) : (
+                <>
+                  <StartConversationButton
+                    recipientId={listing.owner?._id}
+                    context={{ tradeListingId: listing._id }}
+                    variant="ghost"
+                    className="w-full xl:w-auto xl:min-w-[240px]"
+                    label={messageOwnerLabel}
+                  />
+                  <button
+                    disabled={listing.status !== 'open'}
+                    onClick={() => setShowOfferModal(true)}
                   className="flex-1 bg-gundam-cyan py-4 font-orbitron font-bold uppercase tracking-[0.3em] text-black shadow-[0_0_25px_rgba(0,243,255,0.4)] transition-all hover:bg-white disabled:grayscale disabled:opacity-30"
                 >
                   {listing.status === 'open' ? t('trade.detail.initiateProposal') : t('trade.detail.sectorClosed')}

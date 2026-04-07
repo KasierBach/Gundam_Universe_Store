@@ -3,10 +3,19 @@ const asyncHandler = require('../../shared/utils/asyncHandler');
 const ApiResponse = require('../../shared/utils/ApiResponse');
 
 class ChatController {
+  createDirectConversation = asyncHandler(async (req, res) => {
+    const { recipientId, productId, tradeListingId } = req.body;
+    const conversation = await chatService.createDirectConversation(req.user._id, recipientId, {
+      productId,
+      tradeListingId,
+    });
+
+    res.status(201).json(ApiResponse.created(conversation, 'Conversation ready'));
+  });
+
   sendMessage = asyncHandler(async (req, res) => {
-    const { text } = req.body;
     const { conversationId } = req.params;
-    const message = await chatService.sendMessage(conversationId, req.user._id, text);
+    const message = await chatService.sendMessage(conversationId, req.user._id, req.body, req.files || []);
     res.status(201).json(ApiResponse.created(message, 'Message sent successfully'));
   });
 
